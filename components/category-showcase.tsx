@@ -1,122 +1,94 @@
 'use client'
 
 import React from 'react'
-import { motion } from 'framer-motion'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 
-const categories = [
+const primaryServices = [
   {
-    id: 'mens',
-    title: "Men’s Couture",
-    subtitle: 'Bespoke Suiting & Linen Coats',
-    itemCount: '142 Designs',
-    image:
-      'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=1200&auto=format&fit=crop',
-    size: 'col-span-12 md:col-span-6 lg:col-span-6 h-[460px]',
-    accent: 'Tailored Suiting & Velvet Blazers',
+    id: 'tailoring',
+    title: 'Tailoring',
+    subtitle: '24 Hours Express Tailoring & Made to Measure Suits',
+    description:
+      'Bespoke 2-piece & 3-piece suits, tuxedos, ladies suits, safari suits, and 24-hour express alterations by master Dubai tailors.',
+    image: '/homepage-image/Homepage (5).jpg',
+    imageAlt: 'Master Tailoring & Bespoke Suits Dubai',
+    link: '#contact',
   },
   {
-    id: 'womens',
-    title: "Women’s Collection",
-    subtitle: 'Pure Silk Gowns & Resortwear',
-    itemCount: '188 Creations',
-    image:
-      'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=1200&auto=format&fit=crop',
-    size: 'col-span-12 md:col-span-6 lg:col-span-6 h-[460px]',
-    accent: 'Hand-Embroidered Mulberry Silk',
+    id: 'textiles',
+    title: 'Textiles',
+    subtitle: 'High Quality Suiting & Shirting Fabric Sourcing',
+    description:
+      'Premium Italian Super wools, pure cottons, linens, kandura fabrics, and industrial flame-retardant enterprise textiles.',
+    image: '/homepage-image/Homepage (4).jpg',
+    imageAlt: 'Suiting & Shirting Fabrics Dubai',
+    link: '#contact',
   },
   {
-    id: 'uniforms',
-    title: 'Corporate & Hospitality',
-    subtitle: 'Aviation, Hotels & Luxury Enterprise',
-    itemCount: '60+ Hotel & Airline Brands',
-    image:
-      'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?q=80&w=1200&auto=format&fit=crop',
-    size: 'col-span-12 md:col-span-6 lg:col-span-6 h-[460px]',
-    accent: 'Executive Apparel & Concierge Wear',
-  },
-  {
-    id: 'bespoke',
-    title: 'Bespoke Atelier',
-    subtitle: 'Master Tailoring & Custom Fittings',
-    itemCount: 'By Appointment Only',
-    image:
-      'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1200&auto=format&fit=crop',
-    size: 'col-span-12 md:col-span-6 lg:col-span-6 h-[460px]',
-    accent: '3D Laser Measurement & Hand Stitching',
+    id: 'garments',
+    title: 'Garments',
+    subtitle: '100% Cotton Ready Made & Custom Corporate Attire',
+    description:
+      'Corporate polo shirts, executive shirts, coveralls, chef coats, and custom embroidered corporate identity wear.',
+    image: '/homepage-image/Homepage.jpg',
+    imageAlt: '100% Cotton Ready Made Garments Dubai',
+    link: '#contact',
   },
 ]
 
 export function CategoryShowcase() {
   return (
-    <section id="categories" className="py-24 sm:py-32 bg-[#FAFAF8] relative z-10">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-          <div className="space-y-3">
-            <div className="text-[#00A758] text-xs uppercase tracking-[0.3em] font-semibold">
-              THE CURATED REALMS
-            </div>
-            <h2 className="font-cormorant text-4xl sm:text-5xl lg:text-6xl font-light text-[#1A1A1A]">
-              Explore Our <span className="text-[#DE7B3D] italic font-serif">Signature Collections</span>
-            </h2>
-          </div>
-          <p className="text-sm text-[#4B5563] font-sans max-w-md leading-relaxed">
-            From imperial ready-to-wear lines to corporate identity wear for Dubai's premiere palaces and airlines, discover uncompromising elegance.
-          </p>
+    <section id="services" className="bg-[#F7F5F2] py-20 border-b border-[#E5E7EB]">
+      <div className="max-w-[1200px] mx-auto px-6">
+        {/* Header */}
+        <div className="mb-14 text-left space-y-2">
+          <span className="text-xs uppercase tracking-[0.2em] font-inter font-bold text-[#DE7B3D] block">
+            CORE BUSINESS CAPABILITIES
+          </span>
+          <h2 className="font-playfair text-[34px] text-[#1F2A37] font-normal leading-tight">
+            Our Primary Services & Sourcing Solutions
+          </h2>
         </div>
 
-        {/* 4 Large Editorial Cards Grid */}
-        <div className="grid grid-cols-12 gap-6 lg:gap-8">
-          {categories.map((cat, idx) => (
-            <motion.div
-              key={cat.id}
-              initial={{ opacity: 0, y: 35 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.7, delay: idx * 0.15, ease: [0.16, 1, 0.3, 1] }}
-              className={`${cat.size} group relative overflow-hidden rounded-sm cursor-pointer border border-[#E5E7EB] hover:border-[#DE7B3D] transition-all duration-500 shadow-sm hover:shadow-xl`}
+        {/* 3 Service Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+          {primaryServices.map((service) => (
+            <div
+              key={service.id}
+              className="bg-[#FFFFFF] border border-[#E5E7EB] rounded-xs overflow-hidden shadow-xs hover:-translate-y-0.5 transition-all duration-180 flex flex-col justify-between"
             >
-              {/* Background Image with Hover Scale */}
-              <div className="absolute inset-0 z-0">
+              <div className="aspect-[4/3] w-full overflow-hidden bg-[#F7F5F2]">
                 <img
-                  src={cat.image}
-                  alt={cat.title}
-                  className="w-full h-full object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-110 filter brightness-[0.82]"
+                  src={service.image}
+                  alt={service.imageAlt}
+                  className="w-full h-full object-cover object-center"
                 />
               </div>
 
-              {/* Gradient Overlays */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#111827]/90 via-[#111827]/40 to-transparent z-10 transition-opacity duration-500 group-hover:via-[#111827]/60" />
+              <div className="p-6 space-y-3 flex-1 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <h3 className="font-playfair text-2xl text-[#1F2A37] font-normal">
+                    {service.title}
+                  </h3>
+                  <p className="font-inter text-xs font-semibold text-[#DE7B3D] uppercase tracking-wider">
+                    {service.subtitle}
+                  </p>
+                  <p className="font-inter text-sm text-[#6B7280] leading-relaxed pt-1">
+                    {service.description}
+                  </p>
+                </div>
 
-              {/* Top Details: Secondary Green #00A758 Badge */}
-              <div className="absolute top-6 left-6 right-6 z-20 flex justify-between items-center">
-                <span className="text-[11px] uppercase tracking-[0.25em] text-white font-medium bg-[#00A758] px-3 py-1 rounded-full shadow-sm">
-                  {cat.itemCount}
-                </span>
-                <div className="w-10 h-10 rounded-full bg-[#DE7B3D] text-white flex items-center justify-center transition-all duration-500 transform group-hover:scale-110 group-hover:rotate-45 shadow-md">
-                  <ArrowUpRight className="w-5 h-5" />
+                <div className="pt-4 border-t border-[#E5E7EB]">
+                  <a
+                    href={service.link}
+                    className="inline-flex items-center space-x-1.5 text-xs uppercase tracking-wider font-inter font-bold text-[#1F2A37] hover:text-[#DE7B3D] transition-colors"
+                  >
+                    <span>Read More</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </a>
                 </div>
               </div>
-
-              {/* Bottom Text Content */}
-              <div className="absolute bottom-8 left-6 right-6 z-20 space-y-2 transform transition-transform duration-500 group-hover:-translate-y-1">
-                <span className="text-xs font-sans tracking-[0.2em] uppercase text-[#DE7B3D] font-medium block">
-                  {cat.accent}
-                </span>
-                <h3 className="font-cormorant text-3xl sm:text-4xl text-white font-light">
-                  {cat.title}
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-200 font-sans font-light leading-relaxed">
-                  {cat.subtitle}
-                </p>
-
-                {/* Bottom Line Indicator */}
-                <div className="pt-2">
-                  <div className="h-[2px] w-12 bg-[#DE7B3D] group-hover:w-full transition-all duration-700 ease-out" />
-                </div>
-              </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

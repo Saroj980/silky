@@ -2,56 +2,73 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Play, Pause, ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react'
 
 const heroSlides = [
   {
     id: 1,
-    tagline: 'AUTUMN / WINTER 2026 COUTURE',
-    title: 'Elegance Woven in Silk & Gold',
-    subtitle:
-      'Immerse in the pinnacle of Dubai haute couture. Hand-tailored Mulberry silk gowns, bespoke coats, and royal evening attire.',
-    primaryCta: 'Shop Collection',
-    primaryHref: '#new-arrivals',
-    secondaryCta: 'Book Tailoring',
-    secondaryHref: '#story',
-    image:
-      'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2000&auto=format&fit=crop',
-    accentBadge: 'High Couture 2026',
+    tagline: 'Serving Dubai Since 1963',
+    title: 'Bespoke Tailors & Executive Suiting',
+    description:
+      'Handcrafted 2-piece & 3-piece suits, tuxedos, blazer jackets, safari suits, and traditional Kandura tailoring delivered with six decades of Dubai master craftsmanship.',
+    primaryBtnText: 'Get a Quote',
+    primaryBtnHref: '#contact',
+    secondaryBtnText: 'Visit Showroom',
+    secondaryBtnHref: '#contact',
+    image: '/homepage-image/Homepage (9).jpg',
+    imageAlt: 'Bespoke Tailored Suit Dubai - Silky Textiles & Garments LLC',
+    badgeText: 'Deira Master Tailoring Workshop, Dubai',
+    trustBadges: [
+      '24 Hrs Express Tailoring',
+      'Made to Measure Suits',
+      'Italian Super Wool Fabrics',
+      'Delivery Available',
+    ],
   },
   {
     id: 2,
-    tagline: 'DIFC & JUMEIRAH BESPOKE ATELIER',
-    title: 'The Art of Imperial Suiting',
-    subtitle:
-      'Crafted with Super 150s Italian wool, custom hand-stitched lapels, and tailored perfection for GCC executives and gentlemen.',
-    primaryCta: 'Explore Menswear',
-    primaryHref: '#categories',
-    secondaryCta: 'Reserve Private Fitting',
-    secondaryHref: '#story',
-    image:
-      'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=2000&auto=format&fit=crop',
-    accentBadge: 'Master Suiting',
+    tagline: 'Enterprise & Institutional Supply',
+    title: 'Corporate & Hotel Uniform Solutions',
+    description:
+      'Turnkey uniform solutions for Dubai hotels, corporate firms, medical clinics, construction teams, and retail chains with custom logo embroidery.',
+    primaryBtnText: 'Request Bulk Pricing',
+    primaryBtnHref: '#contact',
+    secondaryBtnText: 'View Work',
+    secondaryBtnHref: '#work',
+    image: '/homepage-image/Homepage (11).jpg',
+    imageAlt: 'Corporate & Hotel Uniform Solutions Dubai',
+    badgeText: 'Corporate Uniform Manufacturing, Dubai',
+    trustBadges: [
+      'Bulk Uniform Orders',
+      'Embroidery & Printing',
+      'Industry Workwear',
+      'UAE Doorstep Delivery',
+    ],
   },
   {
     id: 3,
-    tagline: 'EXECUTIVE UNIFORMS & HOSPITALITY',
-    title: 'Distinguished Uniform Identity',
-    subtitle:
-      'Designing bespoke apparel for Dubai’s finest 5-star hotels, luxury aviation fleets, and prestigious corporate houses since 1963.',
-    primaryCta: 'Uniform Catalogue',
-    primaryHref: '#categories',
-    secondaryCta: 'Request Corporate Pitch',
-    secondaryHref: '#newsletter',
-    image:
-      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=2000&auto=format&fit=crop',
-    accentBadge: 'Corporate Elite',
+    tagline: 'Premium Fabric Sourcing',
+    title: 'High Quality Suiting & Shirting Textiles',
+    description:
+      'Direct importer and distributor of Italian Super 150s wools, 100% Egyptian cottons, linens, and flame-retardant industrial textiles.',
+    primaryBtnText: 'Explore Fabrics',
+    primaryBtnHref: '#services',
+    secondaryBtnText: 'Contact Sourcing',
+    secondaryBtnHref: '#contact',
+    image: '/homepage-image/Homepage (8).jpg',
+    imageAlt: 'High Quality Suiting & Shirting Textiles Dubai',
+    badgeText: 'Textile Fabric Sourcing & Wholesale, Dubai',
+    trustBadges: [
+      'Italian Super Wools',
+      '100% Pure Cotton',
+      'Flame-Retardant Fabric',
+      'Deira Creek Showroom',
+    ],
   },
 ]
 
 export function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0)
-  const [isPlaying, setIsPlaying] = useState(true)
 
   const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
@@ -61,175 +78,141 @@ export function Hero() {
     setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)
   }, [])
 
+  // Auto-scroll every 5 seconds
   useEffect(() => {
-    if (!isPlaying) return
     const timer = setInterval(() => {
       nextSlide()
-    }, 5500)
+    }, 5000)
     return () => clearInterval(timer)
-  }, [isPlaying, nextSlide])
+  }, [nextSlide])
 
   const slide = heroSlides[currentSlide]
 
   return (
-    <section className="relative w-full h-screen min-h-[750px] overflow-hidden bg-[#111827] flex items-center justify-center">
-      {/* Background Slideshow with Ken Burns Effect */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={slide.id}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 1.2, ease: [0.25, 1, 0.5, 1] }}
-          className="absolute inset-0 z-0"
-        >
-          {/* Ken Burns Zoom Effect */}
-          <motion.div
-            initial={{ scale: 1.0 }}
-            animate={{ scale: 1.1 }}
-            transition={{ duration: 7, ease: 'linear' }}
-            className="w-full h-full relative"
-          >
-            <img
-              src={slide.image}
-              alt={slide.title}
-              className="w-full h-full object-cover object-center filter brightness-[0.68] contrast-[1.08]"
-            />
-          </motion.div>
+    <section className="bg-[#F7F5F2] pt-24 sm:pt-36 pb-16 sm:pb-20 min-h-[80vh] flex items-center border-b border-[#E5E7EB] relative overflow-hidden">
+      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 w-full relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-14 items-center">
+          
+          {/* Prominent Image Block */}
+          <div className="order-1 lg:order-2 lg:col-span-7 relative">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={slide.id}
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
+                className="relative aspect-[4/3] sm:aspect-[16/10.5] w-full min-h-[280px] sm:min-h-[440px] lg:min-h-[480px] rounded-xs overflow-hidden bg-[#FFFFFF] border border-[#E5E7EB] shadow-xl"
+              >
+                <img
+                  src={slide.image}
+                  alt={slide.imageAlt}
+                  className="w-full h-full object-cover object-center filter contrast-[1.03] brightness-[0.98]"
+                  style={{ imageRendering: '-webkit-optimize-contrast' }}
+                />
+                
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1F2A37]/85 via-transparent to-transparent pointer-events-none" />
 
-          {/* Warm Subtle Overlay rgba(222,123,61,0.08) & Dark Gradients */}
-          <div className="absolute inset-0 bg-[rgba(222,123,61,0.08)] pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#111827] via-[#111827]/40 to-[#111827]/60" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#111827]/80 via-[#111827]/40 to-transparent" />
-        </motion.div>
-      </AnimatePresence>
+                <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 bg-[#1F2A37]/90 text-white text-[11px] sm:text-sm font-inter font-medium px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-xs backdrop-blur-xs shadow-md max-w-[90%] truncate">
+                  {slide.badgeText}
+                </div>
+              </motion.div>
+            </AnimatePresence>
 
-      {/* Main Editorial Content Container */}
-      <div className="relative z-20 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 w-full pt-20 sm:pt-28">
-        <div className="max-w-3xl">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={slide.id}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="space-y-6 sm:space-y-8"
-            >
-              {/* Badge & Tagline: Secondary Green #00A758 Badge */}
-              <div className="flex items-center space-x-3">
-                <span className="px-3.5 py-1 bg-[#00A758]/20 border border-[#00A758]/40 text-[#00A758] text-[10px] sm:text-xs font-semibold tracking-[0.25em] uppercase rounded-full backdrop-blur-md">
-                  {slide.accentBadge}
-                </span>
-                <span className="h-px w-12 bg-[#DE7B3D]/40 hidden sm:inline-block" />
-                <span className="text-xs sm:text-sm font-sans tracking-[0.25em] uppercase text-gray-200">
-                  {slide.tagline}
-                </span>
-              </div>
+            {/* Controls */}
+            <div className="absolute top-1/2 -translate-y-1/2 left-2 right-2 sm:-left-4 sm:-right-4 flex justify-between pointer-events-none z-20">
+              <button
+                onClick={prevSlide}
+                className="pointer-events-auto w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#1F2A37]/90 hover:bg-[#DE7B3D] text-white flex items-center justify-center transition-colors duration-180 shadow-lg"
+                aria-label="Previous Slide"
+              >
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 stroke-[1.5]" />
+              </button>
 
-              {/* Main Headline */}
-              <h1 className="font-cormorant text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-light text-white leading-[1.05] tracking-tight">
-                {slide.title.split(' ').map((word, i) => (
-                  <span
-                    key={i}
-                    className={
-                      word.toLowerCase() === 'silk' || word.toLowerCase() === 'suiting' || word.toLowerCase() === 'uniform'
-                        ? 'text-[#DE7B3D] italic font-serif'
-                        : 'inline-block mr-3'
-                    }
+              <button
+                onClick={nextSlide}
+                className="pointer-events-auto w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#1F2A37]/90 hover:bg-[#DE7B3D] text-white flex items-center justify-center transition-colors duration-180 shadow-lg"
+                aria-label="Next Slide"
+              >
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 stroke-[1.5]" />
+              </button>
+            </div>
+          </div>
+
+          {/* Left Text Block */}
+          <div className="order-2 lg:order-1 lg:col-span-5 space-y-5 sm:space-y-6">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={slide.id}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.25 }}
+                className="space-y-5 sm:space-y-6"
+              >
+                {/* Tagline Badge */}
+                <div className="inline-flex items-center space-x-2 px-3 py-0.5 sm:px-3.5 sm:py-1 bg-[#DE7B3D] text-white rounded-full text-[11px] sm:text-xs font-inter font-semibold shadow-xs">
+                  <span>{slide.tagline}</span>
+                </div>
+
+                {/* Main Heading & Copy */}
+                <div className="space-y-3 sm:space-y-4">
+                  <h1 className="font-playfair text-[28px] sm:text-[40px] lg:text-[44px] text-[#1F2A37] font-normal leading-[1.18] tracking-tight">
+                    {slide.title}
+                  </h1>
+
+                  <p className="font-inter text-xs sm:text-base text-[#2B2B2B] leading-relaxed">
+                    {slide.description}
+                  </p>
+                </div>
+
+                {/* Call To Action Buttons */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
+                  <a
+                    href={slide.primaryBtnHref}
+                    className="h-[46px] sm:h-[48px] px-6 sm:px-8 bg-[#DE7B3D] hover:bg-[#C96A30] text-white font-inter font-semibold text-xs uppercase tracking-widest rounded-xs transition-colors duration-180 flex items-center justify-center gap-2 shadow-sm"
                   >
-                    {word}{' '}
-                  </span>
-                ))}
-              </h1>
+                    <span>{slide.primaryBtnText}</span>
+                    <ArrowUpRight className="w-4 h-4" />
+                  </a>
 
-              {/* Subheadline Description */}
-              <p className="text-sm sm:text-lg text-gray-200 font-sans font-light max-w-2xl leading-relaxed tracking-wide">
-                {slide.subtitle}
-              </p>
+                  <a
+                    href={slide.secondaryBtnHref}
+                    className="h-[46px] sm:h-[48px] px-6 sm:px-8 bg-transparent hover:bg-white text-[#1F2A37] border border-[#1F2A37] font-inter font-semibold text-xs uppercase tracking-widest rounded-xs transition-colors duration-180 flex items-center justify-center"
+                  >
+                    <span>{slide.secondaryBtnText}</span>
+                  </a>
+                </div>
 
-              {/* Action Buttons: Primary #DE7B3D (hover #C96A30), Secondary Border #00A758 (hover #00A758 text white) */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 pt-2 sm:pt-4 max-w-md sm:max-w-none">
-                <a
-                  href={slide.primaryHref}
-                  className="group relative inline-flex items-center justify-center px-8 py-4 bg-[#DE7B3D] hover:bg-[#C96A30] text-white font-sans font-medium text-xs sm:text-sm uppercase tracking-[0.25em] transition-all duration-300 rounded-sm shadow-xl hover:-translate-y-0.5"
-                >
-                  <span>{slide.primaryCta}</span>
-                  <ArrowUpRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-                </a>
+                {/* Trust Badges Bar */}
+                <div className="pt-5 sm:pt-6 border-t border-[#E5E7EB] grid grid-cols-2 gap-2.5 sm:gap-3 text-left">
+                  {slide.trustBadges.map((badge, idx) => (
+                    <div key={idx} className="flex items-center space-x-1.5 text-[11px] sm:text-xs font-inter text-[#2B2B2B]">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#DE7B3D] shrink-0" />
+                      <span>{badge}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            </AnimatePresence>
 
-                <a
-                  href={slide.secondaryHref}
-                  className="group inline-flex items-center justify-center px-8 py-4 bg-transparent hover:bg-[#00A758] text-[#00A758] hover:text-white border border-[#00A758] font-sans font-medium text-xs sm:text-sm uppercase tracking-[0.25em] transition-all duration-300 rounded-sm backdrop-blur-sm shadow-md"
-                >
-                  <span>{slide.secondaryCta}</span>
-                </a>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </div>
+            {/* Pagination Indicators */}
+            <div className="flex items-center space-x-2 pt-2">
+              {heroSlides.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentSlide(index)}
+                  className={`transition-all duration-300 rounded-full ${
+                    currentSlide === index
+                      ? 'w-8 h-2.5 bg-[#DE7B3D]'
+                      : 'w-2.5 h-2.5 bg-gray-300 hover:bg-[#1F2A37]'
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+          </div>
 
-      {/* Controls & Progress Indicator Bar */}
-      <div className="absolute bottom-10 left-0 right-0 z-30 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-6">
-        {/* Animated Progress Indicators */}
-        <div className="flex items-center space-x-3 w-full sm:w-auto">
-          {heroSlides.map((item, index) => (
-            <button
-              key={item.id}
-              onClick={() => setCurrentSlide(index)}
-              className="group py-2 flex items-center focus:outline-none"
-              aria-label={`Go to slide ${index + 1}`}
-            >
-              <div className="relative h-1 w-16 sm:w-24 bg-white/20 rounded-full overflow-hidden transition-all duration-300 group-hover:bg-white/40">
-                {currentSlide === index && (
-                  <motion.div
-                    layoutId="heroProgress"
-                    className="absolute inset-y-0 left-0 bg-[#DE7B3D] rounded-full"
-                    initial={{ width: '0%' }}
-                    animate={{ width: '100%' }}
-                    transition={{
-                      duration: isPlaying ? 5.5 : 0.3,
-                      ease: 'linear',
-                    }}
-                  />
-                )}
-              </div>
-            </button>
-          ))}
-        </div>
-
-        {/* Play/Pause & Arrow Navigation */}
-        <div className="flex items-center space-x-4 bg-[#111827]/70 backdrop-blur-md px-4 py-2 rounded-full border border-gray-700">
-          <span className="text-xs font-mono text-[#DE7B3D] tracking-wider mr-2 font-semibold">
-            0{currentSlide + 1} / 0{heroSlides.length}
-          </span>
-
-          <button
-            onClick={() => setIsPlaying(!isPlaying)}
-            className="p-2 text-gray-300 hover:text-[#DE7B3D] transition-colors"
-            title={isPlaying ? 'Pause auto-slide' : 'Play auto-slide'}
-          >
-            {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
-          </button>
-
-          <div className="h-4 w-px bg-white/20" />
-
-          <button
-            onClick={prevSlide}
-            className="p-2 text-gray-300 hover:text-[#DE7B3D] transition-colors"
-            aria-label="Previous Slide"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-
-          <button
-            onClick={nextSlide}
-            className="p-2 text-gray-300 hover:text-[#DE7B3D] transition-colors"
-            aria-label="Next Slide"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
         </div>
       </div>
     </section>

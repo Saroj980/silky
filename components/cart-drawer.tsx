@@ -35,14 +35,14 @@ export function CartDrawer({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
+        <div className="fixed inset-0 z-50 overflow-hidden font-inter">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/70 backdrop-blur-md"
+            className="fixed inset-0 bg-[#241A12]/40 backdrop-blur-xs"
           />
 
           <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
@@ -50,68 +50,68 @@ export function CartDrawer({
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="w-screen max-w-md bg-[#111827] border-l border-gray-800 text-white shadow-2xl flex flex-col justify-between"
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              className="w-screen max-w-md bg-[#FBF8F3] border-l border-[#E5D9C8] text-[#241A12] shadow-xl flex flex-col justify-between"
             >
               {/* Header */}
-              <div className="p-6 border-b border-gray-800 flex items-center justify-between">
+              <div className="p-6 border-b border-[#E5D9C8] flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <ShoppingBag className="w-5 h-5 text-[#DE7B3D]" />
-                  <h3 className="font-cormorant text-2xl font-light text-white">
-                    Shopping Bag <span className="text-sm font-sans text-[#DE7B3D]">({items.length})</span>
+                  <ShoppingBag className="w-4 h-4 text-[#241A12] stroke-[1.5]" />
+                  <h3 className="font-cormorant text-2xl font-normal text-[#241A12]">
+                    Shopping Bag <span className="text-sm font-inter text-[#5E5145]">({items.length})</span>
                   </h3>
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-2 text-gray-400 hover:text-[#DE7B3D] rounded-full transition-colors"
+                  className="p-2 text-[#5E5145] hover:text-[#241A12] rounded-full transition-colors"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-5 h-5 stroke-[1.5]" />
                 </button>
               </div>
 
-              {/* Cart List */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {/* Cart Items */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-4">
                 {items.length === 0 ? (
-                  <div className="text-center py-16 space-y-4 text-gray-400">
-                    <ShoppingBag className="w-12 h-12 stroke-1 text-[#DE7B3D] mx-auto opacity-50" />
-                    <p className="font-cormorant text-2xl text-white">Your bag is empty</p>
-                    <p className="text-xs font-sans">Discover our new Mulberry silk & suiting arrivals.</p>
+                  <div className="text-center py-16 space-y-3 text-[#5E5145]">
+                    <ShoppingBag className="w-8 h-8 stroke-1 mx-auto opacity-40 text-[#241A12]" />
+                    <p className="font-cormorant text-2xl text-[#241A12]">Your bag is empty</p>
+                    <p className="text-xs font-inter text-[#5E5145]">Explore our lightweight silk pieces designed in the UAE.</p>
                   </div>
                 ) : (
                   items.map((item, idx) => (
                     <div
                       key={idx}
-                      className="p-4 bg-gray-900 border border-gray-800 rounded-xs flex gap-4 items-center"
+                      className="p-4 bg-[#FBF8F3] border border-[#E5D9C8] rounded-[10px] flex gap-4 items-center shadow-2xs"
                     >
                       <img
                         src={item.product.image}
                         alt={item.product.name}
-                        className="w-20 h-24 object-cover rounded-xs border border-gray-800"
+                        className="w-16 h-20 object-cover rounded-[6px] border border-[#E5D9C8]"
                       />
                       <div className="flex-1 space-y-1">
-                        <h4 className="font-cormorant text-lg text-white font-light leading-tight line-clamp-1">
+                        <h4 className="font-cormorant text-base text-[#241A12] font-normal leading-tight line-clamp-1">
                           {item.product.name}
                         </h4>
-                        <div className="text-[11px] text-[#DE7B3D] font-mono">
+                        <div className="text-[11px] text-[#5E5145]">
                           Size: {item.size} | Color: {item.color}
                         </div>
-                        <div className="text-xs font-sans text-[#DE7B3D] font-medium pt-1">
+                        <div className="text-xs font-inter text-[#241A12] font-medium pt-0.5">
                           {item.product.price}
                         </div>
 
                         {/* Quantity Controls */}
                         <div className="flex items-center gap-3 pt-2">
-                          <div className="flex items-center border border-gray-800 rounded-xs bg-[#111827]">
+                          <div className="flex items-center border border-[#E5D9C8] rounded-full bg-[#F4EEE5] px-2 py-0.5">
                             <button
                               onClick={() => onUpdateQuantity(idx, -1)}
-                              className="px-2 py-0.5 text-xs text-white hover:text-[#DE7B3D]"
+                              className="px-1.5 text-xs text-[#241A12] hover:text-[#C8A06B]"
                             >
                               -
                             </button>
-                            <span className="px-2 text-xs font-mono">{item.quantity}</span>
+                            <span className="px-2 text-xs font-inter text-[#241A12]">{item.quantity}</span>
                             <button
                               onClick={() => onUpdateQuantity(idx, 1)}
-                              className="px-2 py-0.5 text-xs text-white hover:text-[#DE7B3D]"
+                              className="px-1.5 text-xs text-[#241A12] hover:text-[#C8A06B]"
                             >
                               +
                             </button>
@@ -119,10 +119,10 @@ export function CartDrawer({
 
                           <button
                             onClick={() => onRemoveItem(idx)}
-                            className="text-gray-500 hover:text-rose-400 p-1"
+                            className="text-[#5E5145] hover:text-rose-600 p-1 transition-colors"
                             title="Remove"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-4 h-4 stroke-[1.5]" />
                           </button>
                         </div>
                       </div>
@@ -131,30 +131,30 @@ export function CartDrawer({
                 )}
               </div>
 
-              {/* Footer Checkout Summary */}
+              {/* Summary & Checkout */}
               {items.length > 0 && (
-                <div className="p-6 border-t border-gray-800 bg-gray-900 space-y-4">
-                  <div className="space-y-2 text-xs font-sans text-gray-300">
+                <div className="p-6 border-t border-[#E5D9C8] bg-[#F4EEE5] space-y-4">
+                  <div className="space-y-2 text-xs font-inter text-[#5E5145]">
                     <div className="flex justify-between">
                       <span>Subtotal</span>
-                      <span className="text-[#DE7B3D] font-medium">Dh {subtotal.toLocaleString()}</span>
+                      <span className="text-[#241A12] font-medium">AED {subtotal.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between text-[11px] text-gray-400">
-                      <span>Express UAE Courier</span>
-                      <span className="text-[#00A758] font-semibold">Complimentary</span>
+                    <div className="flex justify-between text-[11px]">
+                      <span>Free UAE Courier Shipping</span>
+                      <span className="text-[#241A12] font-medium">Complimentary</span>
                     </div>
                   </div>
 
                   <button
-                    onClick={() => alert('Proceeding to VIP Dubai Checkout & Payment Gateway')}
-                    className="w-full py-4 bg-[#DE7B3D] hover:bg-[#C96A30] text-white font-sans font-medium text-xs uppercase tracking-[0.25em] rounded-xs shadow-lg transition-all flex items-center justify-center gap-2"
+                    onClick={() => alert('Proceeding to Secure UAE Checkout')}
+                    className="w-full h-[46px] bg-[#C8A06B] hover:bg-[#B38C58] text-[#FBF8F3] font-inter font-medium text-sm rounded-full transition-colors flex items-center justify-center gap-2 shadow-2xs"
                   >
-                    <span>Proceed to VIP Checkout</span>
+                    <span>Proceed to Checkout</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
 
-                  <div className="flex items-center justify-center gap-2 text-[10px] text-gray-400 font-sans pt-1">
-                    <ShieldCheck className="w-3.5 h-3.5 text-[#00A758]" /> Secure Dubai Encrypted Checkout
+                  <div className="flex items-center justify-center gap-2 text-[10px] text-[#5E5145] pt-1">
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#241A12]" /> Encrypted UAE Secure Checkout
                   </div>
                 </div>
               )}

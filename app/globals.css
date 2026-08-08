@@ -2,52 +2,57 @@
 @import 'tw-animate-css';
 
 @theme inline {
-  --font-sans: var(--font-open-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-open-sans: var(--font-open-sans), sans-serif;
-  --font-serif: var(--font-cormorant), var(--font-playfair), Georgia, 'Times New Roman', serif;
-  --font-playfair: var(--font-playfair), Georgia, serif;
-  --font-cormorant: var(--font-cormorant), Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-inter: var(--font-inter), sans-serif;
+  --font-serif: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-playfair: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-  --color-orange-primary: #DE7B3D;
-  --color-orange-hover: #C96A30;
-  --color-green-secondary: #00A758;
-
-  --color-bg-main: #FAFAF8;
-  --color-bg-alt: #FFFFFF;
-  --color-bg-dark: #111827;
-
-  --color-text-heading: #1A1A1A;
-  --color-text-body: #4B5563;
-  --color-text-muted: #6B7280;
+  --color-silky-bg: #F7F5F2;
+  --color-silky-white: #FFFFFF;
+  --color-silky-navy: #1F2A37;
+  --color-silky-charcoal: #2B2B2B;
+  --color-silky-orange: #DE7B3D;
+  --color-silky-gray: #6B7280;
+  --color-silky-border: #E5E7EB;
 }
 
 :root {
-  color-scheme: light dark;
-  --background: #FAFAF8;
-  --foreground: #1A1A1A;
+  color-scheme: light;
+  --background: #F7F5F2;
+  --foreground: #2B2B2B;
+  --navy: #1F2A37;
   --orange: #DE7B3D;
-  --orange-hover: #C96A30;
-  --green: #00A758;
+  --border: #E5E7EB;
 }
 
 @layer base {
   * {
     border-color: #E5E7EB;
+    font-style: normal !important;
   }
   body {
-    background-color: #FAFAF8;
-    color: #1A1A1A;
-    font-family: var(--font-open-sans), sans-serif;
+    background-color: #F7F5F2;
+    color: #2B2B2B;
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    color: #1F2A37;
+    font-weight: 700;
+    letter-spacing: -0.01em;
   }
 }
 
-/* Custom Luxury Scrollbar Matched to Primary Orange #DE7B3D */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #111827;
+  background: #F7F5F2;
 }
 ::-webkit-scrollbar-thumb {
   background: #DE7B3D;
@@ -57,62 +62,29 @@
   background: #C96A30;
 }
 
-/* Typography Utilities */
-.font-open-sans {
-  font-family: var(--font-open-sans), sans-serif;
-}
-
-.font-cormorant {
-  font-family: var(--font-cormorant), serif;
-}
-
+/* Font Classes - Clean Human Corporate Typography */
 .font-playfair {
-  font-family: var(--font-playfair), serif;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+}
+.font-inter {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
-.tracking-luxury {
-  letter-spacing: 0.28em;
+/* Nav Link Underline in Logo Terracotta Orange #DE7B3D (180ms) */
+.nav-link-underline {
+  position: relative;
 }
-
-.tracking-wide-caps {
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+.nav-link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #DE7B3D;
+  transition: width 180ms ease-out;
 }
-
-/* Glassmorphism Styling for Floating Header */
-.glass-nav {
-  background: rgba(250, 250, 248, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(229, 231, 235, 0.8);
-}
-
-.glass-nav-scrolled {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(222, 123, 61, 0.25);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-}
-
-.glass-drawer {
-  background: rgba(17, 24, 39, 0.96);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-}
-
-/* Luxury Accent Gradients & Borders */
-.orange-gradient-text {
-  background: linear-gradient(135deg, #1A1A1A 0%, #DE7B3D 70%, #C96A30 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.orange-border-glow {
-  transition: all 0.4s ease;
-}
-
-.orange-border-glow:hover {
-  border-color: #DE7B3D;
-  box-shadow: 0 4px 20px rgba(222, 123, 61, 0.12);
+.nav-link-underline:hover::after {
+  width: 100%;
 }
