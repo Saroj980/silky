@@ -26,25 +26,29 @@ const whyPoints = [
   },
 ]
 
-export function WhySilky() {
+export function WhySilky({ data }: { data?: any }) {
+  const label = data?.label || 'DUBAI TAILORING & UNIFORM ADVANTAGE'
+  const title = data?.title || 'Why Leading UAE Businesses Choose Silky'
+  const pointsList = data?.points?.length > 0 ? data.points : whyPoints
+
   return (
     <section id="why-silky" className="bg-[#FFFFFF] py-16 border-b border-[#E5E7EB]">
       <div className="max-w-[1200px] mx-auto px-6 space-y-10">
         {/* Clean Corporate Section Header */}
         <div className="space-y-2">
           <span className="text-xs uppercase tracking-widest font-inter font-bold text-[#DE7B3D] block">
-            DUBAI TAILORING & UNIFORM ADVANTAGE
+            {label}
           </span>
           <h2 className="font-playfair text-[32px] text-[#1F2A37] font-normal leading-tight">
-            Why Leading UAE Businesses Choose Silky
+            {title}
           </h2>
           <div className="w-16 h-0.5 bg-[#DE7B3D] mt-2" />
         </div>
 
         {/* 4 Practical Human-Designed Business Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {whyPoints.map((point, idx) => {
-            const IconComponent = point.icon
+          {pointsList.map((point: any, idx: number) => {
+            const IconComponent = point.icon || Building
             return (
               <div
                 key={idx}

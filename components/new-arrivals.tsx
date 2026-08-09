@@ -12,6 +12,8 @@ const productsData: (Product & { isNew?: boolean })[] = [
     price: 'AED 349',
     fabric: 'Silk Blend',
     isNew: true,
+    rating: 4.9,
+    reviewsCount: 24,
     image:
       'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=800&auto=format&fit=crop',
     hoverImage:
@@ -27,6 +29,8 @@ const productsData: (Product & { isNew?: boolean })[] = [
     category: 'Sets',
     price: 'AED 289',
     fabric: 'Satin Silk',
+    rating: 4.8,
+    reviewsCount: 18,
     image:
       'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=800&auto=format&fit=crop',
     hoverImage:
@@ -42,6 +46,8 @@ const productsData: (Product & { isNew?: boolean })[] = [
     category: 'Kaftans',
     price: 'AED 429',
     fabric: 'Pure Silk',
+    rating: 5.0,
+    reviewsCount: 31,
     image:
       'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800&auto=format&fit=crop',
     hoverImage:
@@ -57,6 +63,8 @@ const productsData: (Product & { isNew?: boolean })[] = [
     category: 'Dresses',
     price: 'AED 319',
     fabric: 'Silk Blend',
+    rating: 4.7,
+    reviewsCount: 15,
     image:
       'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop',
     hoverImage:

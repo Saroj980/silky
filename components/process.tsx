@@ -30,7 +30,13 @@ const steps = [
   },
 ]
 
-export function ProcessSection() {
+export function ProcessSection({ data }: { data?: any }) {
+  const label = data?.label || 'HOW WE WORK'
+  const title = data?.title || 'Our Four-Step Tailoring & Order Process'
+  const btnText = data?.btnText || 'Request Consultation'
+  const btnHref = data?.btnHref || '#contact'
+  const processSteps = data?.steps?.length > 0 ? data.steps : steps
+
   return (
     <section className="bg-[#F7F5F2] py-16 border-b border-[#E5E7EB]">
       <div className="max-w-[1200px] mx-auto px-6 space-y-10">
@@ -38,26 +44,27 @@ export function ProcessSection() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[#E5E7EB] pb-6">
           <div className="space-y-2">
             <span className="text-xs uppercase tracking-widest font-inter font-bold text-[#DE7B3D] block">
-              HOW WE WORK
+              {label}
             </span>
             <h2 className="font-playfair text-[32px] text-[#1F2A37] font-normal leading-tight">
-              Our Four-Step Tailoring & Order Process
+              {title}
             </h2>
           </div>
 
           <a
-            href="#contact"
+            href={btnHref}
             className="h-[42px] px-6 bg-[#DE7B3D] hover:bg-[#C96A30] text-white font-inter font-semibold text-xs uppercase tracking-wider rounded-xs transition-colors inline-flex items-center gap-2 self-start sm:self-auto"
           >
-            <span>Request Consultation</span>
+            <span>{btnText}</span>
             <ArrowRight className="w-4 h-4" />
           </a>
         </div>
 
         {/* 4 Clean Steps Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
-          {steps.map((item, idx) => {
-            const IconComponent = item.icon
+          {processSteps.map((item: any, idx: number) => {
+            const IconComponent = item.icon || MessageSquare
+            const stepNum = item.step || (idx + 1 < 10 ? `0${idx + 1}` : `${idx + 1}`)
             return (
               <div
                 key={idx}
@@ -70,7 +77,7 @@ export function ProcessSection() {
                       <IconComponent className="w-5 h-5 stroke-[1.75]" />
                     </div>
                     <span className="font-mono text-xs font-bold text-[#DE7B3D] uppercase tracking-wider bg-[#FDF6F0] px-2 py-0.5 rounded-xs border border-[#DE7B3D]/20">
-                      STEP {item.step}
+                      STEP {stepNum}
                     </span>
                   </div>
 

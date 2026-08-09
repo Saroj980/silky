@@ -48,7 +48,20 @@ const uniformCategories = [
   },
 ]
 
-export function UniformSolutions() {
+export function UniformSolutions({ data }: { data?: any }) {
+  const label = data?.label || 'ENTERPRISE & INSTITUTIONAL SUPPLY'
+  const title = data?.title || 'Uniform Solutions for Every Industry'
+  const uniforms = data?.uniforms?.length > 0 ? data.uniforms : uniformCategories
+
+  const resolveIcon = (name: string, fallback: any) => {
+    if (!name) return fallback
+    const key = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
+    const icons: any = {
+      Briefcase, Hotel, Stethoscope, HardHat, GraduationCap, Shirt
+    }
+    return icons[key] || fallback
+  }
+
   return (
     <section id="uniforms" className="bg-[#FFFFFF] py-20 border-b border-[#E5E7EB]">
       <div className="max-w-[1200px] mx-auto px-6">
@@ -56,10 +69,10 @@ export function UniformSolutions() {
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div className="space-y-2">
             <span className="text-xs uppercase tracking-[0.2em] font-inter font-bold text-[#DE7B3D] block">
-              ENTERPRISE & INSTITUTIONAL SUPPLY
+              {label}
             </span>
             <h2 className="font-playfair text-[34px] text-[#1F2A37] font-normal leading-tight">
-              Uniform Solutions for Every Industry
+              {title}
             </h2>
           </div>
 
@@ -72,10 +85,10 @@ export function UniformSolutions() {
           </a>
         </div>
 
-        {/* 6 Grid Items */}
+        {/* Grid Items */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {uniformCategories.map((cat, idx) => {
-            const IconComponent = cat.icon
+          {uniforms.map((cat: any, idx: number) => {
+            const IconComponent = resolveIcon(cat.iconName, cat.icon || Briefcase)
             return (
               <div
                 key={idx}
@@ -84,7 +97,7 @@ export function UniformSolutions() {
                 <div className="aspect-[16/9] w-full overflow-hidden bg-[#E5E7EB]">
                   <img
                     src={cat.image}
-                    alt={cat.imageAlt}
+                    alt={cat.imageAlt || cat.title}
                     className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-200"
                   />
                 </div>

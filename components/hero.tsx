@@ -4,79 +4,30 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowUpRight, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react'
 
-const heroSlides = [
-  {
-    id: 1,
-    tagline: 'Serving Dubai Since 1963',
-    title: 'Bespoke Tailors & Executive Suiting',
-    description:
-      'Handcrafted 2-piece & 3-piece suits, tuxedos, blazer jackets, safari suits, and traditional Kandura tailoring delivered with six decades of Dubai master craftsmanship.',
-    primaryBtnText: 'Get a Quote',
-    primaryBtnHref: '#contact',
-    secondaryBtnText: 'Visit Showroom',
-    secondaryBtnHref: '#contact',
-    image: '/homepage-image/Homepage (9).jpg',
-    imageAlt: 'Bespoke Tailored Suit Dubai - Silky Textiles & Garments LLC',
-    badgeText: 'Deira Master Tailoring Workshop, Dubai',
-    trustBadges: [
-      '24 Hrs Express Tailoring',
-      'Made to Measure Suits',
-      'Italian Super Wool Fabrics',
-      'Delivery Available',
-    ],
-  },
-  {
-    id: 2,
-    tagline: 'Enterprise & Institutional Supply',
-    title: 'Corporate & Hotel Uniform Solutions',
-    description:
-      'Turnkey uniform solutions for Dubai hotels, corporate firms, medical clinics, construction teams, and retail chains with custom logo embroidery.',
-    primaryBtnText: 'Request Bulk Pricing',
-    primaryBtnHref: '#contact',
-    secondaryBtnText: 'View Work',
-    secondaryBtnHref: '#work',
-    image: '/homepage-image/Homepage (11).jpg',
-    imageAlt: 'Corporate & Hotel Uniform Solutions Dubai',
-    badgeText: 'Corporate Uniform Manufacturing, Dubai',
-    trustBadges: [
-      'Bulk Uniform Orders',
-      'Embroidery & Printing',
-      'Industry Workwear',
-      'UAE Doorstep Delivery',
-    ],
-  },
-  {
-    id: 3,
-    tagline: 'Premium Fabric Sourcing',
-    title: 'High Quality Suiting & Shirting Textiles',
-    description:
-      'Direct importer and distributor of Italian Super 150s wools, 100% Egyptian cottons, linens, and flame-retardant industrial textiles.',
-    primaryBtnText: 'Explore Fabrics',
-    primaryBtnHref: '#services',
-    secondaryBtnText: 'Contact Sourcing',
-    secondaryBtnHref: '#contact',
-    image: '/homepage-image/Homepage (8).jpg',
-    imageAlt: 'High Quality Suiting & Shirting Textiles Dubai',
-    badgeText: 'Textile Fabric Sourcing & Wholesale, Dubai',
-    trustBadges: [
-      'Italian Super Wools',
-      '100% Pure Cotton',
-      'Flame-Retardant Fabric',
-      'Deira Creek Showroom',
-    ],
-  },
-]
-
-export function Hero() {
+export function Hero({ slides }: { slides: any[] }) {
   const [currentSlide, setCurrentSlide] = useState(0)
 
+  // Filter out slides marked as Hidden or Draft
+  const activeSlides = (slides || []).filter((s: any) => {
+    let status = s.status || 'Active'
+    try {
+      const parsed = typeof s.trustBadges === 'string' ? JSON.parse(s.trustBadges) : s.trustBadges
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && parsed.status) {
+        status = parsed.status
+      }
+    } catch (e) {}
+    return status === 'Active'
+  })
+
+  const slidesToRender = activeSlides.length > 0 ? activeSlides : slides
+
   const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
-  }, [])
+    setCurrentSlide((prev) => (prev + 1) % slidesToRender.length)
+  }, [slidesToRender.length])
 
   const prevSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)
-  }, [])
+    setCurrentSlide((prev) => (prev - 1 + slidesToRender.length) % slidesToRender.length)
+  }, [slidesToRender.length])
 
   // Auto-scroll every 5 seconds
   useEffect(() => {
@@ -86,7 +37,41 @@ export function Hero() {
     return () => clearInterval(timer)
   }, [nextSlide])
 
-  const slide = heroSlides[currentSlide]
+  const rawSlide = slidesToRender?.[currentSlide] || slidesToRender?.[0]
+  if (!rawSlide) return null
+
+  let trustBadges: string[] = []
+  let textColor = rawSlide.textColor || '#1F2A37'
+  let textAlignment = rawSlide.textAlignment || 'Left'
+  let overlayEnabled = rawSlide.overlayEnabled || 'true'
+  let overlayOpacity = rawSlide.overlayOpacity || '60'
+
+  try {
+    const parsed = typeof rawSlide.trustBadges === 'string' ? JSON.parse(rawSlide.trustBadges) : rawSlide.trustBadges
+    if (Array.isArray(parsed)) {
+      trustBadges = parsed
+    } else if (parsed && typeof parsed === 'object') {
+      trustBadges = parsed.badges || []
+      if (parsed.textColor) textColor = parsed.textColor
+      if (parsed.textAlignment) textAlignment = parsed.textAlignment
+      if (parsed.overlayEnabled) overlayEnabled = parsed.overlayEnabled
+      if (parsed.overlayOpacity) overlayOpacity = parsed.overlayOpacity
+    }
+  } catch (e) {}
+
+  const slide = {
+    ...rawSlide,
+    trustBadges,
+    textColor,
+    textAlignment,
+    overlayEnabled,
+    overlayOpacity,
+  }
+
+  const alignmentClass = textAlignment === 'Center' ? 'text-center items-center' : textAlignment === 'Right' ? 'text-right items-end' : 'text-left items-start'
+  const isOverlayOn = overlayEnabled !== 'false'
+  // Soft dim opacity cap (max 60%) so background images are never pitch-black
+  const opacityVal = (parseFloat(overlayOpacity || '40') / 100) * 0.6
 
   return (
     <section className="bg-[#F7F5F2] pt-24 sm:pt-36 pb-16 sm:pb-20 min-h-[80vh] flex items-center border-b border-[#E5E7EB] relative overflow-hidden">
@@ -111,7 +96,12 @@ export function Hero() {
                   style={{ imageRendering: '-webkit-optimize-contrast' }}
                 />
                 
-                <div className="absolute inset-0 bg-gradient-to-t from-[#1F2A37]/85 via-transparent to-transparent pointer-events-none" />
+                {isOverlayOn && (
+                  <div 
+                    className="absolute inset-0 bg-[#1F2A37] pointer-events-none transition-opacity" 
+                    style={{ opacity: opacityVal }}
+                  />
+                )}
 
                 <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 bg-[#1F2A37]/90 text-white text-[11px] sm:text-sm font-inter font-medium px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-xs backdrop-blur-xs shadow-md max-w-[90%] truncate">
                   {slide.badgeText}
@@ -140,7 +130,7 @@ export function Hero() {
           </div>
 
           {/* Left Text Block */}
-          <div className="order-2 lg:order-1 lg:col-span-5 space-y-5 sm:space-y-6">
+          <div className={`order-2 lg:order-1 lg:col-span-5 space-y-5 sm:space-y-6 flex flex-col ${alignmentClass}`}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={slide.id}
@@ -148,7 +138,7 @@ export function Hero() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ duration: 0.25 }}
-                className="space-y-5 sm:space-y-6"
+                className={`space-y-5 sm:space-y-6 flex flex-col ${alignmentClass}`}
               >
                 {/* Tagline Badge */}
                 <div className="inline-flex items-center space-x-2 px-3 py-0.5 sm:px-3.5 sm:py-1 bg-[#DE7B3D] text-white rounded-full text-[11px] sm:text-xs font-inter font-semibold shadow-xs">
@@ -157,11 +147,17 @@ export function Hero() {
 
                 {/* Main Heading & Copy */}
                 <div className="space-y-3 sm:space-y-4">
-                  <h1 className="font-playfair text-[28px] sm:text-[40px] lg:text-[44px] text-[#1F2A37] font-normal leading-[1.18] tracking-tight">
+                  <h1 
+                    className="font-playfair text-[28px] sm:text-[40px] lg:text-[44px] font-normal leading-[1.18] tracking-tight"
+                    style={{ color: textColor }}
+                  >
                     {slide.title}
                   </h1>
 
-                  <p className="font-inter text-xs sm:text-base text-[#2B2B2B] leading-relaxed">
+                  <p 
+                    className="font-inter text-xs sm:text-base leading-relaxed"
+                    style={{ color: textColor === '#1F2A37' ? '#2B2B2B' : textColor }}
+                  >
                     {slide.description}
                   </p>
                 </div>
@@ -186,7 +182,7 @@ export function Hero() {
 
                 {/* Trust Badges Bar */}
                 <div className="pt-5 sm:pt-6 border-t border-[#E5E7EB] grid grid-cols-2 gap-2.5 sm:gap-3 text-left">
-                  {slide.trustBadges.map((badge, idx) => (
+                  {slide.trustBadges?.map((badge: any, idx: number) => (
                     <div key={idx} className="flex items-center space-x-1.5 text-[11px] sm:text-xs font-inter text-[#2B2B2B]">
                       <CheckCircle2 className="w-3.5 h-3.5 text-[#DE7B3D] shrink-0" />
                       <span>{badge}</span>
@@ -197,20 +193,22 @@ export function Hero() {
             </AnimatePresence>
 
             {/* Pagination Indicators */}
-            <div className="flex items-center space-x-2 pt-2">
-              {heroSlides.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentSlide(index)}
-                  className={`transition-all duration-300 rounded-full ${
-                    currentSlide === index
-                      ? 'w-8 h-2.5 bg-[#DE7B3D]'
-                      : 'w-2.5 h-2.5 bg-gray-300 hover:bg-[#1F2A37]'
-                  }`}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
+            {slidesToRender.length > 1 && (
+              <div className="flex items-center space-x-2 pt-2">
+                {slidesToRender.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentSlide(index)}
+                    className={`transition-all duration-300 rounded-full ${
+                      currentSlide === index
+                        ? 'w-8 h-2.5 bg-[#DE7B3D]'
+                        : 'w-2.5 h-2.5 bg-gray-300 hover:bg-[#1F2A37]'
+                    }`}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
         </div>

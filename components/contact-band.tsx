@@ -4,7 +4,14 @@ import React from 'react'
 import { Phone, MapPin, Mail, Navigation } from 'lucide-react'
 import { FaWhatsapp } from 'react-icons/fa6'
 
-export function ContactBand() {
+export function ContactBand({ data }: { data?: any }) {
+  const label = data?.label || 'DUBAI SHOWROOM & HEADQUARTERS'
+  const title = data?.title || 'Visit Our Deira Creek Showroom'
+  const buildingName = data?.buildingName || 'Showroom No. 1, Al Zarooni Building'
+  const address = data?.address || 'Next to HBL, Baniyas Road (D85), Deira Creek, Dubai, UAE'
+  const phone = data?.phone || '+971 4 226 1050 / +971 4 294 6754'
+  const email = data?.email || 'sales@silky.ae'
+
   return (
     <section id="contact" className="bg-[#1F2A37] text-white py-20 border-b border-gray-800">
       <div className="max-w-[1200px] mx-auto px-6">
@@ -14,10 +21,10 @@ export function ContactBand() {
           <div className="lg:col-span-7 space-y-6">
             <div className="space-y-2">
               <span className="text-xs uppercase tracking-[0.2em] font-inter font-bold text-[#DE7B3D] block">
-                DUBAI SHOWROOM & HEADQUARTERS
+                {label}
               </span>
               <h2 className="font-playfair text-[34px] text-white font-normal leading-tight">
-                Visit Our Deira Creek Showroom
+                {title}
               </h2>
             </div>
 
@@ -25,19 +32,19 @@ export function ContactBand() {
               <div className="flex items-start space-x-3">
                 <MapPin className="w-5 h-5 text-[#DE7B3D] shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-semibold text-white">Showroom No. 1, Al Zarooni Building</p>
-                  <p className="text-xs text-gray-400">Next to HBL, Baniyas Road (D85), Deira Creek, Dubai, UAE</p>
+                  <p className="font-semibold text-white">{buildingName}</p>
+                  <p className="text-xs text-gray-400">{address}</p>
                 </div>
               </div>
 
               <div className="flex items-center space-x-3">
                 <Phone className="w-5 h-5 text-[#DE7B3D] shrink-0" />
-                <span>+971 4 226 1050 / +971 4 294 6754</span>
+                <span>{phone}</span>
               </div>
 
               <div className="flex items-center space-x-3">
                 <Mail className="w-5 h-5 text-[#DE7B3D] shrink-0" />
-                <a href="mailto:sales@silky.ae" className="hover:text-[#DE7B3D]">sales@silky.ae</a>
+                <a href={`mailto:${email}`} className="hover:text-[#DE7B3D]">{email}</a>
               </div>
             </div>
           </div>

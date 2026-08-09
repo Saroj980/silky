@@ -38,7 +38,11 @@ const projects = [
   },
 ]
 
-export function OurWork() {
+export function OurWork({ data }: { data?: any }) {
+  const label = data?.label || 'PORTFOLIO & CLIENT PROJECTS'
+  const title = data?.title || 'Our Completed Tailoring & Uniform Projects'
+  const workProjects = data?.projects?.length > 0 ? data.projects : projects
+
   return (
     <section id="work" className="bg-[#F7F5F2] py-20 border-b border-[#E5E7EB]">
       <div className="max-w-[1200px] mx-auto px-6 space-y-12">
@@ -46,10 +50,10 @@ export function OurWork() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
           <div className="space-y-2">
             <span className="text-xs uppercase tracking-[0.2em] font-inter font-bold text-[#DE7B3D] block">
-              PORTFOLIO & CLIENT PROJECTS
+              {label}
             </span>
             <h2 className="font-playfair text-[34px] text-[#1F2A37] font-normal leading-tight">
-              Our Completed Tailoring & Uniform Projects
+              {title}
             </h2>
           </div>
 
@@ -64,7 +68,7 @@ export function OurWork() {
 
         {/* Clean Portfolio Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-          {projects.map((proj, idx) => (
+          {workProjects.map((proj: any, idx: number) => (
             <div
               key={idx}
               className="bg-[#FFFFFF] border border-[#E5E7EB] rounded-xs overflow-hidden shadow-xs hover:shadow-lg transition-all duration-200 group"

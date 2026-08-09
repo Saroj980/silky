@@ -6,9 +6,10 @@ import { FaWhatsapp } from 'react-icons/fa6'
 
 interface SiteHeaderProps {
   onOpenQuoteModal?: () => void
+  config?: any
 }
 
-export function SiteHeader({ onOpenQuoteModal }: SiteHeaderProps) {
+export function SiteHeader({ onOpenQuoteModal, config }: SiteHeaderProps) {
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -20,16 +21,19 @@ export function SiteHeader({ onOpenQuoteModal }: SiteHeaderProps) {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const navLinks = [
+  // Default values just in case config is not passed
+  const navLinks = config?.navLinks ? JSON.parse(config.navLinks) : [
     { label: 'Home', href: '#' },
     { label: 'Tailoring', href: '#services' },
     { label: 'Textiles', href: '#services' },
-    { label: 'Garments', href: '#services' },
-    { label: 'Uniforms', href: '#uniforms' },
-    { label: 'Our Work', href: '#work' },
-    { label: 'About Us', href: '#heritage' },
     { label: 'Contact', href: '#contact' },
   ]
+
+  const logoUrl = config?.logoUrl || '/silky-logo.png'
+  const topBarText = config?.topBarText || 'Serving Dubai Since 1963'
+  const phone = config?.phone || '+971 4 226 1050'
+  const email = config?.email || 'sales@silky.ae'
+  const whatsapp = config?.whatsapp || '97142261050'
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-200">
@@ -39,25 +43,25 @@ export function SiteHeader({ onOpenQuoteModal }: SiteHeaderProps) {
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-1.5 text-[#DE7B3D] font-medium">
               <Clock className="w-3.5 h-3.5" />
-              <span>Serving Dubai Since 1963</span>
+              <span>{topBarText}</span>
             </div>
             <div className="flex items-center space-x-1.5 text-gray-300">
               <Phone className="w-3.5 h-3.5 text-[#DE7B3D]" />
-              <a href="tel:+97142261050" className="hover:text-white transition-colors">
-                +971 4 226 1050
+              <a href={`tel:${phone.replace(/\s+/g, '')}`} className="hover:text-white transition-colors">
+                {phone}
               </a>
             </div>
             <div className="flex items-center space-x-1.5 text-gray-300">
               <Mail className="w-3.5 h-3.5 text-[#DE7B3D]" />
-              <a href="mailto:sales@silky.ae" className="hover:text-white transition-colors">
-                sales@silky.ae
+              <a href={`mailto:${email}`} className="hover:text-white transition-colors">
+                {email}
               </a>
             </div>
           </div>
 
           <div className="flex items-center space-x-4">
             <a
-              href="https://wa.me/97142261050"
+              href={`https://wa.me/${whatsapp}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center space-x-1.5 text-[#25D366] hover:text-white font-medium transition-colors"
@@ -88,8 +92,8 @@ export function SiteHeader({ onOpenQuoteModal }: SiteHeaderProps) {
 
             <a href="#" className="flex flex-col items-start group">
               <img
-                src="/silky-logo.png"
-                alt="Silky Textiles & Garments LLC Dubai"
+                src={logoUrl}
+                alt={config?.logoAlt || 'Silky Logo'}
                 className="h-8 sm:h-12 w-auto object-contain transition-transform duration-200 group-hover:scale-102"
               />
               <span className="hidden sm:block text-[8.5px] uppercase tracking-[0.25em] text-[#DE7B3D] font-inter font-bold mt-0.5 whitespace-nowrap">
@@ -100,7 +104,7 @@ export function SiteHeader({ onOpenQuoteModal }: SiteHeaderProps) {
 
           {/* Center: Navigation Links */}
           <nav className="hidden lg:flex items-center space-x-7">
-            {navLinks.map((link) => (
+            {navLinks.map((link: any) => (
               <a
                 key={link.label}
                 href={link.href}
@@ -129,10 +133,9 @@ export function SiteHeader({ onOpenQuoteModal }: SiteHeaderProps) {
       {mobileMenuOpen && (
         <div className="lg:hidden bg-[#FFFFFF] border-b border-[#E5E7EB] px-6 py-6 space-y-3 shadow-xl max-h-[80vh] overflow-y-auto">
           <div className="text-xs font-inter text-[#DE7B3D] font-bold pb-2 border-b border-gray-100 flex justify-between items-center">
-            <span>SERVING DUBAI SINCE 1963</span>
-            <span className="text-[10px] text-[#6B7280]">BESPOKE TAILORS</span>
+            <span>{topBarText}</span>
           </div>
-          {navLinks.map((link) => (
+          {navLinks.map((link: any) => (
             <a
               key={link.label}
               href={link.href}
@@ -143,8 +146,7 @@ export function SiteHeader({ onOpenQuoteModal }: SiteHeaderProps) {
             </a>
           ))}
           <div className="pt-2 text-xs font-inter text-[#6B7280] space-y-1">
-            <p className="font-semibold text-[#1F2A37]">Showroom Tel: +971 4 226 1050</p>
-            <p>Deira Creek, Dubai, UAE</p>
+            <p className="font-semibold text-[#1F2A37]">Showroom Tel: {phone}</p>
           </div>
         </div>
       )}

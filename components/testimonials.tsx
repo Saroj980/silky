@@ -20,23 +20,27 @@ const b2bTestimonials = [
   },
 ]
 
-export function Testimonials() {
+export function Testimonials({ data }: { data?: any }) {
+  const label = data?.label || 'CLIENT FEEDBACK'
+  const title = data?.title || 'What Our B2B & Corporate Partners Say'
+  const testimonialsList = data?.testimonials?.length > 0 ? data.testimonials : b2bTestimonials
+
   return (
     <section className="bg-[#FFFFFF] py-20 border-b border-[#E5E7EB]">
       <div className="max-w-[1200px] mx-auto px-6">
         {/* Header */}
         <div className="mb-12 text-left space-y-2">
           <span className="text-xs uppercase tracking-[0.2em] font-inter font-bold text-[#DE7B3D] block">
-            CLIENT FEEDBACK
+            {label}
           </span>
           <h2 className="font-playfair text-[34px] text-[#1F2A37] font-normal leading-tight">
-            What Our B2B & Corporate Partners Say
+            {title}
           </h2>
         </div>
 
         {/* 3 Static B2B Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {b2bTestimonials.map((item, idx) => (
+          {testimonialsList.map((item: any, idx: number) => (
             <div
               key={idx}
               className="p-8 bg-[#F7F5F2] border border-[#E5E7EB] rounded-xs space-y-6 flex flex-col justify-between"

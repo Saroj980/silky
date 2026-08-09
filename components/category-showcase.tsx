@@ -36,31 +36,36 @@ const primaryServices = [
   },
 ]
 
-export function CategoryShowcase() {
+export function CategoryShowcase({ data }: { data?: any }) {
+  // Use CMS data if available, fallback to static defaults
+  const label = data?.label || 'CORE BUSINESS CAPABILITIES'
+  const title = data?.title || 'Our Primary Services & Sourcing Solutions'
+  const categories = data?.categories?.length > 0 ? data.categories : primaryServices
+
   return (
     <section id="services" className="bg-[#F7F5F2] py-20 border-b border-[#E5E7EB]">
       <div className="max-w-[1200px] mx-auto px-6">
         {/* Header */}
         <div className="mb-14 text-left space-y-2">
           <span className="text-xs uppercase tracking-[0.2em] font-inter font-bold text-[#DE7B3D] block">
-            CORE BUSINESS CAPABILITIES
+            {label}
           </span>
           <h2 className="font-playfair text-[34px] text-[#1F2A37] font-normal leading-tight">
-            Our Primary Services & Sourcing Solutions
+            {title}
           </h2>
         </div>
 
-        {/* 3 Service Cards */}
+        {/* Service Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-          {primaryServices.map((service) => (
+          {categories.map((service: any, idx: number) => (
             <div
-              key={service.id}
+              key={service.id || idx}
               className="bg-[#FFFFFF] border border-[#E5E7EB] rounded-xs overflow-hidden shadow-xs hover:-translate-y-0.5 transition-all duration-180 flex flex-col justify-between"
             >
               <div className="aspect-[4/3] w-full overflow-hidden bg-[#F7F5F2]">
                 <img
                   src={service.image}
-                  alt={service.imageAlt}
+                  alt={service.imageAlt || service.title}
                   className="w-full h-full object-cover object-center"
                 />
               </div>
@@ -80,7 +85,7 @@ export function CategoryShowcase() {
 
                 <div className="pt-4 border-t border-[#E5E7EB]">
                   <a
-                    href={service.link}
+                    href={service.link || '#contact'}
                     className="inline-flex items-center space-x-1.5 text-xs uppercase tracking-wider font-inter font-bold text-[#1F2A37] hover:text-[#DE7B3D] transition-colors"
                   >
                     <span>Read More</span>
@@ -95,3 +100,4 @@ export function CategoryShowcase() {
     </section>
   )
 }
+

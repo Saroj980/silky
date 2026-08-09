@@ -50,6 +50,7 @@
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: #F7F5F2;
@@ -60,6 +61,15 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #C96A30;
+}
+
+/* Utilities to hide scrollbar */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 /* Font Classes - Clean Human Corporate Typography */
