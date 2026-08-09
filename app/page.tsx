@@ -1,6 +1,9 @@
 import { prisma } from '@/lib/prisma'
 import { HomePageClient } from '@/components/home-page-client'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function HomePage() {
   const slides = await prisma.heroSlide.findMany({
     orderBy: { id: 'asc' }
