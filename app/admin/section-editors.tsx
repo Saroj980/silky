@@ -517,3 +517,422 @@ export function ContactBandEditor({ data, onChange }: any) {
   )
 }
 
+// Product Page Specific Editors
+export function SpecsMatrixEditor({ data, onChange }: any) {
+  const specs = data.specs || []
+
+  const updateSpec = (idx: number, key: string, value: any) => {
+    const newSpecs = [...specs]
+    newSpecs[idx] = { ...newSpecs[idx], [key]: value }
+    onChange('specs', newSpecs)
+  }
+
+  const addSpec = () => {
+    onChange('specs', [...specs, { title: 'New Feature', value: 'Value Detail', desc: 'Description of benefit...' }])
+  }
+
+  const removeSpec = (idx: number) => {
+    onChange('specs', specs.filter((_: any, i: number) => i !== idx))
+  }
+
+  return (
+    <div className="space-y-8">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 space-y-6">
+        <h3 className="font-bold text-slate-800 border-b border-gray-100 pb-4">Section Header</h3>
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Eyebrow Label</label>
+          <input type="text" value={data.label || ''} onChange={(e) => onChange('label', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white" placeholder="WHY CHOOSE OUR PURE COTTON SHIRTS?" />
+        </div>
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Main Heading</label>
+          <input type="text" value={data.title || ''} onChange={(e) => onChange('title', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white" placeholder="Key Fabric Features & Benefits" />
+        </div>
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Subtitle</label>
+          <textarea value={data.subtitle || ''} onChange={(e) => onChange('subtitle', e.target.value)} rows={2} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white" placeholder="Section subtitle description..." />
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-bold text-slate-800 text-lg">Technical Specifications Matrix ({specs.length})</h3>
+          <button onClick={addSpec} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold bg-blue-50 text-blue-600 hover:bg-blue-100">
+            <Plus className="w-4 h-4" /> Add Spec Card
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {specs.map((spec: any, idx: number) => (
+            <div key={idx} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4 relative">
+              <button onClick={() => removeSpec(idx)} className="absolute top-4 right-4 text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 p-2 rounded-lg">
+                <Trash2 className="w-4 h-4" />
+              </button>
+              <h4 className="font-bold text-slate-800 text-sm">Spec #{idx + 1}</h4>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Feature Title</label>
+                  <input type="text" value={spec.title || ''} onChange={(e) => updateSpec(idx, 'title', e.target.value)} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white font-bold" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Value / Metric Callout</label>
+                  <input type="text" value={spec.value || ''} onChange={(e) => updateSpec(idx, 'value', e.target.value)} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Description</label>
+                  <textarea value={spec.desc || ''} onChange={(e) => updateSpec(idx, 'desc', e.target.value)} rows={2} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function FaqEditor({ data, onChange }: any) {
+  const faqs = data.faqs || []
+
+  const updateFaq = (idx: number, key: string, value: any) => {
+    const newFaqs = [...faqs]
+    newFaqs[idx] = { ...newFaqs[idx], [key]: value }
+    onChange('faqs', newFaqs)
+  }
+
+  const addFaq = () => {
+    onChange('faqs', [...faqs, { q: 'New Frequently Asked Question?', a: 'Detailed answer response...' }])
+  }
+
+  const removeFaq = (idx: number) => {
+    onChange('faqs', faqs.filter((_: any, i: number) => i !== idx))
+  }
+
+  return (
+    <div className="space-y-8">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 space-y-6">
+        <h3 className="font-bold text-slate-800 border-b border-gray-100 pb-4">FAQ Header</h3>
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Eyebrow Label</label>
+          <input type="text" value={data.label || ''} onChange={(e) => onChange('label', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white" placeholder="FREQUENTLY ASKED QUESTIONS" />
+        </div>
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Main Heading</label>
+          <input type="text" value={data.title || ''} onChange={(e) => onChange('title', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white" placeholder="Frequently Asked Questions" />
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-bold text-slate-800 text-lg">FAQ Accordion Items ({faqs.length})</h3>
+          <button onClick={addFaq} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold bg-blue-50 text-blue-600 hover:bg-blue-100">
+            <Plus className="w-4 h-4" /> Add FAQ
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          {faqs.map((faq: any, idx: number) => (
+            <div key={idx} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4 relative">
+              <button onClick={() => removeFaq(idx)} className="absolute top-4 right-4 text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 p-2 rounded-lg">
+                <Trash2 className="w-4 h-4" />
+              </button>
+              <h4 className="font-bold text-slate-800 text-sm">FAQ #{idx + 1}</h4>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Question</label>
+                  <input type="text" value={faq.q || ''} onChange={(e) => updateFaq(idx, 'q', e.target.value)} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white font-bold" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Answer</label>
+                  <textarea value={faq.a || ''} onChange={(e) => updateFaq(idx, 'a', e.target.value)} rows={3} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function FabricSwatchesEditor({ data, onChange }: any) {
+  const swatches = data.swatches || []
+
+  const updateSwatch = (idx: number, key: string, value: any) => {
+    const newSwatches = [...swatches]
+    newSwatches[idx] = { ...newSwatches[idx], [key]: value }
+    onChange('swatches', newSwatches)
+  }
+
+  const addSwatch = () => {
+    onChange('swatches', [...swatches, { name: 'New Color Swatch', color: '#DE7B3D', desc: '100% Cotton Color Swatch' }])
+  }
+
+  const removeSwatch = (idx: number) => {
+    onChange('swatches', swatches.filter((_: any, i: number) => i !== idx))
+  }
+
+  return (
+    <div className="space-y-8">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 space-y-6">
+        <h3 className="font-bold text-slate-800 border-b border-gray-100 pb-4">Section Header</h3>
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Eyebrow Label</label>
+          <input type="text" value={data.label || ''} onChange={(e) => onChange('label', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white" placeholder="FABRIC WEAVES & COLOR SELECTION" />
+        </div>
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Main Heading</label>
+          <input type="text" value={data.title || ''} onChange={(e) => onChange('title', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white" placeholder="Explore Available Colors & Weaves" />
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-bold text-slate-800 text-lg">Color Swatches List ({swatches.length})</h3>
+          <button onClick={addSwatch} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold bg-blue-50 text-blue-600 hover:bg-blue-100">
+            <Plus className="w-4 h-4" /> Add Swatch
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {swatches.map((swatch: any, idx: number) => (
+            <div key={idx} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4 relative">
+              <button onClick={() => removeSwatch(idx)} className="absolute top-4 right-4 text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 p-2 rounded-lg">
+                <Trash2 className="w-4 h-4" />
+              </button>
+              <h4 className="font-bold text-slate-800 text-sm">Swatch #{idx + 1}</h4>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <input type="color" value={swatch.color || '#DE7B3D'} onChange={(e) => updateSwatch(idx, 'color', e.target.value)} className="w-10 h-10 rounded-lg cursor-pointer bg-transparent border-0 p-0 shadow-sm" />
+                  <div className="flex-1">
+                    <label className="block text-xs font-bold text-slate-500 mb-1">Color Name</label>
+                    <input type="text" value={swatch.name || ''} onChange={(e) => updateSwatch(idx, 'name', e.target.value)} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white font-bold" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Description / Composition</label>
+                  <input type="text" value={swatch.desc || ''} onChange={(e) => updateSwatch(idx, 'desc', e.target.value)} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function QualityControlEditor({ data, onChange, onUpload }: any) {
+  const steps = data.steps || []
+
+  const updateStep = (idx: number, key: string, value: any) => {
+    const newSteps = [...steps]
+    newSteps[idx] = { ...newSteps[idx], [key]: value }
+    onChange('steps', newSteps)
+  }
+
+  const addStep = () => {
+    onChange('steps', [...steps, { step: steps.length + 1, title: 'New Quality Stage', shortDesc: 'Short summary...', fullDesc: 'Detailed inspection protocol...', metric: '100% Verified', image: '/images/hotel_uniform_luxury.png' }])
+  }
+
+  const removeStep = (idx: number) => {
+    onChange('steps', steps.filter((_: any, i: number) => i !== idx))
+  }
+
+  return (
+    <div className="space-y-8">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 space-y-6">
+        <h3 className="font-bold text-slate-800 border-b border-gray-100 pb-4">Quality Process Header</h3>
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Eyebrow Label</label>
+          <input type="text" value={data.label || ''} onChange={(e) => onChange('label', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white" placeholder="ISO 9001:2015 CERTIFIED MANUFACTURING" />
+        </div>
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Main Heading</label>
+          <input type="text" value={data.title || ''} onChange={(e) => onChange('title', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white" placeholder="4-Step Quality Assurance Process" />
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-bold text-slate-800 text-lg">Process Stages ({steps.length})</h3>
+          <button onClick={addStep} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold bg-blue-50 text-blue-600 hover:bg-blue-100">
+            <Plus className="w-4 h-4" /> Add Stage
+          </button>
+        </div>
+
+        <div className="space-y-6">
+          {steps.map((st: any, idx: number) => (
+            <div key={idx} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4 relative">
+              <button onClick={() => removeStep(idx)} className="absolute top-4 right-4 text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 p-2 rounded-lg">
+                <Trash2 className="w-4 h-4" />
+              </button>
+              <h4 className="font-bold text-slate-800 text-sm">Stage {idx + 1}: {st.title || 'Untitled'}</h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Stage Title</label>
+                  <input type="text" value={st.title || ''} onChange={(e) => updateStep(idx, 'title', e.target.value)} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white font-bold" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Metric Callout</label>
+                  <input type="text" value={st.metric || ''} onChange={(e) => updateStep(idx, 'metric', e.target.value)} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white" placeholder="e.g. < 1% Residual Shrinkage" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-500 mb-1">Short Description</label>
+                <input type="text" value={st.shortDesc || ''} onChange={(e) => updateStep(idx, 'shortDesc', e.target.value)} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white" />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-500 mb-1">Full Detailed Protocol Description</label>
+                <textarea value={st.fullDesc || ''} onChange={(e) => updateStep(idx, 'fullDesc', e.target.value)} rows={3} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function BulkPricingEditor({ data, onChange }: any) {
+  const tiers = data.tiers || []
+
+  const updateTier = (idx: number, key: string, value: any) => {
+    const newTiers = [...tiers]
+    newTiers[idx] = { ...newTiers[idx], [key]: value }
+    onChange('tiers', newTiers)
+  }
+
+  const addTier = () => {
+    onChange('tiers', [...tiers, { title: 'New Tier', range: '100 - 299 Pcs', badge: '15% OFF', desc: 'Bulk discount tier description...', highlighted: false }])
+  }
+
+  const removeTier = (idx: number) => {
+    onChange('tiers', tiers.filter((_: any, i: number) => i !== idx))
+  }
+
+  return (
+    <div className="space-y-8">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 space-y-6">
+        <h3 className="font-bold text-slate-800 border-b border-gray-100 pb-4">Wholesale Tiers Header</h3>
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Eyebrow Label</label>
+          <input type="text" value={data.label || ''} onChange={(e) => onChange('label', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white" placeholder="WHOLESALE & BULK DISCOUNTS" />
+        </div>
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Main Heading</label>
+          <input type="text" value={data.title || ''} onChange={(e) => onChange('title', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white" placeholder="Wholesale Volume Discount Tiers" />
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-bold text-slate-800 text-lg">Volume Discount Tiers ({tiers.length})</h3>
+          <button onClick={addTier} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold bg-blue-50 text-blue-600 hover:bg-blue-100">
+            <Plus className="w-4 h-4" /> Add Pricing Tier
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {tiers.map((tier: any, idx: number) => (
+            <div key={idx} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4 relative flex flex-col justify-between">
+              <button onClick={() => removeTier(idx)} className="absolute top-4 right-4 text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 p-2 rounded-lg">
+                <Trash2 className="w-4 h-4" />
+              </button>
+              <h4 className="font-bold text-slate-800 text-sm">Tier #{idx + 1}</h4>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Tier Name</label>
+                  <input type="text" value={tier.title || ''} onChange={(e) => updateTier(idx, 'title', e.target.value)} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white font-bold" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Quantity Range</label>
+                  <input type="text" value={tier.range || ''} onChange={(e) => updateTier(idx, 'range', e.target.value)} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white" placeholder="50 - 199 Pcs" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Discount Badge</label>
+                  <input type="text" value={tier.badge || ''} onChange={(e) => updateTier(idx, 'badge', e.target.value)} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white" placeholder="STANDARD BULK" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Description</label>
+                  <textarea value={tier.desc || ''} onChange={(e) => updateTier(idx, 'desc', e.target.value)} rows={2} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function LogisticsEditor({ data, onChange }: any) {
+  const routes = data.routes || []
+
+  const updateRoute = (idx: number, key: string, value: any) => {
+    const newRoutes = [...routes]
+    newRoutes[idx] = { ...newRoutes[idx], [key]: value }
+    onChange('routes', newRoutes)
+  }
+
+  const addRoute = () => {
+    onChange('routes', [...routes, { hub: 'New Logistics Hub', status: 'Express Delivery Available', time: '24-48 Hours', badge: 'EXPRESS' }])
+  }
+
+  const removeRoute = (idx: number) => {
+    onChange('routes', routes.filter((_: any, i: number) => i !== idx))
+  }
+
+  return (
+    <div className="space-y-8">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 space-y-6">
+        <h3 className="font-bold text-slate-800 border-b border-gray-100 pb-4">Logistics Header</h3>
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Eyebrow Label</label>
+          <input type="text" value={data.label || ''} onChange={(e) => onChange('label', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white" placeholder="EXPRESS LOGISTICS & UAE COVERAGE" />
+        </div>
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Main Heading</label>
+          <input type="text" value={data.title || ''} onChange={(e) => onChange('title', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white" placeholder="Rapid Delivery Across All 7 Emirates" />
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-bold text-slate-800 text-lg">Dispatch Hubs & Routes ({routes.length})</h3>
+          <button onClick={addRoute} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold bg-blue-50 text-blue-600 hover:bg-blue-100">
+            <Plus className="w-4 h-4" /> Add Logistics Route
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          {routes.map((rt: any, idx: number) => (
+            <div key={idx} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4 relative">
+              <button onClick={() => removeRoute(idx)} className="absolute top-4 right-4 text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 p-2 rounded-lg">
+                <Trash2 className="w-4 h-4" />
+              </button>
+              <h4 className="font-bold text-slate-800 text-sm">Route #{idx + 1}</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Hub Name</label>
+                  <input type="text" value={rt.hub || ''} onChange={(e) => updateRoute(idx, 'hub', e.target.value)} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white font-bold" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Transit Time Window</label>
+                  <input type="text" value={rt.time || ''} onChange={(e) => updateRoute(idx, 'time', e.target.value)} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Badge Tag</label>
+                  <input type="text" value={rt.badge || ''} onChange={(e) => updateRoute(idx, 'badge', e.target.value)} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+

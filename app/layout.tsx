@@ -1,11 +1,18 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { Plus_Jakarta_Sans, Montserrat } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600', '700', '800'],
-  variable: '--font-inter',
+  variable: '--font-jakarta',
+  display: 'swap',
+})
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-montserrat',
   display: 'swap',
 })
 
@@ -34,7 +41,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   colorScheme: 'light',
-  themeColor: '#1F2A37',
+  themeColor: '#2B241E',
 }
 
 export default function RootLayout({
@@ -45,9 +52,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} bg-[#F7F5F2] text-[#2B2B2B] scroll-smooth`}
+      className={`${jakarta.variable} ${montserrat.variable} bg-[#FBF7F2] text-[#2B241E] scroll-smooth`}
     >
-      <body className="antialiased selection:bg-[#DE7B3D] selection:text-white font-sans">
+      <body className="antialiased selection:bg-[#D97A42] selection:text-white font-sans">
         {children}
       </body>
     </html>

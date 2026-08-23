@@ -3,9 +3,9 @@
 import React, { useState, useRef } from 'react'
 import { Hero } from '@/components/hero'
 import { SiteHeader } from '@/components/site-header'
-import { updateSlide, createSlide, deleteSlide, updateSiteConfig, updatePageSection, updateSectionOrder } from './actions'
+import { updateSlide, createSlide, deleteSlide, updateSiteConfig, updatePageSection, updateSectionOrder, saveProductPageSectionsAction } from './actions'
 import { Plus, Trash2, Save, Layout, Settings, Image as ImageIcon, UploadCloud, Monitor, Menu, Search, Bell, HelpCircle, FileText, ShoppingBag, FolderTree, BookOpen, Briefcase, Activity, FolderOpen, Users as UsersIcon, ExternalLink, ChevronDown, Check } from 'lucide-react'
-import { CategoryShowcaseEditor, UniformSolutionsEditor, OurWorkEditor, WhySilkyEditor, ProcessEditor, TestimonialsEditor, ContactBandEditor } from './section-editors'
+import { CategoryShowcaseEditor, UniformSolutionsEditor, OurWorkEditor, WhySilkyEditor, ProcessEditor, TestimonialsEditor, ContactBandEditor, SpecsMatrixEditor, FaqEditor, FabricSwatchesEditor, QualityControlEditor, BulkPricingEditor, LogisticsEditor } from './section-editors'
 
 const getSectionLabel = (type: string) => {
   switch (type) {
@@ -18,6 +18,15 @@ const getSectionLabel = (type: string) => {
     case 'PROCESS': return 'Our Process'
     case 'TESTIMONIALS': return 'Client Testimonials'
     case 'CONTACT_BAND': return 'Contact & Showroom'
+    case 'SPECS_MATRIX': return 'Fabric Specs Matrix'
+    case 'CUSTOMIZATION': return 'Custom Embroidery'
+    case 'SECTORS': return 'Industries We Supply'
+    case 'FABRIC_SWATCHES': return 'Fabric & Color Swatches'
+    case 'QUALITY_CONTROL': return '4-Step Quality Control'
+    case 'BULK_PRICING': return 'Wholesale Bulk Pricing'
+    case 'LOGISTICS': return 'Express Logistics & GCC'
+    case 'FAQ': return 'B2B Supply FAQ'
+    case 'QUOTE_BAND': return 'Get Quotation Form'
     default: return type.replace(/_/g, ' ')
   }
 }
@@ -71,18 +80,88 @@ const parseSlideData = (s: any) => {
   }
 }
 
-export function ClientDashboard({ initialSlides, initialConfig, initialSections = [] }: { initialSlides: any[], initialConfig: any, initialSections?: any[] }) {
+const DEFAULT_HOMEPAGE_SECTIONS = [
+  { id: 101, type: 'HERO', data: '{}', isActive: true },
+  { id: 102, type: 'BRAND_STORY', data: '{}', isActive: true },
+  { id: 103, type: 'CATEGORY_SHOWCASE', data: '{}', isActive: true },
+  { id: 104, type: 'UNIFORM_SOLUTIONS', data: '{}', isActive: true },
+  { id: 105, type: 'OUR_WORK', data: '{}', isActive: true },
+  { id: 106, type: 'WHY_SILKY', data: '{}', isActive: true },
+  { id: 107, type: 'PROCESS', data: '{}', isActive: true },
+  { id: 108, type: 'TESTIMONIALS', data: '{}', isActive: true },
+  { id: 109, type: 'CONTACT_BAND', data: '{}', isActive: true },
+]
+
+const DEFAULT_PRODUCT_PAGE_SECTIONS = [
+  { id: 201, type: 'HERO', data: '{}', isActive: true, order: 1 },
+  { id: 202, type: 'SPECS_MATRIX', data: '{}', isActive: true, order: 2 },
+  { id: 203, type: 'CUSTOMIZATION', data: '{}', isActive: true, order: 3 },
+  { id: 204, type: 'SECTORS', data: '{}', isActive: true, order: 4 },
+  { id: 205, type: 'FABRIC_SWATCHES', data: '{}', isActive: true, order: 5 },
+  { id: 206, type: 'QUALITY_CONTROL', data: '{}', isActive: true, order: 6 },
+  { id: 207, type: 'BULK_PRICING', data: '{}', isActive: true, order: 7 },
+  { id: 208, type: 'LOGISTICS', data: '{}', isActive: true, order: 8 },
+  { id: 209, type: 'TESTIMONIALS', data: '{}', isActive: true, order: 9 },
+  { id: 210, type: 'FAQ', data: '{}', isActive: true, order: 10 },
+  { id: 211, type: 'QUOTE_BAND', data: '{}', isActive: true, order: 11 },
+]
+
+export function ClientDashboard({
+  initialSlides,
+  initialConfig,
+  initialSections = [],
+  initialProductPages = [],
+}: {
+  initialSlides: any[]
+  initialConfig: any
+  initialSections?: any[]
+  initialProductPages?: any[]
+}) {
   const [slides, setSlides] = useState<any[]>(
     initialSlides.map(parseSlideData)
   )
   const [config, setConfig] = useState(initialConfig || {})
-  const [sections, setSections] = useState<any[]>(initialSections)
   
-  const [activeTab, setActiveTab] = useState<'builder' | 'header'>('builder')
-  const [selectedSectionId, setSelectedSectionId] = useState<number | null>(sections[0]?.id || null)
-  
-  // For Hero Editor
-  const [selectedSlideId, setSelectedSlideId] = useState<number | null>(slides[0]?.id || null)
+  const [homepageSections, setHomepageSections] = useState<any[]>(
+    initialSections.length > 0 ? initialSections : DEFAULT_HOMEPAGE_SECTIONS
+  )
+
+  const initialProdPageSections = initialProductPages[0]?.sections?.length > 0
+    ? initialProductPages[0].sections
+    : DEFAULT_PRODUCT_PAGE_SECTIONS
+
+  const [productPageSections, setProductPageSections] = useState<any[]>(initialProdPageSections)
+  const [productPages, setProductPages] = useState<any[]>(initialProductPages)
+  const [selectedProductSlug, setSelectedProductSlug] = useState<string>(
+    initialProductPages[0]?.slug || 'pure-cotton-shirts-supplier-in-uae'
+  )
+
+  const [activeTab, setActiveTab] = useState<'builder' | 'header' | 'product-pages'>('product-pages')
+
+  const currentSections = activeTab === 'product-pages' ? productPageSections : homepageSections
+
+  const [selectedSectionId, setSelectedSectionId] = useState<number | null>(
+    (activeTab === 'product-pages' ? productPageSections : homepageSections)[0]?.id || 201
+  )
+  const [selectedSlideId, setSelectedSlideId] = useState<number | null>(
+    slides[0]?.id || null
+  )
+
+  // Sync selectedSectionId on tab switch
+  const switchTab = (tab: 'builder' | 'header' | 'product-pages') => {
+    setActiveTab(tab)
+    if (tab === 'product-pages') {
+      setSelectedSectionId(productPageSections[0]?.id || 201)
+    } else if (tab === 'builder') {
+      setSelectedSectionId(homepageSections[0]?.id || 101)
+    }
+  }
+
+  React.useEffect(() => {
+    if (!selectedSlideId && slides.length > 0) {
+      setSelectedSlideId(slides[0].id)
+    }
+  }, [slides, selectedSlideId])
   
   const [isSaving, setIsSaving] = useState(false)
   const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null)
@@ -95,17 +174,20 @@ export function ClientDashboard({ initialSlides, initialConfig, initialSections 
     setTimeout(() => setToast(null), 3000)
   }
 
-  const activeSection = sections.find(s => s.id === selectedSectionId) || null
+  const sections = currentSections
+  const activeSection = sections.find(s => s.id === selectedSectionId) || sections[0] || null
   const activeSlide = slides.find(s => s.id === selectedSlideId) || null
   
   // Section Data Management
   const getSectionData = (section: any) => {
+    if (!section) return {}
     try { return JSON.parse(section.data) } catch (e) { return {} }
   }
   
-  const handleSectionDataChange = (field: string, value: string) => {
+  const handleSectionDataChange = (field: string, value: any) => {
     if (!selectedSectionId) return
-    setSections(prev => prev.map(s => {
+    const updateFn = activeTab === 'product-pages' ? setProductPageSections : setHomepageSections
+    updateFn(prev => prev.map(s => {
       if (s.id === selectedSectionId) {
         const data = getSectionData(s)
         data[field] = value
@@ -113,6 +195,30 @@ export function ClientDashboard({ initialSlides, initialConfig, initialSections 
       }
       return s
     }))
+  }
+
+  const handleAddProductSection = (type: string) => {
+    const newId = Date.now()
+    const newSec = {
+      id: newId,
+      type,
+      data: '{}',
+      isActive: true,
+      order: productPageSections.length + 1,
+    }
+    setProductPageSections((prev) => [...prev, newSec])
+    setSelectedSectionId(newId)
+    showToast(`Added ${getSectionLabel(type)} section to product page!`)
+  }
+
+  const handleDeleteProductSection = (id: number) => {
+    if (!confirm('Are you sure you want to delete this section from the product page?')) return
+    const remaining = productPageSections.filter((s) => s.id !== id)
+    setProductPageSections(remaining)
+    if (selectedSectionId === id) {
+      setSelectedSectionId(remaining[0]?.id || null)
+    }
+    showToast('Section removed!')
   }
 
   // Hero Data Management
@@ -129,52 +235,57 @@ export function ClientDashboard({ initialSlides, initialConfig, initialSections 
   const handleSave = async () => {
     setIsSaving(true)
     try {
-      // 1. Save all slides
-      for (const s of slides) {
-        let badgesList: string[] = []
-        if (Array.isArray(s.trustBadges)) {
-          badgesList = s.trustBadges
-        } else if (typeof s.trustBadges === 'string') {
-          try {
-            const p = JSON.parse(s.trustBadges)
-            badgesList = Array.isArray(p) ? p : (p?.badges || [])
-          } catch (e) {}
+      if (activeTab === 'product-pages') {
+        await saveProductPageSectionsAction(selectedProductSlug, productPageSections)
+        showToast('Product Page sections published successfully!')
+      } else {
+        // 1. Save all slides
+        for (const s of slides) {
+          let badgesList: string[] = []
+          if (Array.isArray(s.trustBadges)) {
+            badgesList = s.trustBadges
+          } else if (typeof s.trustBadges === 'string') {
+            try {
+              const p = JSON.parse(s.trustBadges)
+              badgesList = Array.isArray(p) ? p : (p?.badges || [])
+            } catch (e) {}
+          }
+
+          const trustBadgesPayload = JSON.stringify({
+            badges: badgesList,
+            textColor: s.textColor || '#1F2A37',
+            textAlignment: s.textAlignment || 'Left',
+            overlayEnabled: s.overlayEnabled || 'true',
+            overlayOpacity: s.overlayOpacity || '60',
+            status: s.status || 'Active',
+          })
+
+          await updateSlide(s.id, {
+            ...s,
+            trustBadges: trustBadgesPayload,
+            textColor: s.textColor || '#1F2A37',
+            textAlignment: s.textAlignment || 'Left',
+            overlayEnabled: s.overlayEnabled || 'true',
+            overlayOpacity: s.overlayOpacity || '60',
+            status: s.status || 'Active',
+          })
         }
 
-        const trustBadgesPayload = JSON.stringify({
-          badges: badgesList,
-          textColor: s.textColor || '#1F2A37',
-          textAlignment: s.textAlignment || 'Left',
-          overlayEnabled: s.overlayEnabled || 'true',
-          overlayOpacity: s.overlayOpacity || '60',
-          status: s.status || 'Active',
-        })
+        // 2. Save all homepage sections
+        for (const sec of homepageSections) {
+          await updatePageSection(sec.id, sec.data || '{}', sec.isActive ?? true)
+        }
 
-        await updateSlide(s.id, {
-          ...s,
-          trustBadges: trustBadgesPayload,
-          textColor: s.textColor || '#1F2A37',
-          textAlignment: s.textAlignment || 'Left',
-          overlayEnabled: s.overlayEnabled || 'true',
-          overlayOpacity: s.overlayOpacity || '60',
-          status: s.status || 'Active',
-        })
+        // 3. Save global config
+        if (config) {
+          const navLinksStr = typeof config.navLinks === 'string'
+            ? config.navLinks
+            : JSON.stringify(config.navLinks || [])
+          await updateSiteConfig({ ...config, navLinks: navLinksStr })
+        }
+
+        showToast('Website changes published successfully!')
       }
-
-      // 2. Save all page sections
-      for (const sec of sections) {
-        await updatePageSection(sec.id, sec.data || '{}', sec.isActive ?? true)
-      }
-
-      // 3. Save global config
-      if (config) {
-        const navLinksStr = typeof config.navLinks === 'string'
-          ? config.navLinks
-          : JSON.stringify(config.navLinks || [])
-        await updateSiteConfig({ ...config, navLinks: navLinksStr })
-      }
-
-      showToast('All website changes published successfully!')
     } catch (err: any) {
       console.error(err)
       showToast('Error publishing changes', 'error')
@@ -295,13 +406,11 @@ export function ClientDashboard({ initialSlides, initialConfig, initialSections 
         
         {/* Brand */}
         <div className="px-6 py-8 flex flex-col gap-4">
-          {config?.logoUrl ? (
-            <img src={config.logoUrl} alt="Logo" className="h-10 object-contain self-start" />
-          ) : (
-            <h2 className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
-              <Layout className="w-6 h-6 text-[#DE7B3D]" /> Silky<span className="text-[#DE7B3D] text-xs align-top pt-1">LLC</span>
-            </h2>
-          )}
+          <img
+            src={config?.logoUrl || '/silky-logo.png'}
+            alt="Silky Logo"
+            className="h-10 sm:h-12 w-auto object-contain self-start"
+          />
           <div className="flex items-center gap-2 bg-[#1A233A] rounded-full px-3 py-1.5 w-fit border border-white/5">
             <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
             <span className="text-[10px] font-bold tracking-widest uppercase text-gray-300">System Online</span>
@@ -313,7 +422,7 @@ export function ClientDashboard({ initialSlides, initialConfig, initialSections 
           <div className="px-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 mt-2">Main Pages</div>
           
           <button 
-            onClick={() => setActiveTab('header')}
+            onClick={() => switchTab('header')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
               activeTab === 'header' 
                 ? 'bg-[#DE7B3D]/10 text-white border-l-2 border-[#DE7B3D] font-semibold' 
@@ -324,12 +433,7 @@ export function ClientDashboard({ initialSlides, initialConfig, initialSections 
           </button>
           
           <button 
-            onClick={() => {
-              setActiveTab('builder')
-              if (!selectedSectionId && sections.length > 0) {
-                setSelectedSectionId(sections[0].id)
-              }
-            }}
+            onClick={() => switchTab('builder')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
               activeTab === 'builder' 
                 ? 'bg-[#DE7B3D]/10 text-white border-l-2 border-[#DE7B3D] font-semibold' 
@@ -338,6 +442,27 @@ export function ClientDashboard({ initialSlides, initialConfig, initialSections 
           >
             <Layout className={`w-4 h-4 ${activeTab === 'builder' ? 'text-[#DE7B3D]' : ''}`} /> Homepage
           </button>
+
+          <button 
+            onClick={() => switchTab('product-pages')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+              activeTab === 'product-pages' 
+                ? 'bg-[#DE7B3D]/10 text-white border-l-2 border-[#DE7B3D] font-semibold' 
+                : 'text-gray-400 hover:text-white hover:bg-white/5 border-l-2 border-transparent'
+            }`}
+          >
+            <ShoppingBag className={`w-4 h-4 ${activeTab === 'product-pages' ? 'text-[#DE7B3D]' : ''}`} /> Product Pages CMS
+          </button>
+
+          <a 
+            href={`/products/${selectedProductSlug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold text-gray-400 hover:text-white hover:bg-white/5 border-l-2 border-transparent mt-2"
+          >
+            <ExternalLink className="w-4 h-4 text-[#1C7A4C]" />
+            <span>Preview Live Page ↗</span>
+          </a>
         </div>
         
         {/* Quick Actions & User */}
@@ -402,7 +527,103 @@ export function ClientDashboard({ initialSlides, initialConfig, initialSections 
           </div>
         </header>
 
-        {/* EXACT REFERENCE HORIZONTAL TABS */}
+        {/* PRODUCT PAGES HORIZONTAL TABS */}
+        {activeTab === 'product-pages' && (
+          <div className="bg-white border-b border-gray-200 z-10 shrink-0 shadow-xs">
+            <div className="max-w-7xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-4 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Active Product Page:</span>
+                <select
+                  value={selectedProductSlug}
+                  onChange={(e) => setSelectedProductSlug(e.target.value)}
+                  className="px-4 py-2 text-xs font-bold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                >
+                  <option value="pure-cotton-shirts-supplier-in-uae">Pure Cotton Shirts Supplier in UAE</option>
+                  {productPages.map((p) => (
+                    <option key={p.id} value={p.slug}>
+                      {p.title} ({p.slug})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <a
+                  href={`/products/${selectedProductSlug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-slate-800 transition-all shadow-xs"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-[#1C7A4C]" /> Live Preview ↗
+                </a>
+
+                <button
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="flex items-center gap-2 px-5 py-2 bg-[#DE7B3D] text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-md hover:bg-[#c96a2e] transition-all cursor-pointer"
+                >
+                  <Save className="w-3.5 h-3.5" /> Publish All Changes
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between overflow-x-auto px-6 hide-scrollbar max-w-7xl mx-auto border-t border-gray-100">
+              <div className="flex items-center gap-1 overflow-x-auto hide-scrollbar">
+                {sections.map((s, idx) => (
+                  <button
+                    key={s.id}
+                    onClick={() => setSelectedSectionId(s.id)}
+                    className={`whitespace-nowrap px-5 py-4 text-[11px] font-bold uppercase tracking-wider transition-all border-b-2 flex items-center gap-2 ${
+                      selectedSectionId === s.id
+                        ? 'text-[#DE7B3D] border-[#DE7B3D]'
+                        : 'text-gray-500 border-transparent hover:text-gray-800'
+                    }`}
+                  >
+                    <span>{getSectionLabel(s.type)}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2 py-2 shrink-0">
+                <select
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      handleAddProductSection(e.target.value)
+                      e.target.value = ''
+                    }
+                  }}
+                  defaultValue=""
+                  className="px-3.5 py-2 text-xs font-bold text-[#DE7B3D] bg-[#DE7B3D]/10 border border-[#DE7B3D]/30 rounded-xl focus:outline-none cursor-pointer"
+                >
+                  <option value="" disabled>+ Add Section to Page</option>
+                  <option value="HERO">Hero Banner</option>
+                  <option value="SPECS_MATRIX">Fabric Specs Matrix</option>
+                  <option value="CUSTOMIZATION">Custom Embroidery & Tailoring</option>
+                  <option value="SECTORS">Industries We Supply</option>
+                  <option value="FABRIC_SWATCHES">Fabric Types & Swatches</option>
+                  <option value="QUALITY_CONTROL">4-Step Quality Control</option>
+                  <option value="BULK_PRICING">Wholesale Bulk Pricing</option>
+                  <option value="LOGISTICS">Express Logistics & GCC</option>
+                  <option value="TESTIMONIALS">Verified B2B Client Reviews</option>
+                  <option value="FAQ">B2B Supply FAQ</option>
+                  <option value="QUOTE_BAND">Get A Free Quote Form</option>
+                </select>
+
+                {selectedSectionId && (
+                  <button
+                    onClick={() => handleDeleteProductSection(selectedSectionId)}
+                    className="p-2 text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 rounded-xl border border-red-200 transition-colors shrink-0"
+                    title="Remove selected section from page"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* HOMEPAGE HORIZONTAL TABS */}
         {activeTab === 'builder' && (
           <div className="bg-white border-b border-gray-200 z-10 shrink-0">
              <div className="flex overflow-x-auto px-6 hide-scrollbar max-w-7xl mx-auto">
@@ -428,22 +649,22 @@ export function ClientDashboard({ initialSlides, initialConfig, initialSections 
           <div className="mb-8 flex items-center justify-between">
             <div>
               <h1 className="text-[28px] font-bold text-[#1E293B] tracking-tight">
-                {activeTab === 'builder' ? (activeSection ? `${activeSection.type.replace('_', ' ')} Editor` : 'Page Builder') : 'Theme & Settings'}
+                {activeTab === 'header' ? 'Theme & Settings' : (activeSection ? `${getSectionLabel(activeSection.type)} Editor` : 'Page Builder')}
               </h1>
               <p className="text-gray-500 mt-1 text-sm">
-                {activeTab === 'builder' ? 'Modify the content and layout of this section.' : 'Manage your global site configuration.'}
+                {activeTab === 'header' ? 'Manage your global site configuration.' : 'Modify the content and layout of this section.'}
               </p>
             </div>
             {/* The Add Slide Button goes here in the header for Hero */}
-            {activeTab === 'builder' && activeSection?.type === 'HERO' && (
+            {(activeTab === 'builder' || activeTab === 'product-pages') && activeSection?.type === 'HERO' && (
               <button onClick={handleCreateSlide} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-white text-gray-700 hover:bg-gray-50 transition-all border border-gray-200 shadow-sm">
-                <Plus className="w-4 h-4" /> Add Slide
+                <Plus className="w-4 h-4 text-gray-500" /> Add New Slide
               </button>
             )}
           </div>
 
-          {/* BUILDER AREA */}
-          {activeTab === 'builder' ? (
+          {/* BUILDER / PRODUCT PAGES AREA */}
+          {activeTab === 'builder' || activeTab === 'product-pages' ? (
             activeSection ? (
               <div className="space-y-6 animate-in fade-in duration-300">
                 
@@ -781,6 +1002,51 @@ export function ClientDashboard({ initialSlides, initialConfig, initialSections 
                       </div>
                     </div>
                   </div>
+                )}
+
+                {/* SPECS MATRIX EDITOR */}
+                {activeSection.type === 'SPECS_MATRIX' && (
+                  <SpecsMatrixEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} />
+                )}
+
+                {/* FAQ EDITOR */}
+                {activeSection.type === 'FAQ' && (
+                  <FaqEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} />
+                )}
+
+                {/* FABRIC SWATCHES EDITOR */}
+                {activeSection.type === 'FABRIC_SWATCHES' && (
+                  <FabricSwatchesEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} />
+                )}
+
+                {/* QUALITY CONTROL EDITOR */}
+                {activeSection.type === 'QUALITY_CONTROL' && (
+                  <QualityControlEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} onUpload={uploadFile} />
+                )}
+
+                {/* BULK PRICING EDITOR */}
+                {activeSection.type === 'BULK_PRICING' && (
+                  <BulkPricingEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} />
+                )}
+
+                {/* LOGISTICS EDITOR */}
+                {activeSection.type === 'LOGISTICS' && (
+                  <LogisticsEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} />
+                )}
+
+                {/* CUSTOMIZATION EDITOR */}
+                {activeSection.type === 'CUSTOMIZATION' && (
+                  <CategoryShowcaseEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} onUpload={uploadFile} />
+                )}
+
+                {/* SECTORS EDITOR */}
+                {activeSection.type === 'SECTORS' && (
+                  <UniformSolutionsEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} onUpload={uploadFile} />
+                )}
+
+                {/* QUOTE BAND EDITOR */}
+                {activeSection.type === 'QUOTE_BAND' && (
+                  <ContactBandEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} />
                 )}
 
                 {/* CATEGORY SHOWCASE EDITOR */}

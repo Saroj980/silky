@@ -1,33 +1,25 @@
 import { NextResponse } from 'next/server'
-import { writeFile } from 'fs/promises'
-import path from 'path'
+
+const LARAVEL_API_URL = process.env.NEXT_PUBLIC_LARAVEL_API_URL || 'http://127.0.0.1:8000/api'
 
 export async function POST(request: Request) {
   try {
-    const data = await request.formData()
-    const file: File | null = data.get('file') as unknown as File
+    const formData = await request.formData()
 
-    if (!file) {
-      return NextResponse.json({ success: false, error: 'No file uploaded' }, { status: 400 })
+    const res = await fetch(`${LARAVEL_API_URL}/upload`, {
+      method: 'POST',
+      body: formData,
+    })
+
+    if (!res.ok) {
+      const errText = await res.text()
+      return NextResponse.json({ success: false, error: errText }, { status: res.status })
     }
 
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-
-    // Ensure the filename is safe and unique
-    const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '')}`
-    const uploadDir = path.join(process.cwd(), 'public/uploads')
-    const filepath = path.join(uploadDir, filename)
-
-    // Write the file to the public directory
-    await writeFile(filepath, buffer)
-
-    return NextResponse.json({ 
-      success: true, 
-      url: `/uploads/${filename}` 
-    })
+    const data = await res.json()
+    return NextResponse.json(data)
   } catch (error) {
-    console.error('Upload Error:', error)
+    console.error('Upload Proxy Error:', error)
     return NextResponse.json({ success: false, error: 'Upload failed' }, { status: 500 })
   }
 }

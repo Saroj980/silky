@@ -58,3 +58,29 @@ model PageSection {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model ProductPage {
+  id              Int                  @id @default(autoincrement())
+  slug            String               @unique
+  title           String
+  category        String
+  heroImage       String
+  metaTitle       String?
+  metaDescription String?
+  isPublished     Boolean              @default(true)
+  sections        ProductPageSection[]
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+}
+
+model ProductPageSection {
+  id            Int         @id @default(autoincrement())
+  productPageId Int
+  productPage   ProductPage @relation(fields: [productPageId], references: [id], onDelete: Cascade)
+  type          String      // HERO, SPECS_MATRIX, CUSTOMIZATION, SECTORS, PROCESS, FAQ, QUOTE_BAND
+  order         Int         @default(0)
+  isActive      Boolean     @default(true)
+  data          String      // JSON string
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}

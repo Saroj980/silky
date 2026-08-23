@@ -1,28 +1,22 @@
-import { prisma } from '@/lib/prisma'
+import { getHeroSlides, getSiteConfig, getPageSections } from '@/lib/laravel-api'
 import { HomePageClient } from '@/components/home-page-client'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export default async function HomePage() {
-  const slides = await prisma.heroSlide.findMany({
-    orderBy: { id: 'asc' }
-  })
-  const heroSlides = slides.map(s => ({
+  const slidesData = await getHeroSlides()
+  const heroSlides = slidesData.map((s: any) => ({
     ...s,
-    trustBadges: JSON.parse(s.trustBadges)
+    trustBadges: typeof s.trustBadges === 'string' ? JSON.parse(s.trustBadges || '[]') : s.trustBadges,
   }))
 
-  const config = await prisma.siteConfig.findUnique({
-    where: { id: 1 }
-  })
+  const configData = await getSiteConfig()
 
-  const sections = await prisma.pageSection.findMany({
-    where: { isActive: true },
-    orderBy: { order: 'asc' }
-  })
+  const sectionsData = await getPageSections()
+  const activeSections = sectionsData.filter((s: any) => s.isActive)
 
   return (
-    <HomePageClient heroSlides={heroSlides} config={config} sections={sections} />
+    <HomePageClient heroSlides={heroSlides} config={configData} sections={activeSections} />
   )
 }

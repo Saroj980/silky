@@ -62,23 +62,25 @@ export function UniformSolutions({ data }: { data?: any }) {
     return icons[key] || fallback
   }
 
+  const ease = [0.16, 1, 0.3, 1] as const
+
   return (
-    <section id="uniforms" className="bg-[#FFFFFF] py-20 border-b border-[#E5E7EB]">
-      <div className="max-w-[1200px] mx-auto px-6">
+    <section id="uniforms" className="bg-[#FFFFFF] py-28 lg:py-36 border-b border-slate-200/80 relative overflow-hidden select-none">
+      <div className="max-w-[1380px] mx-auto px-6 sm:px-10">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-          <div className="space-y-2">
-            <span className="text-xs uppercase tracking-[0.2em] font-inter font-bold text-[#DE7B3D] block">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 lg:mb-20 gap-8">
+          <div className="space-y-3 max-w-2xl">
+            <span className="text-xs font-sans font-extrabold uppercase tracking-[0.25em] text-[#D97A42] block">
               {label}
             </span>
-            <h2 className="font-playfair text-[34px] text-[#1F2A37] font-normal leading-tight">
+            <h2 className="font-serif text-3xl sm:text-4xl lg:text-[44px] text-slate-900 font-black leading-[1.15]">
               {title}
             </h2>
           </div>
 
           <a
             href="#contact"
-            className="h-[44px] px-6 bg-[#DE7B3D] hover:bg-[#C96A30] text-white font-inter font-semibold text-xs uppercase tracking-widest rounded-xs transition-colors duration-180 inline-flex items-center gap-2 shadow-xs self-start md:self-auto"
+            className="h-[48px] px-8 bg-[#D97A42] hover:bg-[#c46833] text-white font-sans font-bold text-xs uppercase tracking-widest rounded-lg transition-all duration-300 inline-flex items-center gap-2.5 shadow-lg self-start md:self-auto hover:scale-105"
           >
             <span>Request Bulk Pricing</span>
             <ArrowRight className="w-4 h-4" />
@@ -86,37 +88,38 @@ export function UniformSolutions({ data }: { data?: any }) {
         </div>
 
         {/* Grid Items */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
           {uniforms.map((cat: any, idx: number) => {
             const IconComponent = resolveIcon(cat.iconName, cat.icon || Briefcase)
             return (
               <div
                 key={idx}
-                className="bg-[#F7F5F2] border border-[#E5E7EB] rounded-xs overflow-hidden shadow-xs hover:bg-white hover:shadow-md transition-all duration-180 group flex flex-col justify-between"
+                className="bg-[#FAF9F6] border border-slate-200/80 rounded-2xl overflow-hidden shadow-xs hover:bg-white hover:shadow-2xl hover:border-[#D97A42]/50 transition-all duration-300 group flex flex-col justify-between"
               >
-                <div className="aspect-[16/9] w-full overflow-hidden bg-[#E5E7EB]">
+                <div className="aspect-[16/10] w-full overflow-hidden bg-slate-100 relative">
                   <img
                     src={cat.image}
                     alt={cat.imageAlt || cat.title}
-                    className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-200"
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none" />
                 </div>
 
-                <div className="p-6 space-y-3 flex-1 flex flex-col justify-between">
-                  <div className="space-y-2">
+                <div className="p-7 space-y-4 flex-1 flex flex-col justify-between">
+                  <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <div className="w-8 h-8 rounded-xs bg-[#FDF6F0] border border-[#DE7B3D]/25 text-[#DE7B3D] flex items-center justify-center group-hover:bg-[#DE7B3D] group-hover:text-white transition-colors">
-                        <IconComponent className="w-4 h-4" />
+                      <div className="w-9 h-9 rounded-lg bg-[#D97A42]/10 border border-[#D97A42]/30 text-[#D97A42] flex items-center justify-center group-hover:bg-[#D97A42] group-hover:text-white transition-all">
+                        <IconComponent className="w-4.5 h-4.5" />
                       </div>
-                      <span className="text-[11px] font-inter font-bold text-[#6B7280]">
+                      <span className="text-[11px] font-sans font-extrabold text-[#1C7A4C] tracking-widest">
                         0{idx + 1}
                       </span>
                     </div>
 
-                    <h3 className="font-playfair text-xl text-[#1F2A37] font-normal group-hover:text-[#DE7B3D] transition-colors pt-1">
+                    <h3 className="font-serif text-2xl text-slate-900 font-extrabold group-hover:text-[#D97A42] transition-colors pt-1">
                       {cat.title}
                     </h3>
-                    <p className="font-inter text-xs text-[#6B7280] leading-relaxed">
+                    <p className="font-sans text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
                       {cat.desc}
                     </p>
                   </div>

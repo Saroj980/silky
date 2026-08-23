@@ -2,26 +2,32 @@
 @import 'tw-animate-css';
 
 @theme inline {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-inter: var(--font-inter), sans-serif;
-  --font-serif: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-playfair: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-jakarta), 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-inter: var(--font-jakarta), 'Plus Jakarta Sans', sans-serif;
+  --font-jakarta: var(--font-jakarta), 'Plus Jakarta Sans', sans-serif;
+  --font-serif: var(--font-montserrat), 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+  --font-playfair: var(--font-montserrat), 'Montserrat', ui-sans-serif, sans-serif;
+  --font-montserrat: var(--font-montserrat), 'Montserrat', ui-sans-serif, sans-serif;
 
-  --color-silky-bg: #F7F5F2;
+  --color-silky-bg: #FBF7F2;
   --color-silky-white: #FFFFFF;
-  --color-silky-navy: #1F2A37;
-  --color-silky-charcoal: #2B2B2B;
-  --color-silky-orange: #DE7B3D;
+  --color-silky-navy: #2B241E;
+  --color-silky-charcoal: #2B241E;
+  --color-silky-orange: #D97A42;
   --color-silky-gray: #6B7280;
   --color-silky-border: #E5E7EB;
 }
 
 :root {
   color-scheme: light;
-  --background: #F7F5F2;
-  --foreground: #2B2B2B;
-  --navy: #1F2A37;
-  --orange: #DE7B3D;
+  --brand-orange: #D97A42;
+  --brand-green: #1C7A4C;
+  --ink: #2B241E;
+  --surface: #FBF7F2;
+  --background: #FBF7F2;
+  --foreground: #2B241E;
+  --navy: #2B241E;
+  --orange: #D97A42;
   --border: #E5E7EB;
 }
 
@@ -30,20 +36,22 @@
     border-color: #E5E7EB;
     font-style: normal !important;
   }
-  body {
-    background-color: #F7F5F2;
-    color: #2B2B2B;
-    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  html, body {
+    background-color: #FBF7F2;
+    color: #2B241E;
+    font-family: var(--font-jakarta), 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
     font-size: 16px;
     line-height: 1.6;
     overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
     -webkit-font-smoothing: antialiased;
   }
   h1, h2, h3, h4 {
-    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-    color: #1F2A37;
+    font-family: var(--font-montserrat), 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+    color: #2B241E;
     font-weight: 700;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
   }
 }
 
@@ -53,14 +61,14 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #F7F5F2;
+  background: #FBF7F2;
 }
 ::-webkit-scrollbar-thumb {
-  background: #DE7B3D;
+  background: #D97A42;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #C96A30;
+  background: #C46933;
 }
 
 /* Utilities to hide scrollbar */
@@ -72,13 +80,14 @@
   display: none;
 }
 
-/* Font Classes - Clean Human Corporate Typography */
-.font-playfair {
-  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+/* Font Classes - Clean Google Fonts Typography (Montserrat headings + Jakarta body) */
+.font-playfair, .font-montserrat, .font-serif {
+  font-family: var(--font-montserrat), 'Montserrat', ui-sans-serif, system-ui, sans-serif;
   font-weight: 700;
+  letter-spacing: -0.02em;
 }
-.font-inter {
-  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+.font-inter, .font-sans {
+  font-family: var(--font-jakarta), 'Plus Jakarta Sans', sans-serif;
 }
 
 /* Nav Link Underline in Logo Terracotta Orange #DE7B3D (180ms) */
