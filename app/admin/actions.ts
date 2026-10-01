@@ -207,6 +207,15 @@ export async function deletePageSection(id: number) {
 
 export async function getProductPagesAction() {
   try {
+    const apiPages = await laravelApi.getProductPages()
+    if (Array.isArray(apiPages) && apiPages.length > 0) {
+      return apiPages
+    }
+  } catch (err) {
+    console.error('Error fetching product pages via Laravel API (MySQL):', err)
+  }
+
+  try {
     const pages = await prisma.productPage.findMany({
       include: {
         sections: {
@@ -223,26 +232,103 @@ export async function getProductPagesAction() {
 
 export async function createProductPageAction(data: { slug: string; title: string; category: string; heroImage: string }) {
   try {
-    const newPage = await prisma.productPage.create({
-      data: {
-        slug: data.slug,
-        title: data.title,
-        category: data.category,
-        heroImage: data.heroImage,
-        isPublished: true,
-      },
-    })
-    revalidatePath('/products/[slug]', 'page')
-    revalidatePath('/admin')
-    return newPage
+    try {
+      const newPage = await laravelApi.createProductPage(data)
+      revalidatePath('/products/[slug]', 'page')
+      revalidatePath('/admin')
+      return newPage
+    } catch (apiErr) {
+      console.error('Error creating product page via Laravel API, using Prisma fallback:', apiErr)
+      const masterPage = await prisma.productPage.findUnique({
+        where: { slug: 'pure-cotton-shirts-supplier-in-uae' },
+        include: { sections: { orderBy: { order: 'asc' } } }
+      })
+
+      const newPage = await prisma.productPage.create({
+        data: {
+          slug: data.slug,
+          title: data.title,
+          category: data.category,
+          heroImage: data.heroImage,
+          isPublished: true,
+        },
+      })
+
+      if (masterPage && masterPage.sections.length > 0) {
+        for (let i = 0; i < masterPage.sections.length; i++) {
+          const s = masterPage.sections[i]
+          let sData = s.data
+          try {
+            const parsed = JSON.parse(s.data)
+            if (s.type === 'HERO') {
+              parsed.title = data.title
+              parsed.heroImage = data.heroImage
+              parsed.breadcrumb = `Home / Products / ${data.title}`
+              sData = JSON.stringify(parsed)
+            }
+          } catch(e) {}
+
+          await prisma.productPageSection.create({
+            data: {
+              productPageId: newPage.id,
+              type: s.type,
+              order: i + 1,
+              isActive: s.isActive,
+              data: sData,
+            }
+          })
+        }
+      }
+
+      revalidatePath('/products/[slug]', 'page')
+      revalidatePath('/admin')
+      return newPage
+    }
   } catch (err) {
     console.error('Error creating product page:', err)
     throw err
   }
 }
 
+export async function deleteProductPageAction(slug: string) {
+  try {
+    try {
+      const apiPage = await laravelApi.getProductPageBySlug(slug)
+      if (apiPage && apiPage.id) {
+        await laravelApi.deleteProductPage(apiPage.id)
+      }
+    } catch (e) {
+      const page = await prisma.productPage.findUnique({ where: { slug } })
+      if (page) {
+        await prisma.productPage.delete({ where: { slug } })
+      }
+    }
+    revalidatePath('/products/[slug]', 'page')
+    revalidatePath('/admin')
+    return { success: true }
+  } catch (err) {
+    console.error('Error deleting product page:', err)
+    throw err
+  }
+}
+
 export async function saveProductPageSectionsAction(slug: string, sectionsArr: any[]) {
   try {
+    // 1. Primary Source of Truth: MySQL (Laravel API)
+    try {
+      const apiPage = await laravelApi.getProductPageBySlug(slug)
+      if (apiPage && apiPage.id) {
+        await laravelApi.saveProductPageSections(apiPage.id, sectionsArr)
+        revalidatePath('/products/[slug]', 'page')
+        revalidatePath(`/products/${slug}`, 'page')
+        revalidatePath('/admin')
+        return { success: true }
+      }
+    } catch (apiErr) {
+      console.error('Error saving product page sections via Laravel API (MySQL), using Prisma fallback:', apiErr)
+    }
+
+    // 2. Fallback: Prisma SQLite
     let productPage = await prisma.productPage.findUnique({
       where: { slug },
       include: { sections: true },
@@ -261,7 +347,6 @@ export async function saveProductPageSectionsAction(slug: string, sectionsArr: a
       })
     }
 
-    // Delete existing sections for this page and re-create in exact order & data
     await prisma.productPageSection.deleteMany({
       where: { productPageId: productPage.id },
     })

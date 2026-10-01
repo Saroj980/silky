@@ -10,6 +10,15 @@ import { FaWhatsapp } from 'react-icons/fa6'
 
 const ease: any = [0.16, 1, 0.3, 1]
 
+// Dynamic grid class calculator so 1, 2, 3, 4, 5+ items always fill container width evenly
+function getDynamicGridClass(count: number, maxCols: number = 4) {
+  if (count <= 1) return 'grid grid-cols-1 max-w-2xl mx-auto'
+  if (count === 2) return 'grid grid-cols-1 sm:grid-cols-2'
+  if (count === 3) return 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+  if (maxCols === 3) return 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+  return 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
+}
+
 // ----------------------------------------------------------------------
 // 1. PRODUCT HERO SECTION (Ultra-Smooth Slow Luxury Atelier Design)
 // ----------------------------------------------------------------------
@@ -262,7 +271,7 @@ function SpecsMatrixSection({ data }: { data: any }) {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: false, amount: 0.2 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8"
+          className={`${getDynamicGridClass(specs.length, 4)} gap-6 sm:gap-8`}
         >
           {specs.map((spec: any, idx: number) => {
             const isEven = idx % 2 === 0
@@ -278,8 +287,12 @@ function SpecsMatrixSection({ data }: { data: any }) {
                 className="bg-white border border-slate-200/80 p-8 rounded-2xl shadow-xs hover:shadow-2xl hover:border-[#D97A42]/50 transition-all duration-300 flex flex-col justify-between space-y-4"
               >
                 <div className="space-y-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#D97A42]/10 border border-[#D97A42]/30 text-[#D97A42] flex items-center justify-center font-bold text-sm">
-                    0{idx + 1}
+                  <div className="w-10 h-10 rounded-xl bg-[#D97A42]/10 border border-[#D97A42]/30 text-[#D97A42] flex items-center justify-center font-bold text-sm overflow-hidden p-1.5">
+                    {spec.iconImage ? (
+                      <img src={spec.iconImage} alt={spec.title} className="w-full h-full object-contain" />
+                    ) : (
+                      <span>0{idx + 1}</span>
+                    )}
                   </div>
                   <h3 className="font-sans text-xs font-extrabold uppercase tracking-widest text-[#1C7A4C]">
                     {spec.title}
@@ -310,7 +323,7 @@ function CustomizationShowcaseSection({ data }: { data: any }) {
   const label = data?.label || 'CUSTOM LOGO EMBROIDERY & TAILORING'
   const title = data?.title || 'Bespoke Logo Embroidery & Fitting Options'
 
-  const options = [
+  const defaultOptions = [
     {
       id: 0,
       title: '3D High-Definition Logo Embroidery',
@@ -353,8 +366,41 @@ function CustomizationShowcaseSection({ data }: { data: any }) {
     },
   ]
 
-  const activeOption = options[activeTab] || options[0]
-  const ActiveIcon = activeOption.icon
+  const iconMap: Record<string, any> = {
+    Scissors,
+    UserCheck,
+    Award,
+    Ruler,
+    ShieldCheck,
+    Sparkles,
+    Layers,
+    Building2,
+    Truck,
+    Box,
+    PhoneCall,
+  }
+
+  const rawOptions = (data?.options && Array.isArray(data.options) && data.options.length > 0) ? data.options : defaultOptions
+  const defaultIcons = [Scissors, UserCheck, Award, Ruler]
+  const options = rawOptions.map((opt: any, idx: number) => {
+    let resolvedIcon = opt.icon
+    if (typeof opt.iconName === 'string' && iconMap[opt.iconName]) {
+      resolvedIcon = iconMap[opt.iconName]
+    } else if (typeof opt.icon === 'string' && iconMap[opt.icon]) {
+      resolvedIcon = iconMap[opt.icon]
+    } else if (!resolvedIcon || typeof resolvedIcon !== 'function') {
+      resolvedIcon = defaultIcons[idx % defaultIcons.length] || Scissors
+    }
+
+    return {
+      ...opt,
+      icon: resolvedIcon,
+      tag: opt.tag || opt.badge || 'CUSTOM OPTION',
+    }
+  })
+
+  const activeOption = options[activeTab] || options[0] || defaultOptions[0]
+  const ActiveIcon = activeOption.icon || Scissors
 
   return (
     <section className="bg-white py-14 sm:py-20 lg:py-28 border-b border-slate-200/80 relative overflow-hidden select-none">
@@ -413,7 +459,11 @@ function CustomizationShowcaseSection({ data }: { data: any }) {
                       isActive ? 'bg-[#D97A42] text-white' : 'bg-slate-100 text-slate-700'
                     }`}
                   >
-                    <Icon className="w-5 h-5" />
+                    {opt.iconImage ? (
+                      <img src={opt.iconImage} alt={opt.title} className="w-5 h-5 object-contain" />
+                    ) : (
+                      <Icon className="w-5 h-5" />
+                    )}
                   </div>
 
                   <div className="space-y-1 flex-1">
@@ -471,7 +521,11 @@ function CustomizationShowcaseSection({ data }: { data: any }) {
                   </span>
                 </div>
                 <div className="w-10 h-10 rounded-xl bg-[#D97A42]/10 border border-[#D97A42]/30 text-[#D97A42] flex items-center justify-center shrink-0">
-                  <ActiveIcon className="w-5 h-5" />
+                  {activeOption.iconImage ? (
+                    <img src={activeOption.iconImage} alt={activeOption.title} className="w-5 h-5 object-contain" />
+                  ) : (
+                    <ActiveIcon className="w-5 h-5" />
+                  )}
                 </div>
               </div>
             </div>
@@ -512,11 +566,20 @@ function CustomizationShowcaseSection({ data }: { data: any }) {
 function SectorsSection({ data, onOpenQuote }: { data: any, onOpenQuote: () => void }) {
   const label = data?.label || 'INDUSTRIES WE SUPPLY'
   const title = data?.title || 'Tailored Cotton Shirts for Corporate & Hotel Fleets'
-  const items = data?.items || [
+  
+  const defaultSectors = [
     { title: 'Corporate Executives', desc: 'Crisp white & sky blue formal shirts for boardrooms, banks, and DIFC firms.', image: '/images/hero_corporate_uniforms.png' },
     { title: 'Luxury Hotel Front-Desk', desc: 'Elegant front-desk concierge and waiter shirts for 5-star Dubai resorts.', image: '/images/hotel_uniform_luxury.png' },
     { title: 'Aviation & Valet Fleets', desc: 'Durable easy-iron uniforms designed for high-frequency daily wear.', image: '/images/sector_corporate.png' },
   ]
+
+  const rawItems = (data?.items && Array.isArray(data.items) && data.items.length > 0)
+    ? data.items
+    : (data?.uniforms && Array.isArray(data.uniforms) && data.uniforms.length > 0)
+    ? data.uniforms
+    : defaultSectors
+
+  const items = rawItems
 
   const containerVariants = {
     hidden: {},
@@ -554,7 +617,7 @@ function SectorsSection({ data, onOpenQuote }: { data: any, onOpenQuote: () => v
           initial="hidden"
           whileInView="visible"
           viewport={{ once: false, amount: 0.2 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10"
+          className={`${getDynamicGridClass(items.length, 4)} gap-8 sm:gap-10`}
         >
           {items.map((item: any, idx: number) => (
             <motion.div
@@ -591,11 +654,15 @@ function SectorsSection({ data, onOpenQuote }: { data: any, onOpenQuote: () => v
 function ProductFaqSection({ data, openIndex, onToggle }: { data: any, openIndex: number | null, onToggle: (i: number) => void }) {
   const label = data?.label || 'FREQUENTLY ASKED QUESTIONS'
   const title = data?.title || 'B2B Purchasing & Supply FAQ'
-  const faqs = data?.faqs || [
+
+  const defaultFaqs = [
     { q: 'What is the Minimum Order Quantity (MOQ) for custom cotton shirts?', a: 'Our standard MOQ starts from 25 pieces for custom embroidered shirts, with flexible bulk tiers for larger corporate fleets.' },
     { q: 'Can you deliver physical fabric swatches before placing an order?', a: 'Yes! We provide complimentary physical swatch cards and sample shirts directly to your office across Dubai and the UAE.' },
     { q: 'Do you offer on-site employee trial fittings?', a: 'Our master tailors provide on-site sizing fittings at your office or hotel headquarters to ensure 100% perfect fit for every staff member.' },
+    { q: 'What is the standard lead time for bespoke uniform orders in Dubai?', a: 'Standard production & delivery is 5-7 business days across the UAE, with express 48-hour rush orders available for urgent corporate events.' },
   ]
+
+  const faqs = (data?.faqs && data.faqs.length > 0) ? data.faqs : defaultFaqs
 
   const containerVariants = {
     hidden: {},
@@ -689,6 +756,20 @@ function QuoteBandSection({ data, onOpenQuote }: { data: any, onOpenQuote: () =>
     message: '',
   })
 
+  const label = data?.label || 'DEIRA CREEK SHOWROOM • DUBAI EST. 1963'
+  const title = data?.title || 'Request A Custom Quotation'
+  const subtitle = data?.subtitle || 'Send us your quantity & custom shirt details. Our Dubai sales team will prepare your quotation within 2 hours.'
+  const productsList = data?.productsList || ['Custom Embroidered Shirts', '100% Pure Cotton Fabrics', 'Hotel & Hospitality Uniforms', 'Corporate Executive Wear']
+  
+  const rightTag = data?.rightTag || 'DEIRA CREEK SHOWROOM • DUBAI EST. 1963'
+  const rightTitle = data?.rightTitle || 'Silky Textiles & Garments LLC'
+  const rightSubtitle = data?.rightSubtitle || "Dubai's trusted bespoke tailors & corporate uniform partner."
+  const addressTitle = data?.addressTitle || 'Main Showroom & Atelier'
+  const addressDetail = data?.addressDetail || 'Deira Creek District, Al Ras, Dubai, UAE'
+  const phone = data?.phone || '+971 4 228 1234'
+  const guaranteeText = data?.guaranteeText || '⚡ Average reply in under 2 hours'
+  const bgImage = data?.bgImage || '/images/hotel_uniform_luxury.png'
+
   const toggleProduct = (item: string) => {
     if (selectedProducts.includes(item)) {
       setSelectedProducts(selectedProducts.filter((p) => p !== item))
@@ -701,8 +782,6 @@ function QuoteBandSection({ data, onOpenQuote }: { data: any, onOpenQuote: () =>
     e.preventDefault()
     setFormSubmitted(true)
   }
-
-  const productsList = ['Custom Embroidered Shirts', '100% Pure Cotton Fabrics', 'Hotel & Hospitality Uniforms', 'Corporate Executive Wear']
 
   return (
     <section id="quote-form-section" className="bg-[#FAF9F6] py-14 sm:py-20 lg:py-28 border-b border-slate-200/80 relative overflow-hidden select-none">
@@ -725,14 +804,14 @@ function QuoteBandSection({ data, onOpenQuote }: { data: any, onOpenQuote: () =>
 
             <div className="space-y-2 border-b border-slate-100 pb-5">
               <span className="text-xs sm:text-sm font-sans font-extrabold uppercase tracking-[0.22em] text-[#D97A42] block">
-                DEIRA CREEK SHOWROOM • DUBAI EST. 1963
+                {label}
               </span>
 
               <h2 className="font-serif text-3xl sm:text-4xl font-black text-slate-900 leading-tight">
-                Request A Custom Quotation
+                {title}
               </h2>
               <p className="font-sans text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
-                Send us your quantity & custom shirt details. Our Dubai sales team will prepare your quotation within 2 hours.
+                {subtitle}
               </p>
             </div>
 
@@ -811,7 +890,7 @@ function QuoteBandSection({ data, onOpenQuote }: { data: any, onOpenQuote: () =>
                     Select Requirements:
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-                    {productsList.map((p) => {
+                    {productsList.map((p: string) => {
                       const isChecked = selectedProducts.includes(p)
                       return (
                         <button
@@ -877,7 +956,7 @@ function QuoteBandSection({ data, onOpenQuote }: { data: any, onOpenQuote: () =>
             {/* Top Photoshoot Background Overlay */}
             <div className="absolute inset-0 z-0">
               <img
-                src="/images/hotel_uniform_luxury.png"
+                src={bgImage}
                 alt="Silky Textiles Dubai Showroom & Uniform Fleet"
                 className="w-full h-full object-cover filter contrast-[1.08] group-hover:scale-105 transition-transform duration-700 opacity-30"
               />
@@ -890,13 +969,13 @@ function QuoteBandSection({ data, onOpenQuote }: { data: any, onOpenQuote: () =>
               {/* Header */}
               <div className="space-y-2 border-b border-slate-800 pb-5">
                 <span className="text-[10px] font-sans font-extrabold text-[#D97A42] uppercase tracking-[0.2em] bg-black/40 backdrop-blur-md px-3.5 py-1.5 rounded-full inline-block border border-white/10 shadow-sm">
-                  DEIRA CREEK SHOWROOM • DUBAI EST. 1963
+                  {rightTag}
                 </span>
                 <h3 className="font-serif text-2xl sm:text-3xl font-black text-white leading-tight">
-                  Silky Textiles & Garments LLC
+                  {rightTitle}
                 </h3>
                 <p className="font-sans text-xs text-slate-400 font-medium">
-                  Dubai's trusted bespoke tailors & corporate uniform partner.
+                  {rightSubtitle}
                 </p>
               </div>
 
@@ -909,8 +988,8 @@ function QuoteBandSection({ data, onOpenQuote }: { data: any, onOpenQuote: () =>
                     <MapPin className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="font-bold text-white text-xs sm:text-sm">Main Showroom & Atelier</div>
-                    <div className="text-slate-400 text-[11px]">Deira Creek District, Al Ras, Dubai, UAE</div>
+                    <div className="font-bold text-white text-xs sm:text-sm">{addressTitle}</div>
+                    <div className="text-slate-400 text-[11px]">{addressDetail}</div>
                   </div>
                 </div>
 
@@ -921,7 +1000,7 @@ function QuoteBandSection({ data, onOpenQuote }: { data: any, onOpenQuote: () =>
                   </div>
                   <div>
                     <div className="font-bold text-white text-xs sm:text-sm">Direct Sales Inquiry</div>
-                    <a href="tel:+97142281234" className="text-slate-300 font-semibold hover:text-[#D97A42] transition-colors text-[11px]">+971 4 228 1234</a>
+                    <a href={`tel:${phone.replace(/\s+/g, '')}`} className="text-slate-300 font-semibold hover:text-[#D97A42] transition-colors text-[11px]">{phone}</a>
                   </div>
                 </div>
 
@@ -932,7 +1011,7 @@ function QuoteBandSection({ data, onOpenQuote }: { data: any, onOpenQuote: () =>
                   </div>
                   <div>
                     <div className="font-bold text-white text-xs sm:text-sm">Response Time Guarantee</div>
-                    <div className="text-[#1C7A4C] font-semibold text-[11px]">⚡ Average reply in under 2 hours</div>
+                    <div className="text-[#1C7A4C] font-semibold text-[11px]">{guaranteeText}</div>
                   </div>
                 </div>
 
@@ -1035,7 +1114,7 @@ function FabricSwatchesSection({ data, onOpenQuote }: { data: any, onOpenQuote: 
           >
             <h3 className="font-serif text-xl font-bold text-slate-900">Custom Dye Color Selection</h3>
             
-            <div className="grid grid-cols-5 gap-3 sm:gap-4">
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 sm:gap-4">
               {colors.map((c, i) => (
                 <button
                   key={i}
@@ -1103,7 +1182,11 @@ function FabricSwatchesSection({ data, onOpenQuote }: { data: any, onOpenQuote: 
 function QualityCraftsmanshipSection({ data }: { data: any }) {
   const [activeStep, setActiveStep] = useState(0)
 
-  const steps = [
+  const label = data?.label || 'ISO 9001:2015 CERTIFIED MANUFACTURING'
+  const title = data?.title || '4-Step Quality Assurance Process'
+  const subtitle = data?.subtitle || 'Click any step below to explore our rigorous 4-stage manufacturing standards engineered for corporate uniform durability in the Gulf climate.'
+
+  const defaultSteps = [
     {
       num: '01',
       title: 'Combed Egyptian Yarn Sourcing',
@@ -1162,7 +1245,13 @@ function QualityCraftsmanshipSection({ data }: { data: any }) {
     },
   ]
 
-  const current = steps[activeStep]
+  const steps = (data?.steps && Array.isArray(data.steps) && data.steps.length > 0)
+    ? data.steps
+    : (data?.points && Array.isArray(data.points) && data.points.length > 0)
+    ? data.points
+    : defaultSteps
+
+  const current = steps[activeStep] || steps[0]
 
   return (
     <section className="bg-slate-950 text-white py-14 sm:py-20 lg:py-28 border-b border-slate-800 relative overflow-hidden select-none">
@@ -1294,7 +1383,7 @@ function QualityCraftsmanshipSection({ data }: { data: any }) {
                   <span className="text-[10px] font-sans font-extrabold uppercase tracking-wider text-slate-400">
                     STAGE AUDIT SPECIFICATIONS:
                   </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className={`${getDynamicGridClass(current.points.length, 3)} gap-3`}>
                     {current.points.map((pt, i) => (
                       <div key={i} className="bg-slate-950/80 border border-slate-800 p-3 rounded-xl flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-[#1C7A4C] shrink-0" />
@@ -1321,14 +1410,65 @@ function QualityCraftsmanshipSection({ data }: { data: any }) {
 // 7. CORPORATE FLEET BULK PRICING TIERS (Section 7)
 // ----------------------------------------------------------------------
 function BulkPricingTiersSection({ data, onOpenQuote }: { data: any, onOpenQuote: () => void }) {
-  const tiers = [
-    { title: 'Sample & Pilot Fleet', range: '25 – 50 Pieces', desc: 'Ideal for small executive teams and initial quality verification.', badge: 'PILOT TIER', highlight: false },
-    { title: 'Corporate Fleet Tier', range: '50 – 250 Pieces', desc: 'Includes complimentary logo embroidery and free physical swatch delivery.', badge: 'MOST POPULAR', highlight: true },
-    { title: 'Wholesale Enterprise', range: '500+ Pieces', desc: 'Dedicated Dubai account director, custom pantone dye, and priority dispatch.', badge: 'BEST VALUE', highlight: false },
+  const label = data?.label || 'WHOLESALE & BULK DISCOUNTS'
+  const title = data?.title || 'Wholesale Volume Discount Tiers'
+  const subtitle = data?.subtitle || 'Transparent volume tier pricing with complimentary logo embroidery, swatch delivery, and express UAE dispatch.'
+
+  const calloutTitle = data?.calloutTitle || 'Need Custom Volume Above 1,000 Pieces?'
+  const calloutDesc = data?.calloutDesc || 'Our Dubai manufacturing atelier produces over 50,000 corporate shirts annually. Contact our direct enterprise wholesale team for contract pricing & custom fabric weaving.'
+  const calloutBtnText = data?.calloutBtnText || 'Contact Wholesale Director'
+
+  const defaultTiers = [
+    {
+      title: 'Sample & Pilot Fleet',
+      range: '25 – 50 Pieces',
+      priceNote: 'Standard Wholesale Rate',
+      desc: 'Ideal for small executive teams, initial trial orders, and quality verification.',
+      badge: 'PILOT TIER',
+      highlight: false,
+      features: [
+        'Complimentary Logo Digitizing Setup',
+        'Physical Fabric Swatch Box Delivery',
+        'Standard 5-7 Business Day UAE Dispatch',
+        'Flexible Size Ratio Selection',
+      ],
+    },
+    {
+      title: 'Corporate Fleet Tier',
+      range: '50 – 250 Pieces',
+      priceNote: 'Most Popular • 15% Volume Discount',
+      desc: 'Includes complimentary logo embroidery and free physical swatch delivery to your office.',
+      badge: 'MOST POPULAR',
+      highlight: true,
+      features: [
+        'Free 3D High-Definition Logo Embroidery',
+        'On-Site Staff Sizing Trial Fittings',
+        'Express 48-Hour Rush Order Option',
+        'Dedicated Dubai Account Manager',
+        'Complimentary Insured Shipping Across UAE',
+      ],
+    },
+    {
+      title: 'Wholesale Enterprise',
+      range: '500+ Pieces',
+      priceNote: 'Best Value • 25% Volume Discount',
+      desc: 'Dedicated Dubai account director, custom pantone dye, and priority dispatch for regional chains.',
+      badge: 'BEST VALUE',
+      highlight: false,
+      features: [
+        'Custom Pantone Yarn & Fabric Dyeing',
+        '25% Tier Wholesale Volume Discount',
+        'Dedicated Senior Sales Director',
+        'Priority Atelier Production Allocation',
+        'Custom Woven Brand & Care Labels',
+      ],
+    },
   ]
 
+  const tiers = (data?.tiers && data.tiers.length > 0) ? data.tiers : defaultTiers
+
   return (
-    <section className="bg-white py-14 sm:py-20 lg:py-28 border-b border-slate-200/80 relative overflow-hidden select-none">
+    <section id="pricing" className="bg-white py-14 sm:py-20 lg:py-28 border-b border-slate-200/80 relative overflow-hidden select-none">
       <div className="max-w-[1380px] mx-auto px-4 sm:px-8 lg:px-10 space-y-12 sm:space-y-16">
         
         {/* Header */}
@@ -1340,54 +1480,117 @@ function BulkPricingTiersSection({ data, onOpenQuote }: { data: any, onOpenQuote
           className="max-w-3xl space-y-3"
         >
           <span className="text-xs sm:text-sm font-sans font-extrabold uppercase tracking-[0.22em] text-[#D97A42] block">
-            WHOLESALE & BULK DISCOUNTS
+            {label}
           </span>
           <h2 className="font-serif text-3xl sm:text-4xl lg:text-[44px] text-[#0F172A] font-black leading-[1.12]">
-            Wholesale Volume Discount Tiers
+            {title}
           </h2>
+          {subtitle && (
+            <p className="font-sans text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
+              {subtitle}
+            </p>
+          )}
         </motion.div>
 
-        {/* 3 Tier Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {tiers.map((t, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.2 }}
-              transition={{ duration: 1.05, ease: [0.16, 1, 0.3, 1], delay: idx * 0.15 }}
-              whileHover={{ y: -6 }}
-              className={`p-8 rounded-3xl border flex flex-col justify-between space-y-6 transition-all duration-300 ${
-                t.highlight
-                  ? 'bg-[#FAF9F6] border-[#D97A42] shadow-xl ring-2 ring-[#D97A42]/20'
-                  : 'bg-white border-slate-200 shadow-xs'
-              }`}
-            >
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className={`text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-md ${
-                    t.highlight ? 'bg-[#D97A42] text-white' : 'bg-slate-100 text-slate-700'
-                  }`}>
-                    {t.badge}
-                  </span>
-                  <Box className="w-5 h-5 text-[#D97A42]" />
-                </div>
-                <h3 className="font-serif text-2xl font-black text-slate-900">{t.title}</h3>
-                <div className="text-xl font-sans font-black text-[#D97A42]">{t.range}</div>
-                <p className="font-sans text-xs text-slate-600 leading-relaxed font-medium">{t.desc}</p>
-              </div>
+        {/* Tier Cards */}
+        <div className={`${getDynamicGridClass(tiers.length, 4)} gap-8 items-stretch`}>
+          {tiers.map((t: any, idx: number) => {
+            const isHighlighted = Boolean(t.highlight || t.highlighted)
+            const featureList = t.features || t.points || (idx === 0 ? defaultTiers[0].features : idx === 1 ? defaultTiers[1].features : defaultTiers[2].features)
 
-              <button
-                onClick={onOpenQuote}
-                className={`w-full py-4 text-xs font-bold uppercase tracking-widest rounded-xl transition-all cursor-pointer ${
-                  t.highlight ? 'bg-[#D97A42] text-white hover:bg-[#c46833]' : 'bg-slate-900 text-white hover:bg-slate-800'
+            return (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false, amount: 0.2 }}
+                transition={{ duration: 1.05, ease: [0.16, 1, 0.3, 1], delay: idx * 0.15 }}
+                whileHover={{ y: -6 }}
+                className={`p-8 rounded-3xl border flex flex-col justify-between space-y-8 transition-all duration-300 ${
+                  isHighlighted
+                    ? 'bg-[#FAF9F6] border-[#D97A42] shadow-xl ring-2 ring-[#D97A42]/20'
+                    : 'bg-white border-slate-200 shadow-xs'
                 }`}
               >
-                Request Tier Quote
-              </button>
-            </motion.div>
-          ))}
+                <div className="space-y-6">
+                  {/* Top Badge & Box Icon */}
+                  <div className="flex items-center justify-between">
+                    <span className={`text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-md ${
+                      isHighlighted ? 'bg-[#D97A42] text-white' : 'bg-slate-100 text-slate-700'
+                    }`}>
+                      {t.badge || 'BULK TIER'}
+                    </span>
+                    <Box className="w-5 h-5 text-[#D97A42]" />
+                  </div>
+
+                  {/* Title & Quantity Range */}
+                  <div className="space-y-1">
+                    <h3 className="font-serif text-2xl font-black text-slate-900">{t.title}</h3>
+                    <div className="text-xl font-sans font-black text-[#D97A42]">{t.range}</div>
+                    {t.priceNote && (
+                      <div className="text-[11px] font-sans font-bold text-[#1C7A4C] uppercase tracking-wider">
+                        {t.priceNote}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Description */}
+                  <p className="font-sans text-xs text-slate-600 leading-relaxed font-medium border-b border-slate-100 pb-4">
+                    {t.desc}
+                  </p>
+
+                  {/* Feature Bullet Points Checklist */}
+                  {Array.isArray(featureList) && featureList.length > 0 && (
+                    <div className="space-y-2.5 pt-1 font-sans text-xs">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Included Services & Perks:</span>
+                      {featureList.map((f: string, fIdx: number) => (
+                        <div key={fIdx} className="flex items-start gap-2.5 text-slate-700 font-medium">
+                          <CheckCircle2 className="w-4 h-4 text-[#1C7A4C] shrink-0 mt-0.5" />
+                          <span className="leading-tight">{f}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  onClick={onOpenQuote}
+                  className={`w-full py-4 text-xs font-bold uppercase tracking-widest rounded-xl transition-all cursor-pointer shadow-md ${
+                    isHighlighted ? 'bg-[#D97A42] text-white hover:bg-[#c46833]' : 'bg-slate-900 text-white hover:bg-slate-800'
+                  }`}
+                >
+                  Request Tier Quote
+                </button>
+              </motion.div>
+            )
+          })}
         </div>
+
+        {/* Bottom Wholesale Enterprise Callout Banner */}
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+          className="bg-slate-900 text-white p-8 sm:p-10 rounded-3xl border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl relative overflow-hidden"
+        >
+          <div className="space-y-2 max-w-3xl">
+            <span className="text-[10px] font-sans font-extrabold uppercase tracking-widest text-[#D97A42] bg-[#D97A42]/10 px-3 py-1 rounded-md border border-[#D97A42]/20 inline-block">
+              ENTERPRISE FLEET CONTRACTS
+            </span>
+            <h3 className="font-serif text-2xl font-black text-white">{calloutTitle}</h3>
+            <p className="font-sans text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">
+              {calloutDesc}
+            </p>
+          </div>
+          <button
+            onClick={onOpenQuote}
+            className="px-8 py-4 bg-[#D97A42] hover:bg-[#c46833] text-white text-xs font-bold uppercase tracking-widest rounded-xl transition-all shadow-lg shrink-0 cursor-pointer flex items-center gap-2"
+          >
+            <span>{calloutBtnText}</span>
+            <ArrowUpRight className="w-4 h-4" />
+          </button>
+        </motion.div>
 
       </div>
     </section>
@@ -1395,17 +1598,25 @@ function BulkPricingTiersSection({ data, onOpenQuote }: { data: any, onOpenQuote
 }
 
 // ----------------------------------------------------------------------
-// 8. EXPRESS LOGISTICS & UAE DISTRIBUTION (Brand New Split Telemetry & Low-Transparency Tech Shapes)
+// 8. EXPRESS LOGISTICS & UAE DISTRIBUTION (Section 8)
 // ----------------------------------------------------------------------
 function LogisticsCoverageSection({ data }: { data: any }) {
   const label = data?.label || 'EXPRESS LOGISTICS & GCC DISPATCH'
   const title = data?.title || 'Nationwide UAE & Regional Delivery Telemetry'
+  const leftCardTitle = data?.leftCardTitle || 'Deira Direct Dispatch'
+  const metric1Label = data?.metric1Label || 'Dispatch Guarantee'
+  const metric1Value = data?.metric1Value || '100% On-Time'
+  const metric2Label = data?.metric2Label || 'Coverage Hubs'
+  const metric2Value = data?.metric2Value || 'All 7 Emirates'
+  const leftCardNote = data?.leftCardNote || 'Complimentary insured shipping on all orders over 50 pieces.'
 
-  const routes = [
+  const defaultRoutes = [
     { hub: 'Dubai Atelier & DIFC Direct', status: 'Same-Day Dispatch', time: 'Under 6 Hours', badge: 'EXPRESS VAN', icon: MapPin },
     { hub: 'Abu Dhabi, Sharjah & Al Ain', status: '24-Hour Capital Courier', time: 'Next Morning', badge: 'DAILY FREIGHT', icon: Truck },
     { hub: 'GCC Region (KSA, Oman, Qatar, Kuwait)', status: '48-Hour Air & Overland', time: '2-3 Business Days', badge: 'AIR & LAND', icon: Box },
   ]
+
+  const routes = (data?.routes && data.routes.length > 0) ? data.routes : defaultRoutes
 
   return (
     <section className="bg-[#0F172A] text-white py-14 sm:py-20 lg:py-28 border-b border-slate-800 relative overflow-hidden select-none">
@@ -1431,19 +1642,16 @@ function LogisticsCoverageSection({ data }: { data: any }) {
       {/* Low-Transparency Geometric Radar & Telemetry SVG Overlay */}
       <div className="absolute inset-0 pointer-events-none opacity-10 flex items-center justify-center">
         <svg className="w-full h-full text-[#D97A42]" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
-          {/* Concentric Radar Circles */}
           <circle cx="500" cy="500" r="450" stroke="currentColor" strokeWidth="1" strokeDasharray="6 6" />
           <circle cx="500" cy="500" r="320" stroke="currentColor" strokeWidth="1.5" />
           <circle cx="500" cy="500" r="180" stroke="currentColor" strokeWidth="1" strokeDasharray="4 4" />
           <circle cx="500" cy="500" r="60" stroke="currentColor" strokeWidth="2" />
           
-          {/* Diagonal Telemetry Grid Lines */}
           <line x1="500" y1="50" x2="500" y2="950" stroke="currentColor" strokeWidth="1" strokeDasharray="8 8" />
           <line x1="50" y1="500" x2="950" y2="500" stroke="currentColor" strokeWidth="1" strokeDasharray="8 8" />
           <line x1="180" y1="180" x2="820" y2="820" stroke="currentColor" strokeWidth="0.75" />
           <line x1="820" y1="180" x2="180" y2="820" stroke="currentColor" strokeWidth="0.75" />
 
-          {/* Telemetry Corner Crosshairs */}
           <path d="M100 100 H140 M100 100 V140" stroke="currentColor" strokeWidth="2" />
           <path d="M900 100 H860 M900 100 V140" stroke="currentColor" strokeWidth="2" />
           <path d="M100 900 H140 M100 900 V860" stroke="currentColor" strokeWidth="2" />
@@ -1480,7 +1688,6 @@ function LogisticsCoverageSection({ data }: { data: any }) {
             transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-5 bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-8 rounded-3xl space-y-6 shadow-2xl relative overflow-hidden group hover:border-[#D97A42]/60 hover:shadow-[0_0_35px_rgba(217,122,66,0.15)] transition-all duration-500"
           >
-            {/* Low-Transparency Floating Card Graphic */}
             <div className="absolute -right-12 -bottom-12 w-48 h-48 border-2 stroke-dasharray border-[#D97A42]/10 rounded-full pointer-events-none group-hover:scale-125 transition-transform duration-700" />
 
             <div className="flex items-center justify-between border-b border-slate-800/90 pb-5 relative z-10">
@@ -1489,7 +1696,7 @@ function LogisticsCoverageSection({ data }: { data: any }) {
                   <span className="w-1.5 h-1.5 rounded-full bg-[#D97A42] animate-pulse" />
                   HUB TELEMETRY
                 </span>
-                <span className="text-lg font-serif font-black text-white">Deira Direct Dispatch</span>
+                <span className="text-lg font-serif font-black text-white">{leftCardTitle}</span>
               </div>
               <div className="w-11 h-11 rounded-xl bg-[#D97A42]/20 border border-[#D97A42]/40 text-[#D97A42] flex items-center justify-center shadow-lg">
                 <Truck className="w-5 h-5" />
@@ -1498,18 +1705,18 @@ function LogisticsCoverageSection({ data }: { data: any }) {
 
             <div className="grid grid-cols-2 gap-4 relative z-10">
               <div className="bg-slate-950/80 p-4 rounded-2xl border border-slate-800/80 space-y-1 hover:border-[#1C7A4C]/50 transition-colors">
-                <span className="text-[10px] font-sans font-bold text-slate-400 block uppercase">Dispatch Guarantee</span>
-                <span className="text-xl font-sans font-black text-[#1C7A4C]">100% On-Time</span>
+                <span className="text-[10px] font-sans font-bold text-slate-400 block uppercase">{metric1Label}</span>
+                <span className="text-xl font-sans font-black text-[#1C7A4C]">{metric1Value}</span>
               </div>
               <div className="bg-slate-950/80 p-4 rounded-2xl border border-slate-800/80 space-y-1 hover:border-[#D97A42]/50 transition-colors">
-                <span className="text-[10px] font-sans font-bold text-slate-400 block uppercase">Coverage Hubs</span>
-                <span className="text-xl font-sans font-black text-[#D97A42]">All 7 Emirates</span>
+                <span className="text-[10px] font-sans font-bold text-slate-400 block uppercase">{metric2Label}</span>
+                <span className="text-xl font-sans font-black text-[#D97A42]">{metric2Value}</span>
               </div>
             </div>
 
             <div className="pt-2 flex items-center gap-3 text-xs text-slate-300 font-medium relative z-10">
               <CheckCircle2 className="w-4 h-4 text-[#1C7A4C] shrink-0" />
-              <span>Complimentary insured shipping on all orders over 50 pieces.</span>
+              <span>{leftCardNote}</span>
             </div>
           </motion.div>
 
@@ -1521,8 +1728,8 @@ function LogisticsCoverageSection({ data }: { data: any }) {
             transition={{ duration: 1.15, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-7 space-y-4"
           >
-            {routes.map((r, idx) => {
-              const Icon = r.icon
+            {routes.map((r: any, idx: number) => {
+              const Icon = r.icon || (idx === 0 ? MapPin : idx === 1 ? Truck : Box)
               return (
                 <motion.div
                   key={idx}
@@ -1530,12 +1737,15 @@ function LogisticsCoverageSection({ data }: { data: any }) {
                   transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                   className="bg-slate-900/80 backdrop-blur-md border border-slate-800 p-6 rounded-2xl flex items-center justify-between gap-4 shadow-sm hover:border-[#D97A42]/60 hover:bg-slate-900 hover:shadow-[0_0_30px_rgba(217,122,66,0.12)] transition-all duration-300 cursor-pointer relative overflow-hidden"
                 >
-                  {/* Subtle Low-Transparency Accent Line */}
                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#D97A42]/40 opacity-0 group-hover:opacity-100 transition-opacity" />
 
                   <div className="flex items-center gap-4">
                     <div className="w-11 h-11 rounded-xl bg-[#D97A42]/10 border border-[#D97A42]/30 text-[#D97A42] flex items-center justify-center shrink-0 shadow-xs">
-                      <Icon className="w-5 h-5" />
+                      {r.iconImage ? (
+                        <img src={r.iconImage} alt={r.hub} className="w-5 h-5 object-contain" />
+                      ) : (
+                        <Icon className="w-5 h-5" />
+                      )}
                     </div>
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
@@ -1565,10 +1775,14 @@ function LogisticsCoverageSection({ data }: { data: any }) {
 }
 
 // ----------------------------------------------------------------------
-// 9. CLIENT REVIEWS & CASE STUDIES (5 Seeded Infinite Marquee Carousel)
+// 9. CLIENT REVIEWS & CASE STUDIES (Section 9)
 // ----------------------------------------------------------------------
 function ClientTestimonialsSection({ data }: { data: any }) {
-  const reviews = [
+  const label = data?.label || 'VERIFIED B2B CLIENT REVIEWS'
+  const title = data?.title || 'Trusted by Corporate & Hotel Fleets Across UAE'
+  const subtitle = data?.subtitle || 'Scroll horizontally or hover to pause the continuous client testimonial ticker.'
+
+  const defaultReviews = [
     {
       quote: "Silky Textiles supplied over 400 executive cotton shirts for our DIFC office staff. The fit and embroidery accuracy exceeded expectations.",
       author: "Tariq Al-Mansoor",
@@ -1606,6 +1820,12 @@ function ClientTestimonialsSection({ data }: { data: any }) {
     },
   ]
 
+  const reviews = (data?.testimonials && data.testimonials.length > 0)
+    ? data.testimonials
+    : (data?.reviews && data.reviews.length > 0)
+    ? data.reviews
+    : defaultReviews
+
   // Duplicate for seamless infinite loop
   const marqueeReviews = [...reviews, ...reviews]
 
@@ -1622,13 +1842,13 @@ function ClientTestimonialsSection({ data }: { data: any }) {
           className="text-center space-y-3 max-w-2xl mx-auto"
         >
           <span className="text-xs sm:text-sm font-sans font-extrabold uppercase tracking-[0.22em] text-[#D97A42] block">
-            VERIFIED B2B CLIENT REVIEWS
+            {label}
           </span>
           <h2 className="font-serif text-3xl sm:text-4xl text-[#0F172A] font-black leading-tight">
-            Trusted by Corporate & Hotel Fleets Across UAE
+            {title}
           </h2>
           <p className="font-sans text-xs sm:text-sm text-slate-600 font-medium">
-            Scroll horizontally or hover to pause the continuous client testimonial ticker.
+            {subtitle}
           </p>
         </motion.div>
 
@@ -1636,7 +1856,6 @@ function ClientTestimonialsSection({ data }: { data: any }) {
 
       {/* Infinite Smooth Marquee Ticker */}
       <div className="relative w-full overflow-hidden py-4 group">
-        {/* Side Gradient Shadows */}
         <div className="absolute top-0 bottom-0 left-0 w-24 bg-gradient-to-r from-white to-transparent z-20 pointer-events-none" />
         <div className="absolute top-0 bottom-0 right-0 w-24 bg-gradient-to-l from-white to-transparent z-20 pointer-events-none" />
 
@@ -1650,7 +1869,7 @@ function ClientTestimonialsSection({ data }: { data: any }) {
           }}
           className="flex items-center gap-6 w-max group-hover:[animation-play-state:paused]"
         >
-          {marqueeReviews.map((r, idx) => (
+          {marqueeReviews.map((r: any, idx: number) => (
             <div
               key={idx}
               className="w-[380px] sm:w-[440px] bg-[#FAF9F6] border border-slate-200/90 p-8 rounded-3xl shadow-xs hover:shadow-xl hover:border-[#D97A42]/50 transition-all duration-300 shrink-0 flex flex-col justify-between space-y-6"
@@ -1658,7 +1877,7 @@ function ClientTestimonialsSection({ data }: { data: any }) {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1 text-[#D97A42]">
-                    {[...Array(r.rating)].map((_, i) => (
+                    {[...Array(r.rating || 5)].map((_, i) => (
                       <Star key={i} className="w-4 h-4 fill-current" />
                     ))}
                   </div>
@@ -1672,11 +1891,16 @@ function ClientTestimonialsSection({ data }: { data: any }) {
               </div>
 
               <div className="pt-4 border-t border-slate-200/80 flex items-center justify-between">
-                <div>
-                  <div className="font-sans text-sm font-extrabold text-slate-900">{r.author}</div>
-                  <div className="font-sans text-xs text-[#D97A42] font-bold">{r.role}</div>
+                <div className="flex items-center gap-3">
+                  {r.avatar && (
+                    <img src={r.avatar} alt={r.author} className="w-9 h-9 rounded-full object-cover border border-slate-300 shrink-0" />
+                  )}
+                  <div>
+                    <div className="font-sans text-sm font-extrabold text-slate-900">{r.author || r.company}</div>
+                    <div className="font-sans text-xs text-[#D97A42] font-bold">{r.role}</div>
+                  </div>
                 </div>
-                <span className="text-[10px] font-sans font-bold text-slate-400 uppercase tracking-wider">{r.location}</span>
+                <span className="text-[10px] font-sans font-bold text-slate-400 uppercase tracking-wider">{r.location || r.company}</span>
               </div>
             </div>
           ))}
@@ -1752,69 +1976,65 @@ export function ProductPageClient({ page, config }: { page: any, config?: any })
     }
   }
 
-  // Check if DB returns sections, and build full 11-section ordered list
-  const sectionTypeMap = new Map()
-  sections.forEach((sec: any) => {
-    if (sec.isActive) {
-      sectionTypeMap.set(sec.type, sec)
-    }
-  })
+  // Render sections from database if available, sorted by section order
+  const hasSections = Array.isArray(sections) && sections.length > 0
 
-  // Full 11-section canonical order:
-  const canonicalTypes = [
-    'HERO',
-    'SPECS_MATRIX',
-    'CUSTOMIZATION',
-    'SECTORS',
-    'FABRIC_SWATCHES',
-    'QUALITY_CONTROL',
-    'BULK_PRICING',
-    'LOGISTICS',
-    'TESTIMONIALS',
-    'FAQ',
-    'QUOTE_BAND',
-  ]
-
-  const renderCanonicalSection = (type: string) => {
-    const existingSection = sectionTypeMap.get(type)
-    if (existingSection) {
-      return renderSection(existingSection)
+  const renderAllSections = () => {
+    if (hasSections) {
+      const sortedSections = [...sections].sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+      return sortedSections.map((sec: any) => renderSection(sec))
     }
 
-    // Default fallbacks for all 11 sections
-    switch (type) {
-      case 'HERO':
-        return <ProductHeroSection key="default-hero" data={{}} onOpenQuote={() => setIsQuoteOpen(true)} />
-      case 'SPECS_MATRIX':
-        return <SpecsMatrixSection key="default-specs" data={{}} />
-      case 'CUSTOMIZATION':
-        return <CustomizationShowcaseSection key="default-customization" data={{}} />
-      case 'SECTORS':
-        return <SectorsSection key="default-sectors" data={{}} onOpenQuote={() => setIsQuoteOpen(true)} />
-      case 'FABRIC_SWATCHES':
-        return <FabricSwatchesSection key="default-swatches" data={{}} onOpenQuote={() => setIsQuoteOpen(true)} />
-      case 'QUALITY_CONTROL':
-        return <QualityCraftsmanshipSection key="default-qc" data={{}} />
-      case 'BULK_PRICING':
-        return <BulkPricingTiersSection key="default-[#pricing]" data={{}} onOpenQuote={() => setIsQuoteOpen(true)} />
-      case 'LOGISTICS':
-        return <LogisticsCoverageSection key="default-logistics" data={{}} />
-      case 'TESTIMONIALS':
-        return <ClientTestimonialsSection key="default-testimonials" data={{}} />
-      case 'FAQ':
-        return (
-          <ProductFaqSection
-            key="default-faq"
-            data={{}}
-            openIndex={openFaqIndex}
-            onToggle={(idx) => setOpenFaqIndex(openFaqIndex === idx ? null : idx)}
-          />
-        )
-      case 'QUOTE_BAND':
-        return <QuoteBandSection key="default-quote" data={{}} onOpenQuote={() => setIsQuoteOpen(true)} />
-      default:
-        return null
-    }
+    // Default 11-section canonical fallback when page has no custom sections in DB
+    const canonicalTypes = [
+      'HERO',
+      'SPECS_MATRIX',
+      'CUSTOMIZATION',
+      'SECTORS',
+      'FABRIC_SWATCHES',
+      'QUALITY_CONTROL',
+      'BULK_PRICING',
+      'LOGISTICS',
+      'TESTIMONIALS',
+      'FAQ',
+      'QUOTE_BAND',
+    ]
+
+    return canonicalTypes.map((type) => {
+      switch (type) {
+        case 'HERO':
+          return <ProductHeroSection key="default-hero" data={{}} onOpenQuote={() => setIsQuoteOpen(true)} />
+        case 'SPECS_MATRIX':
+          return <SpecsMatrixSection key="default-specs" data={{}} />
+        case 'CUSTOMIZATION':
+          return <CustomizationShowcaseSection key="default-customization" data={{}} />
+        case 'SECTORS':
+          return <SectorsSection key="default-sectors" data={{}} onOpenQuote={() => setIsQuoteOpen(true)} />
+        case 'FABRIC_SWATCHES':
+          return <FabricSwatchesSection key="default-swatches" data={{}} onOpenQuote={() => setIsQuoteOpen(true)} />
+        case 'QUALITY_CONTROL':
+          return <QualityCraftsmanshipSection key="default-qc" data={{}} />
+        case 'BULK_PRICING':
+          return <BulkPricingTiersSection key="default-[#pricing]" data={{}} onOpenQuote={() => setIsQuoteOpen(true)} />
+        case 'LOGISTICS':
+          return <LogisticsCoverageSection key="default-logistics" data={{}} />
+        case 'TESTIMONIALS':
+          return <ClientTestimonialsSection key="default-testimonials" data={{}} />
+        case 'FAQ':
+          return (
+            <ProductFaqSection
+              key="default-faq"
+              data={{}}
+              openIndex={openFaqIndex}
+              onToggle={(idx) => setOpenFaqIndex(openFaqIndex === idx ? null : idx)}
+            />
+          )
+        case 'QUOTE_BAND':
+          return <QuoteBandSection key="default-quote" data={{}} onOpenQuote={() => setIsQuoteOpen(true)} />
+        default:
+          return null
+      }
+    })
   }
 
   return (
@@ -1822,7 +2042,7 @@ export function ProductPageClient({ page, config }: { page: any, config?: any })
       <SiteHeader onOpenQuoteModal={() => setIsQuoteOpen(true)} config={config} />
 
       <main id="main-content" className="relative z-0">
-        {canonicalTypes.map(renderCanonicalSection)}
+        {renderAllSections()}
       </main>
 
       <SiteFooter />

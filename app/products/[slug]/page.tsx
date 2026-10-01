@@ -8,6 +8,11 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 async function getProductPageData(slug: string) {
+  // 1. Primary Source of Truth: MySQL (Laravel API)
+  const apiPage = await getProductPageBySlug(slug)
+  if (apiPage) return apiPage
+
+  // 2. Fallback: Prisma SQLite
   try {
     const dbPage = await prisma.productPage.findUnique({
       where: { slug },
@@ -21,9 +26,6 @@ async function getProductPageData(slug: string) {
   } catch (e) {
     console.error('Error reading product page from Prisma:', e)
   }
-
-  const apiPage = await getProductPageBySlug(slug)
-  if (apiPage) return apiPage
 
   if (slug === 'pure-cotton-shirts-supplier-in-uae') {
     return {

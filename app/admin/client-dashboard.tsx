@@ -3,9 +3,9 @@
 import React, { useState, useRef } from 'react'
 import { Hero } from '@/components/hero'
 import { SiteHeader } from '@/components/site-header'
-import { updateSlide, createSlide, deleteSlide, updateSiteConfig, updatePageSection, updateSectionOrder, saveProductPageSectionsAction } from './actions'
-import { Plus, Trash2, Save, Layout, Settings, Image as ImageIcon, UploadCloud, Monitor, Menu, Search, Bell, HelpCircle, FileText, ShoppingBag, FolderTree, BookOpen, Briefcase, Activity, FolderOpen, Users as UsersIcon, ExternalLink, ChevronDown, Check } from 'lucide-react'
-import { CategoryShowcaseEditor, UniformSolutionsEditor, OurWorkEditor, WhySilkyEditor, ProcessEditor, TestimonialsEditor, ContactBandEditor, SpecsMatrixEditor, FaqEditor, FabricSwatchesEditor, QualityControlEditor, BulkPricingEditor, LogisticsEditor } from './section-editors'
+import { updateSlide, createSlide, deleteSlide, updateSiteConfig, updatePageSection, updateSectionOrder, saveProductPageSectionsAction, createProductPageAction, deleteProductPageAction } from './actions'
+import { Plus, Trash2, Save, Layout, Settings, Image as ImageIcon, UploadCloud, Monitor, Menu, Search, Bell, HelpCircle, FileText, ShoppingBag, FolderTree, BookOpen, Briefcase, Activity, FolderOpen, Users as UsersIcon, ExternalLink, ChevronDown, Check, ArrowUp, ArrowDown, Layers, Move } from 'lucide-react'
+import { CategoryShowcaseEditor, UniformSolutionsEditor, OurWorkEditor, WhySilkyEditor, ProcessEditor, TestimonialsEditor, ContactBandEditor, SpecsMatrixEditor, FaqEditor, FabricSwatchesEditor, QualityControlEditor, BulkPricingEditor, LogisticsEditor, ProductHeroEditor, CustomizationEditor } from './section-editors'
 
 const getSectionLabel = (type: string) => {
   switch (type) {
@@ -106,6 +106,27 @@ const DEFAULT_PRODUCT_PAGE_SECTIONS = [
   { id: 211, type: 'QUOTE_BAND', data: '{}', isActive: true, order: 11 },
 ]
 
+function ensureAll11ProductSections(existingSections: any[]) {
+  if (!Array.isArray(existingSections) || existingSections.length === 0) {
+    return DEFAULT_PRODUCT_PAGE_SECTIONS
+  }
+
+  const existingMap = new Map<string, any>()
+  existingSections.forEach(s => {
+    if (s && s.type) existingMap.set(s.type, s)
+  })
+
+  const merged = DEFAULT_PRODUCT_PAGE_SECTIONS.map(item => {
+    if (existingMap.has(item.type)) {
+      const ex = existingMap.get(item.type)
+      return { ...ex, order: ex.order || item.order }
+    }
+    return { ...item }
+  })
+
+  return merged.sort((a, b) => (a.order || 0) - (b.order || 0))
+}
+
 export function ClientDashboard({
   initialSlides,
   initialConfig,
@@ -126,9 +147,7 @@ export function ClientDashboard({
     initialSections.length > 0 ? initialSections : DEFAULT_HOMEPAGE_SECTIONS
   )
 
-  const initialProdPageSections = initialProductPages[0]?.sections?.length > 0
-    ? initialProductPages[0].sections
-    : DEFAULT_PRODUCT_PAGE_SECTIONS
+  const initialProdPageSections = ensureAll11ProductSections(initialProductPages[0]?.sections || [])
 
   const [productPageSections, setProductPageSections] = useState<any[]>(initialProdPageSections)
   const [productPages, setProductPages] = useState<any[]>(initialProductPages)
@@ -137,6 +156,15 @@ export function ClientDashboard({
   )
 
   const [activeTab, setActiveTab] = useState<'builder' | 'header' | 'product-pages'>('product-pages')
+
+  const switchTab = (tab: 'builder' | 'header' | 'product-pages') => {
+    setActiveTab(tab)
+    if (tab === 'product-pages') {
+      setSelectedSectionId(productPageSections[0]?.id || 201)
+    } else if (tab === 'builder') {
+      setSelectedSectionId(homepageSections[0]?.id || 101)
+    }
+  }
 
   const currentSections = activeTab === 'product-pages' ? productPageSections : homepageSections
 
@@ -147,13 +175,99 @@ export function ClientDashboard({
     slides[0]?.id || null
   )
 
-  // Sync selectedSectionId on tab switch
-  const switchTab = (tab: 'builder' | 'header' | 'product-pages') => {
-    setActiveTab(tab)
-    if (tab === 'product-pages') {
-      setSelectedSectionId(productPageSections[0]?.id || 201)
-    } else if (tab === 'builder') {
-      setSelectedSectionId(homepageSections[0]?.id || 101)
+  // Create Product Page Modal State
+  const [isCreatePageModalOpen, setIsCreatePageModalOpen] = useState(false)
+  const [newPageTitle, setNewPageTitle] = useState('')
+  const [newPageSlug, setNewPageSlug] = useState('')
+  const [newPageCategory, setNewPageCategory] = useState('Corporate Uniforms & Shirting')
+  const [newPageHeroImage, setNewPageHeroImage] = useState('/images/textile_fabric_rolls.png')
+
+  // Auto-fetch sections when selectedProductSlug changes
+  React.useEffect(() => {
+    async function loadSelectedPageData() {
+      if (!selectedProductSlug) return
+      try {
+        const res = await fetch(`http://127.0.0.1:8000/api/product-pages/slug/${selectedProductSlug}`)
+        if (res.ok) {
+          const data = await res.json()
+          if (data && data.sections && data.sections.length > 0) {
+            const merged = ensureAll11ProductSections(data.sections)
+            setProductPageSections(merged)
+            setSelectedSectionId(merged[0]?.id || null)
+            return
+          }
+        }
+      } catch (e) {}
+      const target = productPages.find(p => p.slug === selectedProductSlug)
+      if (target?.sections?.length > 0) {
+        const merged = ensureAll11ProductSections(target.sections)
+        setProductPageSections(merged)
+        setSelectedSectionId(merged[0]?.id || null)
+      } else {
+        setProductPageSections(DEFAULT_PRODUCT_PAGE_SECTIONS)
+        setSelectedSectionId(201)
+      }
+    }
+
+    loadSelectedPageData()
+  }, [selectedProductSlug])
+
+  const handleTitleChange = (val: string) => {
+    setNewPageTitle(val)
+    const generatedSlug = val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+    setNewPageSlug(generatedSlug)
+  }
+
+  const handleCreateProductPageSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newPageTitle.trim() || !newPageSlug.trim()) {
+      showToast('Please fill in both Title and Slug', 'error')
+      return
+    }
+
+    setIsSaving(true)
+    try {
+      const createdPage = await createProductPageAction({
+        title: newPageTitle.trim(),
+        slug: newPageSlug.trim(),
+        category: newPageCategory,
+        heroImage: newPageHeroImage,
+      })
+
+      setProductPages(prev => [...prev.filter(p => p.slug !== createdPage.slug), createdPage])
+      setSelectedProductSlug(createdPage.slug)
+      setIsCreatePageModalOpen(false)
+      setNewPageTitle('')
+      setNewPageSlug('')
+      showToast(`Created product page "${createdPage.title}" with 11 template sections!`)
+    } catch (err: any) {
+      console.error(err)
+      showToast('Error creating page. Ensure slug is unique.', 'error')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleDeleteActiveProductPage = async () => {
+    if (selectedProductSlug === 'pure-cotton-shirts-supplier-in-uae') {
+      alert('The Master Template Product Page cannot be deleted.')
+      return
+    }
+
+    if (!confirm(`Are you sure you want to delete the product page "${selectedProductSlug}"?`)) return
+
+    setIsSaving(true)
+    try {
+      await deleteProductPageAction(selectedProductSlug)
+      const remainingPages = productPages.filter(p => p.slug !== selectedProductSlug)
+      setProductPages(remainingPages)
+      setSelectedProductSlug('pure-cotton-shirts-supplier-in-uae')
+      showToast('Product page deleted!')
+    } catch (err) {
+      console.error(err)
+      showToast('Error deleting page', 'error')
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -168,6 +282,21 @@ export function ClientDashboard({
   
   const fileInputRef = useRef<HTMLInputElement>(null)
   const logoInputRef = useRef<HTMLInputElement>(null)
+  const newPageHeroFileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleNewPageHeroUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.[0]) return
+    setIsSaving(true)
+    try {
+      const url = await uploadFile(e.target.files[0])
+      setNewPageHeroImage(url)
+      showToast('Hero image uploaded successfully!')
+    } catch (err) {
+      alert('Upload failed')
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type })
@@ -219,6 +348,22 @@ export function ClientDashboard({
       setSelectedSectionId(remaining[0]?.id || null)
     }
     showToast('Section removed!')
+  }
+
+  const moveProductSectionToPosition = (fromIdx: number, targetPosition: number) => {
+    const toIdx = targetPosition - 1
+    if (toIdx < 0 || toIdx >= productPageSections.length || fromIdx === toIdx) return
+    const updated = [...productPageSections]
+    const [movedItem] = updated.splice(fromIdx, 1)
+    updated.splice(toIdx, 0, movedItem)
+    const reordered = updated.map((s, i) => ({ ...s, order: i + 1 }))
+    setProductPageSections(reordered)
+    showToast(`Moved ${getSectionLabel(movedItem.type)} to position #${targetPosition}!`)
+  }
+
+  const moveProductSection = (fromIdx: number, direction: 'up' | 'down') => {
+    const targetPosition = direction === 'up' ? fromIdx : fromIdx + 2
+    moveProductSectionToPosition(fromIdx, targetPosition)
   }
 
   // Hero Data Management
@@ -538,13 +683,31 @@ export function ClientDashboard({
                   onChange={(e) => setSelectedProductSlug(e.target.value)}
                   className="px-4 py-2 text-xs font-bold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
                 >
-                  <option value="pure-cotton-shirts-supplier-in-uae">Pure Cotton Shirts Supplier in UAE</option>
-                  {productPages.map((p) => (
+                  <option value="pure-cotton-shirts-supplier-in-uae">Pure Cotton Shirts Supplier in UAE (Master)</option>
+                  {productPages.filter(p => p.slug !== 'pure-cotton-shirts-supplier-in-uae').map((p) => (
                     <option key={p.id} value={p.slug}>
                       {p.title} ({p.slug})
                     </option>
                   ))}
                 </select>
+
+                <button
+                  onClick={() => setIsCreatePageModalOpen(true)}
+                  className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
+                  title="Create new product page using master template"
+                >
+                  <Plus className="w-3.5 h-3.5" /> New Page
+                </button>
+
+                {selectedProductSlug !== 'pure-cotton-shirts-supplier-in-uae' && (
+                  <button
+                    onClick={handleDeleteActiveProductPage}
+                    className="p-2 text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 rounded-xl border border-red-200 transition-colors"
+                    title="Delete active product page"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
 
               <div className="flex items-center gap-3">
@@ -573,12 +736,15 @@ export function ClientDashboard({
                   <button
                     key={s.id}
                     onClick={() => setSelectedSectionId(s.id)}
-                    className={`whitespace-nowrap px-5 py-4 text-[11px] font-bold uppercase tracking-wider transition-all border-b-2 flex items-center gap-2 ${
+                    className={`whitespace-nowrap px-4 py-3.5 text-[11px] font-bold uppercase tracking-wider transition-all border-b-2 flex items-center gap-2 ${
                       selectedSectionId === s.id
                         ? 'text-[#DE7B3D] border-[#DE7B3D]'
                         : 'text-gray-500 border-transparent hover:text-gray-800'
                     }`}
                   >
+                    <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded ${selectedSectionId === s.id ? 'bg-[#DE7B3D]/15 text-[#DE7B3D]' : 'bg-slate-100 text-slate-500'}`}>
+                      #{idx + 1}
+                    </span>
                     <span>{getSectionLabel(s.type)}</span>
                   </button>
                 ))}
@@ -646,17 +812,59 @@ export function ClientDashboard({
 
         <div className="flex-1 overflow-y-auto w-full mx-auto p-8 lg:p-12 pb-32 max-w-7xl">
           
-          <div className="mb-8 flex items-center justify-between">
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
             <div>
               <h1 className="text-[28px] font-bold text-[#1E293B] tracking-tight">
                 {activeTab === 'header' ? 'Theme & Settings' : (activeSection ? `${getSectionLabel(activeSection.type)} Editor` : 'Page Builder')}
               </h1>
               <p className="text-gray-500 mt-1 text-sm">
-                {activeTab === 'header' ? 'Manage your global site configuration.' : 'Modify the content and layout of this section.'}
+                {activeTab === 'header' ? 'Manage your global site configuration.' : 'Modify content, layout, and position of this section.'}
               </p>
             </div>
+
+            {/* SECTION REORDER CONTROLS */}
+            {activeTab === 'product-pages' && activeSection && (
+              <div className="flex items-center gap-3 bg-white border border-slate-200 px-4 py-2.5 rounded-2xl shadow-sm">
+                <Layers className="w-4 h-4 text-[#DE7B3D]" />
+                <span className="text-xs font-bold text-slate-700">Section Position:</span>
+                <select
+                  value={sections.findIndex(s => s.id === selectedSectionId) + 1}
+                  onChange={(e) => moveProductSectionToPosition(
+                    sections.findIndex(s => s.id === selectedSectionId),
+                    parseInt(e.target.value)
+                  )}
+                  className="px-3 py-1.5 text-xs font-extrabold text-slate-900 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none cursor-pointer"
+                >
+                  {sections.map((_, i) => (
+                    <option key={i + 1} value={i + 1}>
+                      Position #{i + 1} {i === 0 ? '(Top of Page)' : (i === sections.length - 1 ? '(Bottom of Page)' : '')}
+                    </option>
+                  ))}
+                </select>
+
+                <div className="flex items-center gap-1 border-l border-slate-200 pl-2">
+                  <button
+                    onClick={() => moveProductSection(sections.findIndex(s => s.id === selectedSectionId), 'up')}
+                    disabled={sections.findIndex(s => s.id === selectedSectionId) === 0}
+                    className="p-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-30 rounded-xl transition-colors cursor-pointer flex items-center gap-1 text-xs font-bold"
+                    title="Move 1 position up (earlier on page)"
+                  >
+                    <ArrowUp className="w-4 h-4" /> Move Up
+                  </button>
+                  <button
+                    onClick={() => moveProductSection(sections.findIndex(s => s.id === selectedSectionId), 'down')}
+                    disabled={sections.findIndex(s => s.id === selectedSectionId) === sections.length - 1}
+                    className="p-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-30 rounded-xl transition-colors cursor-pointer flex items-center gap-1 text-xs font-bold"
+                    title="Move 1 position down (later on page)"
+                  >
+                    <ArrowDown className="w-4 h-4" /> Move Down
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* The Add Slide Button goes here in the header for Hero */}
-            {(activeTab === 'builder' || activeTab === 'product-pages') && activeSection?.type === 'HERO' && (
+            {activeTab === 'builder' && activeSection?.type === 'HERO' && (
               <button onClick={handleCreateSlide} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-white text-gray-700 hover:bg-gray-50 transition-all border border-gray-200 shadow-sm">
                 <Plus className="w-4 h-4 text-gray-500" /> Add New Slide
               </button>
@@ -668,8 +876,17 @@ export function ClientDashboard({
             activeSection ? (
               <div className="space-y-6 animate-in fade-in duration-300">
                 
-                {/* HERO EDITOR */}
-                {activeSection.type === 'HERO' && (
+                {/* PRODUCT HERO EDITOR (for Product Pages) */}
+                {activeTab === 'product-pages' && activeSection.type === 'HERO' && (
+                  <ProductHeroEditor
+                    data={getSectionData(activeSection)}
+                    onChange={handleSectionDataChange}
+                    onUpload={uploadFile}
+                  />
+                )}
+
+                {/* HOMEPAGE HERO SLIDES CAROUSEL EDITOR (for Homepage Builder) */}
+                {activeTab === 'builder' && activeSection.type === 'HERO' && (
                   <div className="space-y-6">
                      <div className="flex items-center justify-between gap-4 flex-wrap">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -1006,7 +1223,7 @@ export function ClientDashboard({
 
                 {/* SPECS MATRIX EDITOR */}
                 {activeSection.type === 'SPECS_MATRIX' && (
-                  <SpecsMatrixEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} />
+                  <SpecsMatrixEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} onUpload={uploadFile} />
                 )}
 
                 {/* FAQ EDITOR */}
@@ -1016,7 +1233,7 @@ export function ClientDashboard({
 
                 {/* FABRIC SWATCHES EDITOR */}
                 {activeSection.type === 'FABRIC_SWATCHES' && (
-                  <FabricSwatchesEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} />
+                  <FabricSwatchesEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} onUpload={uploadFile} />
                 )}
 
                 {/* QUALITY CONTROL EDITOR */}
@@ -1031,12 +1248,12 @@ export function ClientDashboard({
 
                 {/* LOGISTICS EDITOR */}
                 {activeSection.type === 'LOGISTICS' && (
-                  <LogisticsEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} />
+                  <LogisticsEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} onUpload={uploadFile} />
                 )}
 
                 {/* CUSTOMIZATION EDITOR */}
                 {activeSection.type === 'CUSTOMIZATION' && (
-                  <CategoryShowcaseEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} onUpload={uploadFile} />
+                  <CustomizationEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} onUpload={uploadFile} />
                 )}
 
                 {/* SECTORS EDITOR */}
@@ -1066,17 +1283,17 @@ export function ClientDashboard({
 
                 {/* WHY SILKY EDITOR */}
                 {activeSection.type === 'WHY_SILKY' && (
-                  <WhySilkyEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} />
+                  <WhySilkyEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} onUpload={uploadFile} />
                 )}
 
                 {/* PROCESS EDITOR */}
                 {activeSection.type === 'PROCESS' && (
-                  <ProcessEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} />
+                  <ProcessEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} onUpload={uploadFile} />
                 )}
 
                 {/* TESTIMONIALS EDITOR */}
                 {activeSection.type === 'TESTIMONIALS' && (
-                  <TestimonialsEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} />
+                  <TestimonialsEditor data={getSectionData(activeSection)} onChange={handleSectionDataChange} onUpload={uploadFile} />
                 )}
 
                 {/* CONTACT BAND EDITOR */}
@@ -1206,7 +1423,6 @@ export function ClientDashboard({
           )}
         </div>
 
-        {/* FLOATING PUBLISH BUTTON */}
         <button
            onClick={handleSave}
            disabled={isSaving}
@@ -1224,6 +1440,143 @@ export function ClientDashboard({
              </>
            )}
          </button>
+
+        {/* CREATE NEW PRODUCT PAGE MODAL */}
+        {isCreatePageModalOpen && (
+          <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-8 border border-slate-200 space-y-6 animate-in fade-in zoom-in-95 duration-200">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div>
+                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#DE7B3D] block">MASTER TEMPLATE CLONE</span>
+                  <h3 className="text-xl font-extrabold text-slate-900">Create New Product Page</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsCreatePageModalOpen(false)}
+                  className="text-slate-400 hover:text-slate-600 p-2 rounded-xl hover:bg-slate-100 text-lg font-bold cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleCreateProductPageSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">
+                    Product Page Title *
+                  </label>
+                  <input
+                    required
+                    type="text"
+                    value={newPageTitle}
+                    onChange={(e) => handleTitleChange(e.target.value)}
+                    placeholder="e.g. Luxury Linen Fabrics Supplier in UAE"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:border-[#DE7B3D]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">
+                    URL Slug *
+                  </label>
+                  <div className="flex items-center bg-slate-100 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-slate-600">
+                    <span className="text-slate-400 font-sans mr-1">/products/</span>
+                    <input
+                      required
+                      type="text"
+                      value={newPageSlug}
+                      onChange={(e) => setNewPageSlug(e.target.value)}
+                      placeholder="luxury-linen-fabrics-supplier-in-uae"
+                      className="w-full bg-transparent border-none text-xs font-bold text-slate-900 focus:outline-none font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">
+                    Category Tag
+                  </label>
+                  <input
+                    type="text"
+                    value={newPageCategory}
+                    onChange={(e) => setNewPageCategory(e.target.value)}
+                    placeholder="e.g. Corporate Uniforms & Fine Shirting"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:border-[#DE7B3D]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1">
+                    Hero Image
+                  </label>
+                  <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-2xl border border-slate-200">
+                    <div className="w-20 h-14 rounded-xl bg-slate-200 overflow-hidden shrink-0 border border-slate-300 relative flex items-center justify-center">
+                      {newPageHeroImage ? (
+                        <img src={newPageHeroImage} alt="Hero Preview" className="w-full h-full object-cover" />
+                      ) : (
+                        <ImageIcon className="w-6 h-6 text-slate-400" />
+                      )}
+                    </div>
+
+                    <div className="flex-1 space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => newPageHeroFileInputRef.current?.click()}
+                          disabled={isSaving}
+                          className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 shadow-xs"
+                        >
+                          <UploadCloud className="w-4 h-4 text-[#DE7B3D]" /> Upload Image File
+                        </button>
+                        {newPageHeroImage && (
+                          <button
+                            type="button"
+                            onClick={() => setNewPageHeroImage('')}
+                            className="p-2 text-slate-400 hover:text-red-500 rounded-lg"
+                            title="Remove image"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                      <input
+                        type="file"
+                        ref={newPageHeroFileInputRef}
+                        onChange={handleNewPageHeroUpload}
+                        accept="image/*"
+                        className="hidden"
+                      />
+                      <p className="text-[11px] text-slate-500 font-medium">Upload image file directly from your computer</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-[#FAF9F6] border border-amber-200/80 p-4 rounded-2xl text-xs text-amber-900 space-y-1">
+                  <span className="font-extrabold block">✨ Master Template Features:</span>
+                  <p className="text-amber-800 leading-relaxed font-medium">
+                    This new page will instantly clone all 11 master template sections (Hero, Specs Matrix, Custom Embroidery, Sectors, Swatches, Quality Control, Bulk Pricing, Logistics, Reviews, FAQ, Quote Form) as editable components!
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => setIsCreatePageModalOpen(false)}
+                    className="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-600 hover:bg-slate-100 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="px-6 py-2.5 bg-[#DE7B3D] hover:bg-[#c96a2e] text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-md transition-all cursor-pointer flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" /> Create Product Page
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

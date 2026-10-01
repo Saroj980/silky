@@ -189,3 +189,13 @@ export async function deleteProductPageSection(sectionId: number) {
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
   return res.json()
 }
+
+export async function saveProductPageSections(pageId: number, sections: any[]) {
+  const res = await fetch(`${LARAVEL_API_URL}/product-pages/${pageId}/save-sections`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sections }),
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  return res.json()
+}

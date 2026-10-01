@@ -43,11 +43,11 @@ export function SiteFooter() {
               Sectors
             </h4>
             <ul className="space-y-3 text-xs text-slate-400">
-              <li><a href="#services" className="hover:text-[#B38B59] transition-colors inline-block">Corporate & Executive</a></li>
-              <li><a href="#services" className="hover:text-[#B38B59] transition-colors inline-block">Hospitality & Dining</a></li>
-              <li><a href="#services" className="hover:text-[#B38B59] transition-colors inline-block">Healthcare & Clinical</a></li>
-              <li><a href="#services" className="hover:text-[#B38B59] transition-colors inline-block">Bespoke Fabrics</a></li>
-              <li><a href="#services" className="hover:text-[#B38B59] transition-colors inline-block">Embroidery Branding</a></li>
+              <li><a href="/products/pure-cotton-shirts-supplier-in-uae" className="hover:text-[#B38B59] transition-colors inline-block">100% Pure Cotton Shirting</a></li>
+              <li><a href="/products/pure-cotton-shirts-supplier-in-uae" className="hover:text-[#B38B59] transition-colors inline-block">Corporate & Executive</a></li>
+              <li><a href="/products/pure-cotton-shirts-supplier-in-uae" className="hover:text-[#B38B59] transition-colors inline-block">Hospitality & Dining</a></li>
+              <li><a href="/products/pure-cotton-shirts-supplier-in-uae" className="hover:text-[#B38B59] transition-colors inline-block">Healthcare & Clinical</a></li>
+              <li><a href="/products/pure-cotton-shirts-supplier-in-uae" className="hover:text-[#B38B59] transition-colors inline-block">Embroidery Branding</a></li>
             </ul>
           </div>
 
@@ -57,10 +57,10 @@ export function SiteFooter() {
               Company
             </h4>
             <ul className="space-y-3 text-xs text-slate-400">
-              <li><a href="#why-silky" className="hover:text-[#B38B59] transition-colors inline-block">Our Heritage</a></li>
-              <li><a href="#why-silky" className="hover:text-[#B38B59] transition-colors inline-block">ISO Certification</a></li>
-              <li><a href="#why-silky" className="hover:text-[#B38B59] transition-colors inline-block">Why Choose Silky</a></li>
-              <li><a href="#contact" className="hover:text-[#B38B59] transition-colors inline-block">Dubai Showroom</a></li>
+              <li><a href="/" className="hover:text-[#B38B59] transition-colors inline-block">Our Heritage</a></li>
+              <li><a href="/" className="hover:text-[#B38B59] transition-colors inline-block">ISO Certification</a></li>
+              <li><a href="/" className="hover:text-[#B38B59] transition-colors inline-block">Why Choose Silky</a></li>
+              <li><a href="/products/pure-cotton-shirts-supplier-in-uae" className="hover:text-[#B38B59] transition-colors inline-block">Dubai Showroom</a></li>
             </ul>
           </div>
 

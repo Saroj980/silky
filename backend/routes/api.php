@@ -38,6 +38,7 @@ Route::get('/product-pages/slug/{slug}', [ProductPageController::class, 'showByS
 Route::put('/product-pages/{id}', [ProductPageController::class, 'update']);
 Route::delete('/product-pages/{id}', [ProductPageController::class, 'destroy']);
 Route::post('/product-pages/{id}/sections', [ProductPageController::class, 'addSection']);
+Route::post('/product-pages/{id}/save-sections', [ProductPageController::class, 'saveSections']);
 Route::put('/product-pages/sections/{sectionId}', [ProductPageController::class, 'updateSection']);
 Route::delete('/product-pages/sections/{sectionId}', [ProductPageController::class, 'deleteSection']);
 Route::post('/product-pages/{id}/reorder', [ProductPageController::class, 'reorderSections']);

@@ -23,71 +23,78 @@ const MEGA_MENUS: Record<string, MegaMenuData> = {
   'UNIFORM FLEETS': {
     title: 'Commercial & Fleet Uniform Solutions',
     subCategories: [
-      { name: 'Pure Cotton Shirting (100% Egyptian)', tag: 'Popular', href: '/products/pure-cotton-shirts-supplier-in-uae' },
-      { name: 'Hospitality & 5-Star Hotel Wear', tag: 'Hot Sellers', href: '#services' },
-      { name: 'Corporate Executive Suiting & Blazers', tag: 'Premium', href: '#services' },
-      { name: 'Healthcare & Antimicrobial Scrubs', href: '#services' },
-      { name: 'Restaurant & Master Chef Apparel', href: '#services' },
-      { name: 'Aviation & Luxury Transport Fleets', href: '#services' },
-      { name: 'EN ISO Certified Industrial Safety PPE', tag: 'Certified', href: '#services' },
+      { name: '100% Pure Cotton Shirts', tag: 'Egyptian Cotton', href: '/products/pure-cotton-shirts-supplier-in-uae' },
+      { name: 'Oxford Button-Down Shirts', tag: 'Pinpoint Weave', href: '/products/oxford-shirts-supplier-in-uae' },
+      { name: 'Poly Cotton Shirts', tag: 'Easy Care', href: '/products/poly-cotton-shirts-supplier-in-uae' },
+      { name: 'Twill Shirts', tag: 'Durable Weave', href: '/products/twill-shirts-supplier-in-uae' },
+      { name: 'Corporate Uniforms', tag: 'Executive Fleets', href: '/products/corporate-uniforms-supplier-in-uae' },
+      { name: 'Healthcare Uniforms', tag: 'Medical Scrubs', href: '/products/healthcare-uniforms-supplier-in-uae' },
+      { name: 'F&B & Restaurant Apparel', tag: 'Stain Resistant', href: '/products/fb-uniforms-supplier-in-uae' },
+      { name: 'Hospitality & Hotel Fleets', tag: '5-Star Resort', href: '/products/hospitality-uniforms-supplier-in-uae' },
+      { name: 'Logistics Workwear', tag: 'Heavy Duty', href: '/products/logistics-uniforms-supplier-in-uae' },
+      { name: 'Industrial Safety Wear', tag: 'High-Vis Safety', href: '/products/industrial-safety-wear-supplier-in-uae' },
     ],
     popularItems: [
-      { name: 'On-Site Staff Fitting', detail: 'Available across all 7 Emirates', href: '#contact', icon: Ruler },
-      { name: '24-Hour Express Fitting', detail: 'For VIP executive suites', href: '#contact', icon: Clock },
-      { name: 'Custom Logo Embroidery', detail: '3D high-density stitching', href: '#contact', icon: Scissors },
+      { name: 'On-Site Staff Fitting', detail: 'Available across all 7 Emirates', href: '/products/pure-cotton-shirts-supplier-in-uae', icon: Ruler },
+      { name: '24-Hour Express Fitting', detail: 'For VIP executive suites', href: '/products/oxford-shirts-supplier-in-uae', icon: Clock },
+      { name: 'Custom Logo Embroidery', detail: '3D high-density stitching', href: '/products/custom-polo-tshirts-supplier-dubai', icon: Scissors },
     ],
     featured: {
-      title: '5-Star Hotel & Resort Collection',
+      title: '100% Pure Cotton Shirting Fleet',
       subtitle: 'Handcrafted luxury staff uniforms with Italian fabric options.',
-      image: '/images/sector_hospitality.png',
-      badge: 'Featured Fleet',
-      href: '#services',
+      image: '/images/textile_fabric_rolls.png',
+      badge: 'Individual Product Page',
+      href: '/products/pure-cotton-shirts-supplier-in-uae',
     },
   },
   'CUSTOM APPAREL': {
-    title: 'Enterprise T-Shirts, Polos & Merchandise',
+    title: 'Enterprise T-Shirts, Polos & Winter Wear',
     subCategories: [
-      { name: '220 GSM Egyptian Cotton Polos', tag: 'Best Seller', href: '#services' },
-      { name: 'Performance Dry-Fit Athletic Polos', href: '#services' },
-      { name: 'Non-Iron Oxford Cotton Executive Shirts', tag: 'Luxury', href: '#services' },
-      { name: 'Heavyweight Crew Neck & V-Neck Tees', href: '#services' },
-      { name: 'Custom Hoodies, Caps & Tote Bags', tag: 'Eco Friendly', href: '#services' },
-      { name: 'VIP Conference & Event Giveaway Kits', href: '#services' },
+      { name: 'Custom Polo T-Shirts', tag: 'Best Seller', href: '/products/custom-polo-tshirts-supplier-dubai' },
+      { name: 'Round Neck T-Shirts', tag: 'Combed Cotton', href: '/products/round-neck-tshirt-supplier-in-uae' },
+      { name: 'V-Neck T-Shirts', tag: 'Soft Cotton', href: '/products/v-neck-tshirt-supplier-in-uae' },
+      { name: 'Hooded T-Shirts', tag: 'Modern Fit', href: '/products/hooded-tshirt-supplier-in-uae' },
+      { name: 'Long Sleeve T-Shirts', tag: 'Full Coverage', href: '/products/long-sleeve-tshirt-supplier-in-uae' },
+      { name: 'Sports T-Shirts', tag: 'Dri-Fit Mesh', href: '/products/sports-tshirt-supplier-in-uae' },
+      { name: '300 GSM Heavyweight Hoodies', tag: 'Premium Fleece', href: '/products/300-gsm-hoodies-supplier-in-uae' },
+      { name: 'Fleece & Cotton Hoodies', tag: 'Winter Fleets', href: '/products/fleece-hoodies-supplier-in-uae' },
+      { name: 'Zipper & Oversized Hoodies', tag: 'Streetwear Fit', href: '/products/hoodies-with-zipper-supplier-in-uae' },
     ],
     popularItems: [
-      { name: 'Screen Printing & DTG', detail: 'Vibrant multi-color prints', href: '#contact', icon: Scissors },
-      { name: '3D Rubberized Badges', detail: 'Durable corporate logos', href: '#contact', icon: Award },
-      { name: 'Volume Order Discounts', detail: 'Direct mill wholesale pricing', href: '#contact', icon: ShieldCheck },
+      { name: 'Screen Printing & DTG', detail: 'Vibrant multi-color prints', href: '/products/round-neck-tshirt-supplier-in-uae', icon: Scissors },
+      { name: '3D Rubberized Badges', detail: 'Durable corporate logos', href: '/products/custom-polo-tshirts-supplier-dubai', icon: Award },
+      { name: 'Volume Order Discounts', detail: 'Direct mill wholesale pricing', href: '/products/oxford-shirts-supplier-in-uae', icon: ShieldCheck },
     ],
     featured: {
-      title: 'Enterprise Polo Shirts',
+      title: 'Custom Polo T-Shirts',
       subtitle: 'Color-fast, anti-shrink pique cotton for corporate teams.',
       image: '/images/slide-polo.png',
       badge: 'Bulk Supply',
-      href: '#services',
+      href: '/products/custom-polo-tshirts-supplier-dubai',
     },
   },
-  'FABRICS & TAILORING': {
-    title: 'Textile Sourcing & Atelier Crafts',
+  'TROUSERS & TAILORING': {
+    title: 'Executive Trousers & Textile Sourcing',
     subCategories: [
-      { name: 'Italian Super 150s Pure Wools', tag: 'Imported', href: '#services' },
-      { name: '100% Long-Staple Egyptian Cottons', tag: 'Best Seller', href: '#services' },
-      { name: 'Flame Retardant Industrial Fabrics', href: '#services' },
-      { name: 'Linen & Silk Blend Textiles', href: '#services' },
-      { name: 'In-House 3D Logo Embroidery', href: '#services' },
-      { name: 'Bespoke Cuff & Collar Monogramming', href: '#services' },
+      { name: 'Chino Trousers', tag: 'Best Seller', href: '/products/chino-pants-supplier-uae' },
+      { name: 'Formal Corporate Trousers', tag: 'Executive Fit', href: '/products/formal-trousers-supplier-in-uae' },
+      { name: 'Cargo Trousers & Shorts', tag: 'Workwear', href: '/products/cargo-pants-supplier-in-uae' },
+      { name: 'Chef Trousers', tag: 'Kitchen Workwear', href: '/products/chef-trousers-supplier-in-uae' },
+      { name: 'Premium Active Joggers', tag: 'Athleisure', href: '/products/premium-joggers-supplier-in-uae' },
+      { name: '100% Egyptian Cotton Shirting', tag: 'Custom Mill', href: '/products/pure-cotton-shirts-supplier-in-uae' },
+      { name: 'Pinpoint Oxford Fabrics', tag: 'Textured Weave', href: '/products/oxford-shirts-supplier-in-uae' },
     ],
     popularItems: [
-      { name: 'Free Swatch Book Delivery', detail: 'Delivered to your office in UAE', href: '#contact', icon: Award },
-      { name: 'Bespoke Master Tailoring', detail: 'Hand-cut by Dubai master tailors', href: '#contact', icon: Scissors },
-      { name: 'Showroom Consultation', detail: 'Baniyas Road, Deira Creek', href: '#contact', icon: Ruler },
+      { name: 'Free Swatch Book Delivery', detail: 'Delivered to your office in UAE', href: '/products/pure-cotton-shirts-supplier-in-uae', icon: Award },
+      { name: 'Bespoke Master Tailoring', detail: 'Hand-cut by Dubai master tailors', href: '/products/oxford-shirts-supplier-in-uae', icon: Scissors },
+      { name: 'Showroom Consultation', detail: 'Baniyas Road, Deira Creek', href: '/products/custom-polo-tshirts-supplier-dubai', icon: Ruler },
     ],
     featured: {
-      title: 'Bespoke Executive Suiting',
+      title: 'Oxford Button-Down Shirting',
       subtitle: 'Six decades of Dubai master tailoring craftsmanship.',
-      image: '/images/hero_bespoke_suit.png',
+      image: '/homepage-image/Homepage (9).jpg',
       badge: 'Master Atelier',
-      href: '#services',
+      href: '/products/oxford-shirts-supplier-in-uae',
     },
   },
 }
@@ -105,13 +112,13 @@ export function SiteHeader({ onOpenQuoteModal, config }: SiteHeaderProps) {
   const phone = config?.phone || '+971 4 355 8453'
   const whatsapp = config?.whatsapp || '97142261050'
 
-  // Clean Master Navigation Tabs (HOME + 3 Master Mega Categories + CONTACT US)
+  // Master Navigation Tabs (HOME + 3 Master Mega Categories + CONTACT US)
   const categories = [
-    { label: 'HOME', hasDropdown: false, href: '#' },
+    { label: 'HOME', hasDropdown: false, href: '/' },
     { label: 'UNIFORM FLEETS', hasDropdown: true },
     { label: 'CUSTOM APPAREL', hasDropdown: true },
-    { label: 'FABRICS & TAILORING', hasDropdown: true },
-    { label: 'CONTACT US', hasDropdown: false, href: '#contact' },
+    { label: 'TROUSERS & TAILORING', hasDropdown: true },
+    { label: 'CONTACT US', hasDropdown: false, href: '/products/pure-cotton-shirts-supplier-in-uae' },
   ]
 
   const megaData = activeCategory ? MEGA_MENUS[activeCategory] || null : null
@@ -172,7 +179,7 @@ export function SiteHeader({ onOpenQuoteModal, config }: SiteHeaderProps) {
             </button>
 
             {/* Pure Logo Image Only */}
-            <a href="#" className="flex items-center group">
+            <a href="/" className="flex items-center group">
               <img
                 src={logoUrl}
                 alt={config?.logoAlt || 'Silky Logo'}
