@@ -126,7 +126,7 @@ export async function getProductPages() {
 export async function getProductPageBySlug(slug: string) {
   try {
     const res = await fetch(`${LARAVEL_API_URL}/product-pages/slug/${slug}`, { cache: 'no-store' })
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    if (!res.ok) return null
     return res.json()
   } catch (error) {
     console.error('Laravel API getProductPageBySlug error:', error)
