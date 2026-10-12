@@ -13,7 +13,7 @@ import { ContactBand } from '@/components/contact-band'
 import { SiteHeader } from '@/components/site-header'
 import { updateSlide, createSlide, deleteSlide, updateSiteConfig, updatePageSection, updateSectionOrder, saveProductPageSectionsAction, createProductPageAction, deleteProductPageAction } from './actions'
 import { getProductPageBySlug } from '@/lib/laravel-api'
-import { Plus, Trash2, Save, Layout, Settings, Image as ImageIcon, UploadCloud, Monitor, Menu, Search, Bell, HelpCircle, FileText, ShoppingBag, FolderTree, BookOpen, Briefcase, Activity, FolderOpen, Users as UsersIcon, ExternalLink, ChevronDown, Check, ArrowUp, ArrowDown, Layers, Move, Sliders, LogOut, Lock, ShieldCheck, Eye, EyeOff, UserCheck, ArrowRight, ArrowLeft, Edit3, Filter, Copy, CopyCheck, Tag, Shirt, Columns, Smartphone, ZoomIn, ZoomOut, Maximize2, RotateCcw, GripVertical } from 'lucide-react'
+import { Plus, Trash2, Save, Layout, Settings, Image as ImageIcon, UploadCloud, Monitor, Menu, Search, Bell, HelpCircle, FileText, ShoppingBag, FolderTree, BookOpen, Briefcase, Activity, FolderOpen, Users as UsersIcon, ExternalLink, ChevronDown, ChevronLeft, ChevronRight, Check, ArrowUp, ArrowDown, Layers, Move, Sliders, LogOut, Lock, ShieldCheck, Eye, EyeOff, UserCheck, ArrowRight, ArrowLeft, Edit3, Filter, Copy, CopyCheck, Tag, Shirt, Columns, Smartphone, ZoomIn, ZoomOut, Maximize2, RotateCcw, GripVertical } from 'lucide-react'
 import { CategoryShowcaseEditor, UniformSolutionsEditor, OurWorkEditor, WhySilkyEditor, ProcessEditor, TestimonialsEditor, ContactBandEditor, SpecsMatrixEditor, FaqEditor, FabricSwatchesEditor, QualityControlEditor, BulkPricingEditor, LogisticsEditor, ProductHeroEditor, CustomizationEditor } from './section-editors'
 import { WordPressMenuManager } from './menu-manager'
 import { UserManager, getUserList, UserItem } from './user-manager'
@@ -423,7 +423,13 @@ export function ClientDashboard({
   const initialProdPageSections = ensureAll11ProductSections(startingProductPages[0]?.sections || [])
 
   const [productPageSections, setProductPageSections] = useState<any[]>(initialProdPageSections)
-  const [productPages, setProductPages] = useState<any[]>(startingProductPages)
+  const [productPages, setProductPages] = useState<any[]>(() => {
+    return [...startingProductPages].sort((a, b) => {
+      if (a.slug === 'pure-cotton-shirts-supplier-in-uae') return -1
+      if (b.slug === 'pure-cotton-shirts-supplier-in-uae') return 1
+      return 0
+    })
+  })
   const [selectedProductSlug, setSelectedProductSlug] = useState<string>(
     startingProductPages[0]?.slug || 'pure-cotton-shirts-supplier-in-uae'
   )
@@ -436,7 +442,12 @@ export function ClientDashboard({
         if (res.ok) {
           const data = await res.json()
           if (Array.isArray(data) && data.length > 0) {
-            setProductPages(data)
+            const sorted = [...data].sort((a, b) => {
+              if (a.slug === 'pure-cotton-shirts-supplier-in-uae') return -1
+              if (b.slug === 'pure-cotton-shirts-supplier-in-uae') return 1
+              return 0
+            })
+            setProductPages(sorted)
           }
         }
       } catch (err) {
@@ -459,6 +470,17 @@ export function ClientDashboard({
   const [containerWidth, setContainerWidth] = useState<number>(0)
   const [draggedSectionIdx, setDraggedSectionIdx] = useState<number | null>(null)
   const [dragOverSectionIdx, setDragOverSectionIdx] = useState<number | null>(null)
+  const sectionRailRef = useRef<HTMLDivElement>(null)
+
+  const handleScrollSectionRail = (direction: 'left' | 'right') => {
+    if (sectionRailRef.current) {
+      const scrollAmount = 260
+      sectionRailRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      })
+    }
+  }
 
   useEffect(() => {
     if (!previewContainerRef.current) return
@@ -1478,99 +1500,128 @@ export function ClientDashboard({
 
             </div>
 
-            <div className="flex items-center justify-between overflow-x-auto px-6 hide-scrollbar w-full border-t border-gray-100">
-              <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar py-2">
-                {sections.map((s, idx) => {
-                  const isSelected = selectedSectionId === s.id
-                  const isDragging = draggedSectionIdx === idx
-                  const isDragOver = dragOverSectionIdx === idx && draggedSectionIdx !== idx
+            {/* SECTION NAVIGATOR & ACTION CONTROLS */}
+            <div className="px-6 py-2.5 bg-slate-50/70 border-t border-gray-200/80 flex items-center gap-4 w-full">
+              {/* DEDICATED SECTION PILLS RAIL CONTAINER (INDEPENDENT SMOOTH HORIZONTAL SCROLL WITH ARROWS) */}
+              <div className="flex-1 min-w-0 bg-white border border-slate-200/90 rounded-2xl p-1.5 shadow-2xs flex items-center gap-1.5 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => handleScrollSectionRail('left')}
+                  className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all shrink-0 cursor-pointer border border-slate-200/80 shadow-2xs hover:shadow-xs active:scale-95"
+                  title="Scroll Left"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
 
-                  return (
-                    <div
-                      key={s.id}
-                      draggable
-                      onDragStart={(e) => {
-                        setDraggedSectionIdx(idx)
-                        e.dataTransfer.effectAllowed = 'move'
-                        e.dataTransfer.setData('text/plain', idx.toString())
-                      }}
-                      onDragOver={(e) => {
-                        e.preventDefault()
-                        e.dataTransfer.dropEffect = 'move'
-                        if (dragOverSectionIdx !== idx) {
-                          setDragOverSectionIdx(idx)
-                        }
-                      }}
-                      onDragLeave={() => {
-                        if (dragOverSectionIdx === idx) {
+                <div
+                  ref={sectionRailRef}
+                  className="flex-1 min-w-0 flex items-center gap-2 overflow-x-auto hide-scrollbar scroll-smooth px-1 py-0.5"
+                >
+                  {sections.map((s, idx) => {
+                    const isSelected = selectedSectionId === s.id
+                    const isDragging = draggedSectionIdx === idx
+                    const isDragOver = dragOverSectionIdx === idx && draggedSectionIdx !== idx
+
+                    return (
+                      <div
+                        key={s.id}
+                        draggable
+                        onDragStart={(e) => {
+                          setDraggedSectionIdx(idx)
+                          e.dataTransfer.effectAllowed = 'move'
+                          e.dataTransfer.setData('text/plain', idx.toString())
+                        }}
+                        onDragOver={(e) => {
+                          e.preventDefault()
+                          e.dataTransfer.dropEffect = 'move'
+                          if (dragOverSectionIdx !== idx) {
+                            setDragOverSectionIdx(idx)
+                          }
+                        }}
+                        onDragLeave={() => {
+                          if (dragOverSectionIdx === idx) {
+                            setDragOverSectionIdx(null)
+                          }
+                        }}
+                        onDrop={(e) => {
+                          e.preventDefault()
+                          if (draggedSectionIdx !== null && draggedSectionIdx !== idx) {
+                            moveProductSectionToPosition(draggedSectionIdx, idx + 1)
+                          }
+                          setDraggedSectionIdx(null)
                           setDragOverSectionIdx(null)
-                        }
-                      }}
-                      onDrop={(e) => {
-                        e.preventDefault()
-                        if (draggedSectionIdx !== null && draggedSectionIdx !== idx) {
-                          moveProductSectionToPosition(draggedSectionIdx, idx + 1)
-                        }
-                        setDraggedSectionIdx(null)
-                        setDragOverSectionIdx(null)
-                      }}
-                      onDragEnd={() => {
-                        setDraggedSectionIdx(null)
-                        setDragOverSectionIdx(null)
-                      }}
-                      onClick={() => setSelectedSectionId(s.id)}
-                      className={`whitespace-nowrap px-3.5 py-2 text-[11px] font-extrabold uppercase tracking-wider transition-all rounded-xl border flex items-center gap-2 cursor-grab active:cursor-grabbing select-none group ${
-                        isSelected
-                          ? 'bg-[#DE7B3D] text-white border-[#DE7B3D] shadow-md shadow-[#DE7B3D]/20'
-                          : 'bg-white text-slate-700 border-slate-200/80 hover:border-slate-300 hover:bg-slate-50'
-                      } ${
-                        isDragging ? 'opacity-40 scale-95 border-dashed border-[#DE7B3D]' : ''
-                      } ${
-                        isDragOver ? 'ring-2 ring-[#DE7B3D] ring-offset-1 bg-[#DE7B3D]/10 border-[#DE7B3D]' : ''
-                      }`}
-                      title="Click to edit section, or click & drag left/right to change sequence order"
-                    >
-                      <GripVertical className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-white/70' : 'text-slate-400 group-hover:text-slate-600'}`} />
-                      <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-md ${
-                        isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
-                      }`}>
-                        #{idx + 1}
-                      </span>
-                      <span>{getSectionLabel(s.type)}</span>
-                    </div>
-                  )
-                })}
+                        }}
+                        onDragEnd={() => {
+                          setDraggedSectionIdx(null)
+                          setDragOverSectionIdx(null)
+                        }}
+                        onClick={() => setSelectedSectionId(s.id)}
+                        className={`whitespace-nowrap px-3.5 py-1.5 text-[11px] font-extrabold uppercase tracking-wider transition-all rounded-xl border flex items-center gap-2 cursor-grab active:cursor-grabbing select-none shrink-0 group ${
+                          isSelected
+                            ? 'bg-[#DE7B3D] text-white border-[#DE7B3D] shadow-sm shadow-[#DE7B3D]/25'
+                            : 'bg-slate-50/70 text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-white'
+                        } ${
+                          isDragging ? 'opacity-40 scale-95 border-dashed border-[#DE7B3D]' : ''
+                        } ${
+                          isDragOver ? 'ring-2 ring-[#DE7B3D] ring-offset-1 bg-[#DE7B3D]/10 border-[#DE7B3D]' : ''
+                        }`}
+                        title="Click to edit section, or drag to reorder"
+                      >
+                        <GripVertical className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-white/70' : 'text-slate-400 group-hover:text-slate-600'}`} />
+                        <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-md ${
+                          isSelected ? 'bg-white/20 text-white' : 'bg-white border border-slate-200 text-slate-600'
+                        }`}>
+                          #{idx + 1}
+                        </span>
+                        <span>{getSectionLabel(s.type)}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleScrollSectionRail('right')}
+                  className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all shrink-0 cursor-pointer border border-slate-200/80 shadow-2xs hover:shadow-xs active:scale-95"
+                  title="Scroll Right"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
 
-              <div className="flex items-center gap-2 py-2 shrink-0">
-                <select
-                  onChange={(e) => {
-                    if (e.target.value) {
-                      handleAddProductSection(e.target.value)
-                      e.target.value = ''
-                    }
-                  }}
-                  defaultValue=""
-                  className="px-3.5 py-2 text-xs font-bold text-[#DE7B3D] bg-[#DE7B3D]/10 border border-[#DE7B3D]/30 rounded-xl focus:outline-none cursor-pointer"
-                >
-                  <option value="" disabled>+ Add Section to Page</option>
-                  <option value="HERO">Hero Banner</option>
-                  <option value="SPECS_MATRIX">Fabric Specs Matrix</option>
-                  <option value="CUSTOMIZATION">Custom Embroidery & Tailoring</option>
-                  <option value="SECTORS">Industries We Supply</option>
-                  <option value="FABRIC_SWATCHES">Fabric Types & Swatches</option>
-                  <option value="QUALITY_CONTROL">4-Step Quality Control</option>
-                  <option value="BULK_PRICING">Wholesale Bulk Pricing</option>
-                  <option value="LOGISTICS">Express Logistics & GCC</option>
-                  <option value="TESTIMONIALS">Verified B2B Client Reviews</option>
-                  <option value="FAQ">B2B Supply FAQ</option>
-                  <option value="QUOTE_BAND">Get A Free Quote Form</option>
-                </select>
+              {/* DEDICATED SEPARATE CONTAINER: ADD NEW SECTION & DELETE ACTIONS */}
+              <div className="bg-white border border-slate-200/90 rounded-2xl p-1.5 shadow-2xs flex items-center gap-2 shrink-0">
+                <div className="relative">
+                  <select
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        handleAddProductSection(e.target.value)
+                        e.target.value = ''
+                      }
+                    }}
+                    defaultValue=""
+                    className="appearance-none pl-3.5 pr-8 py-2 text-xs font-bold text-[#DE7B3D] bg-orange-50/70 hover:bg-orange-100/60 border border-orange-200/90 rounded-xl focus:outline-none cursor-pointer transition-colors"
+                  >
+                    <option value="" disabled>+ Add Section to Page</option>
+                    <option value="HERO">Hero Banner</option>
+                    <option value="SPECS_MATRIX">Fabric Specs Matrix</option>
+                    <option value="CUSTOMIZATION">Custom Embroidery & Tailoring</option>
+                    <option value="SECTORS">Industries We Supply</option>
+                    <option value="FABRIC_SWATCHES">Fabric Types & Swatches</option>
+                    <option value="QUALITY_CONTROL">4-Step Quality Control</option>
+                    <option value="BULK_PRICING">Wholesale Bulk Pricing</option>
+                    <option value="LOGISTICS">Express Logistics & GCC</option>
+                    <option value="TESTIMONIALS">Verified B2B Client Reviews</option>
+                    <option value="FAQ">B2B Supply FAQ</option>
+                    <option value="QUOTE_BAND">Get A Free Quote Form</option>
+                  </select>
+                  <ChevronDown className="w-3.5 h-3.5 text-[#DE7B3D] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
 
                 {selectedSectionId && (
                   <button
                     onClick={() => handleDeleteProductSection(selectedSectionId)}
-                    className="p-2 text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 rounded-xl border border-red-200 transition-colors shrink-0"
+                    className="p-2 text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 rounded-xl border border-red-200 transition-colors shrink-0 cursor-pointer"
                     title="Remove selected section from page"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -1729,7 +1780,7 @@ export function ClientDashboard({
                     type="text"
                     value={productPageSearchTerm}
                     onChange={(e) => setProductPageSearchTerm(e.target.value)}
-                    placeholder="Search by page title or URL slug..."
+                    placeholder="Search by page title..."
                     className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#DE7B3D] transition-all"
                   />
                 </div>
@@ -1787,7 +1838,7 @@ export function ClientDashboard({
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-slate-50 border-b border-slate-200/80 text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
-                        <th className="py-3.5 px-6">Page Title & Slug</th>
+                        <th className="py-3.5 px-6">Page Title</th>
                         <th className="py-3.5 px-6 text-center">Status</th>
                         <th className="py-3.5 px-6 text-center">Sections</th>
                         <th className="py-3.5 px-6 text-center">Category</th>
@@ -1803,6 +1854,13 @@ export function ClientDashboard({
                           const categoryName = p.category || (p.slug === 'pure-cotton-shirts-supplier-in-uae' ? 'Master Blueprint' : 'Custom Product')
                           const matchesCategory = productPageCategoryFilter === 'ALL' || categoryName === productPageCategoryFilter
                           return matchesSearch && matchesStatus && matchesCategory
+                        })
+                        .sort((a, b) => {
+                          const aIsMaster = a.slug === 'pure-cotton-shirts-supplier-in-uae'
+                          const bIsMaster = b.slug === 'pure-cotton-shirts-supplier-in-uae'
+                          if (aIsMaster && !bIsMaster) return -1
+                          if (!aIsMaster && bIsMaster) return 1
+                          return 0
                         })
                         .map((p) => {
                           const isMaster = p.slug === 'pure-cotton-shirts-supplier-in-uae'
@@ -1823,7 +1881,7 @@ export function ClientDashboard({
                                       p.title.charAt(0)
                                     )}
                                   </div>
-                                  <div>
+                                  <div className="min-w-0">
                                     <div className="flex items-center gap-2 flex-wrap">
                                       <span className="font-bold text-slate-900 text-sm group-hover:text-[#DE7B3D] transition-colors">
                                         {p.title}
@@ -1833,9 +1891,6 @@ export function ClientDashboard({
                                           Master Template
                                         </span>
                                       )}
-                                    </div>
-                                    <div className="flex items-center gap-2 text-slate-400 mt-0.5 font-mono text-[11px]">
-                                      <span>/products/{p.slug}</span>
                                     </div>
                                   </div>
                                 </div>

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import {
   Plus, Trash2, Save, ArrowUp, ArrowDown, ChevronRight,
   ChevronDown, CornerDownRight, X, Layers, Link as LinkIcon,
-  ShoppingBag, Globe, FileText, Check
+  ShoppingBag, Globe, FileText, Check, Edit2
 } from 'lucide-react'
 
 export interface MenuItemTree {
@@ -168,6 +168,7 @@ export function WordPressMenuManager({
 
   // React Modal State for Add Menu Item / Sub-Item
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [editingItemId, setEditingItemId] = useState<string | null>(null)
   const [addItemTitle, setAddItemTitle] = useState('')
   const [addItemUrl, setAddItemUrl] = useState('/products/pure-cotton-shirts-supplier-in-uae')
   const [addItemParentId, setAddItemParentId] = useState<string>('root')
@@ -225,8 +226,19 @@ export function WordPressMenuManager({
     return 'custom'
   }
 
-  // Open Modal Handler
+  // Helper to get clean human-readable label and category for any link URL
+  const getUrlDisplayLabel = (url: string = '') => {
+    if (!url || url === '#') return { label: 'Menu Header (#)', type: 'custom' as const }
+    const prod = combinedProductOptions.find((p) => p.value === url)
+    if (prod) return { label: prod.label, type: 'product' as const }
+    const gen = dynamicGeneralOptions.find((g) => g.value === url)
+    if (gen) return { label: gen.label, type: 'general' as const }
+    return { label: url, type: 'custom' as const }
+  }
+
+  // Open Modal Handler for Adding new item
   const handleOpenAddModal = (parentId: string = 'root') => {
+    setEditingItemId(null)
     setAddItemParentId(parentId)
     setAddItemTitle('')
     setLinkCategory('product')
@@ -234,10 +246,42 @@ export function WordPressMenuManager({
     setIsAddModalOpen(true)
   }
 
-  // Add Item Submit Handler
-  const handleCreateMenuItem = (e: React.FormEvent) => {
+  // Open Modal Handler for Editing existing item
+  const handleOpenEditModal = (item: MenuItemTree, parentId: string = 'root') => {
+    setEditingItemId(item.id)
+    setAddItemParentId(parentId)
+    setAddItemTitle(item.title)
+    setAddItemUrl(item.url || '/')
+    setLinkCategory(getItemCategory(item.url))
+    setIsAddModalOpen(true)
+  }
+
+  // Submit Handler for Add or Edit
+  const handleSaveModalItem = (e: React.FormEvent) => {
     e.preventDefault()
     if (!addItemTitle.trim()) return
+
+    if (editingItemId) {
+      const updatedTree = menuTree.map((top) => {
+        if (top.id === editingItemId) {
+          return { ...top, title: addItemTitle.trim(), url: addItemUrl.trim() || '/' }
+        }
+        if (top.children) {
+          const updatedChildren = top.children.map((sub) => {
+            if (sub.id === editingItemId) {
+              return { ...sub, title: addItemTitle.trim(), url: addItemUrl.trim() || '/' }
+            }
+            return sub
+          })
+          return { ...top, children: updatedChildren }
+        }
+        return top
+      })
+      setMenuTree(updatedTree)
+      setIsAddModalOpen(false)
+      onSave(updatedTree)
+      return
+    }
 
     const newItem: MenuItemTree = {
       id: `item-${Date.now()}`,
@@ -353,39 +397,68 @@ export function WordPressMenuManager({
           </div>
         </div>
 
-        {/* LIST OF TOP-LEVEL ITEMS */}
-        <div className="space-y-3.5">
+        {/* LIST OF TOP-LEVEL ITEMS (CLEAN NAVIGATION LIST) */}
+        <div className="space-y-3">
           {menuTree.map((top, topIdx) => {
             const isExpanded = openTopId === top.id
             const hasChildren = top.children && top.children.length > 0
-            const topCat = getItemCategory(top.url)
+            const urlInfo = getUrlDisplayLabel(top.url)
 
             return (
               <div
                 key={top.id}
-                className="border border-slate-300 rounded-xl bg-white shadow-xs hover:border-slate-400 transition-all overflow-hidden"
+                className="border border-slate-300 rounded-xl bg-white shadow-2xs hover:border-slate-400 transition-all overflow-hidden"
               >
-                {/* ROW: COMPACT & BALANCED (SINGLE LINE ON DESKTOP) */}
-                <div className="p-3.5 bg-white flex flex-wrap items-center justify-between gap-3">
-                  {/* LEFT SIDE: TOGGLE + TITLE + BADGE */}
-                  <div className="flex items-center gap-2.5 flex-wrap min-w-0">
-                    <button
-                      type="button"
-                      onClick={() => setOpenTopId(isExpanded ? null : top.id)}
-                      className="p-1.5 text-slate-500 hover:text-slate-900 rounded-lg hover:bg-slate-100 cursor-pointer transition-colors shrink-0"
-                      title={isExpanded ? 'Collapse Sub-Items' : 'Expand Sub-Items'}
-                    >
-                      {isExpanded ? <ChevronDown className="w-4 h-4 text-[#DE7B3D] stroke-[2.5]" /> : <ChevronRight className="w-4 h-4 text-slate-600 stroke-[2.5]" />}
-                    </button>
+                {/* ROW: CLEAN ITEM BAR */}
+                <div className="p-3 bg-white flex items-center justify-between gap-3">
+                  {/* LEFT SIDE: TOGGLE + TITLE + LINK BADGE */}
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    {hasChildren ? (
+                      <button
+                        type="button"
+                        onClick={() => setOpenTopId(isExpanded ? null : top.id)}
+                        className="p-1.5 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 cursor-pointer transition-colors shrink-0"
+                        title={isExpanded ? 'Collapse Sub-Items' : 'Expand Sub-Items'}
+                      >
+                        {isExpanded ? (
+                          <ChevronDown className="w-4 h-4 text-[#DE7B3D] stroke-[2.5]" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4 text-slate-600 stroke-[2.5]" />
+                        )}
+                      </button>
+                    ) : (
+                      <div className="w-7 shrink-0 flex items-center justify-center">
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+                      </div>
+                    )}
 
-                    {/* MENU TITLE INPUT */}
+                    {/* EDITABLE MENU TITLE */}
                     <input
                       type="text"
                       value={top.title}
                       onChange={(e) => handleUpdateTop(top.id, 'title', e.target.value)}
-                      className="font-bold text-sm text-slate-900 bg-white px-3 py-1.5 rounded-lg border border-slate-300 focus:outline-none focus:border-[#DE7B3D] focus:ring-2 focus:ring-[#DE7B3D]/20 w-44 shadow-2xs transition-all"
+                      className="font-bold text-sm text-slate-900 bg-transparent hover:bg-slate-50 focus:bg-white px-2.5 py-1 rounded-lg border border-transparent hover:border-slate-300 focus:border-[#DE7B3D] focus:ring-2 focus:ring-[#DE7B3D]/20 w-44 shadow-none focus:shadow-2xs transition-all shrink-0"
                       placeholder="Menu Label..."
                     />
+
+                    {/* LINK DESTINATION BADGE (CLICKABLE TO EDIT IN MODAL) */}
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEditModal(top, 'root')}
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer border max-w-sm truncate ${
+                        urlInfo.type === 'product'
+                          ? 'bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100'
+                          : urlInfo.type === 'general'
+                          ? 'bg-sky-50 text-sky-900 border-sky-200 hover:bg-sky-100'
+                          : 'bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-200'
+                      }`}
+                      title="Click to edit link destination"
+                    >
+                      {urlInfo.type === 'product' && <ShoppingBag className="w-3.5 h-3.5 text-[#DE7B3D] shrink-0" />}
+                      {urlInfo.type === 'general' && <Globe className="w-3.5 h-3.5 text-sky-600 shrink-0" />}
+                      {urlInfo.type === 'custom' && <LinkIcon className="w-3.5 h-3.5 text-slate-600 shrink-0" />}
+                      <span className="truncate">{urlInfo.label}</span>
+                    </button>
 
                     {/* SUB-ITEM COUNT BADGE */}
                     {hasChildren && (
@@ -395,106 +468,7 @@ export function WordPressMenuManager({
                     )}
                   </div>
 
-                  {/* MIDDLE: CATEGORY PILLS + TARGET URL */}
-                  <div className="flex items-center gap-2 flex-wrap flex-1 max-w-xl min-w-[280px]">
-                    {/* Category Pills */}
-                    <div className="flex items-center gap-0.5 bg-slate-100 p-1 rounded-lg border border-slate-300/80 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const def = combinedProductOptions[0]?.value || '/products/pure-cotton-shirts-supplier-in-uae'
-                          handleUpdateTop(top.id, 'url', def)
-                        }}
-                        className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold transition-all cursor-pointer ${
-                          topCat === 'product'
-                            ? 'bg-[#DE7B3D] text-white shadow-xs'
-                            : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200/60'
-                        }`}
-                        title="Link to Product Page"
-                      >
-                        <ShoppingBag className="w-3.5 h-3.5" />
-                        <span>Product</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const def = dynamicGeneralOptions[0]?.value || '/'
-                          handleUpdateTop(top.id, 'url', def)
-                        }}
-                        className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold transition-all cursor-pointer ${
-                          topCat === 'general'
-                            ? 'bg-slate-900 text-white shadow-xs'
-                            : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200/60'
-                        }`}
-                        title="Link to General Page"
-                      >
-                        <Globe className="w-3.5 h-3.5 text-sky-400" />
-                        <span>General</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (topCat !== 'custom') {
-                            handleUpdateTop(top.id, 'url', '#')
-                          }
-                        }}
-                        className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold transition-all cursor-pointer ${
-                          topCat === 'custom'
-                            ? 'bg-slate-800 text-white shadow-xs'
-                            : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200/60'
-                        }`}
-                        title="Custom URL"
-                      >
-                        <LinkIcon className="w-3.5 h-3.5 text-amber-300" />
-                        <span>Custom</span>
-                      </button>
-                    </div>
-
-                    {/* Target selector */}
-                    <div className="flex-1 min-w-[200px]">
-                      {topCat === 'product' && (
-                        <select
-                          value={top.url}
-                          onChange={(e) => handleUpdateTop(top.id, 'url', e.target.value)}
-                          className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:border-[#DE7B3D] focus:ring-2 focus:ring-[#DE7B3D]/20 cursor-pointer shadow-2xs"
-                        >
-                          {combinedProductOptions.map((opt) => (
-                            <option key={`top-p-${opt.value}`} value={opt.value}>
-                              🛍️ {opt.label} ({opt.value})
-                            </option>
-                          ))}
-                        </select>
-                      )}
-
-                      {topCat === 'general' && (
-                        <select
-                          value={top.url}
-                          onChange={(e) => handleUpdateTop(top.id, 'url', e.target.value)}
-                          className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:border-[#DE7B3D] focus:ring-2 focus:ring-[#DE7B3D]/20 cursor-pointer shadow-2xs"
-                        >
-                          {dynamicGeneralOptions.map((opt) => (
-                            <option key={`top-g-${opt.value}`} value={opt.value}>
-                              🌐 {opt.label} ({opt.value})
-                            </option>
-                          ))}
-                        </select>
-                      )}
-
-                      {topCat === 'custom' && (
-                        <input
-                          type="text"
-                          value={top.url}
-                          onChange={(e) => handleUpdateTop(top.id, 'url', e.target.value)}
-                          placeholder="e.g. /custom or https://example.com or #"
-                          className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-[#DE7B3D] focus:ring-2 focus:ring-[#DE7B3D]/20 shadow-2xs"
-                        />
-                      )}
-                    </div>
-                  </div>
-
-                  {/* RIGHT CONTROLS */}
+                  {/* RIGHT ACTIONS */}
                   <div className="flex items-center gap-1.5 shrink-0">
                     <button
                       onClick={() => handleOpenAddModal(top.id)}
@@ -503,11 +477,19 @@ export function WordPressMenuManager({
                       <Plus className="w-3.5 h-3.5 text-[#DE7B3D]" /> Sub-Item
                     </button>
 
-                    <div className="flex items-center gap-0.5 pl-1.5 border-l border-slate-300">
+                    <button
+                      onClick={() => handleOpenEditModal(top, 'root')}
+                      className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors"
+                      title="Edit Link & Category"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+
+                    <div className="flex items-center gap-0.5 pl-1 border-l border-slate-300">
                       <button
                         onClick={() => handleMoveTop(topIdx, 'up')}
                         disabled={topIdx === 0}
-                        className="p-1.5 text-slate-600 hover:text-slate-900 disabled:opacity-20 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors"
+                        className="p-1.5 text-slate-600 hover:text-slate-900 disabled:opacity-20 hover:bg-slate-100 rounded-lg cursor-pointer"
                         title="Move Up"
                       >
                         <ArrowUp className="w-4 h-4" />
@@ -515,7 +497,7 @@ export function WordPressMenuManager({
                       <button
                         onClick={() => handleMoveTop(topIdx, 'down')}
                         disabled={topIdx === menuTree.length - 1}
-                        className="p-1.5 text-slate-600 hover:text-slate-900 disabled:opacity-20 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors"
+                        className="p-1.5 text-slate-600 hover:text-slate-900 disabled:opacity-20 hover:bg-slate-100 rounded-lg cursor-pointer"
                         title="Move Down"
                       >
                         <ArrowDown className="w-4 h-4" />
@@ -533,136 +515,62 @@ export function WordPressMenuManager({
 
                 {/* SUB-ITEMS ACCORDION BODY */}
                 {isExpanded && (
-                  <div className="p-3.5 bg-slate-50/90 space-y-2.5 border-t border-slate-200">
+                  <div className="p-3 bg-slate-50/90 space-y-2 border-t border-slate-200">
                     {!hasChildren ? (
                       <div className="text-center py-4 bg-white rounded-lg border border-dashed border-slate-300">
                         <p className="text-xs text-slate-600 font-semibold">No sub-menu items yet.</p>
                         <button
                           onClick={() => handleOpenAddModal(top.id)}
-                          className="mt-1.5 text-xs font-bold text-[#DE7B3D] hover:underline cursor-pointer"
+                          className="mt-1 text-xs font-bold text-[#DE7B3D] hover:underline cursor-pointer"
                         >
                           + Add Sub-Item to {top.title}
                         </button>
                       </div>
                     ) : (
                       top.children!.map((sub, subIdx) => {
-                        const subCat = getItemCategory(sub.url)
+                        const subUrlInfo = getUrlDisplayLabel(sub.url)
                         return (
                           <div
                             key={sub.id}
-                            className="p-3 bg-white rounded-xl border border-slate-300 shadow-2xs hover:border-slate-400 flex flex-wrap items-center justify-between gap-3 transition-all"
+                            className="p-2.5 bg-white rounded-lg border border-slate-300 shadow-2xs hover:border-slate-400 flex items-center justify-between gap-3 transition-all"
                           >
-                            {/* SUB TITLE */}
-                            <div className="flex items-center gap-2 min-w-0">
+                            <div className="flex items-center gap-2.5 min-w-0 flex-1">
                               <CornerDownRight className="w-4 h-4 text-[#DE7B3D] shrink-0 stroke-[2.5]" />
                               <input
                                 type="text"
                                 value={sub.title}
                                 onChange={(e) => handleUpdateSub(top.id, sub.id, 'title', e.target.value)}
-                                className="font-bold text-xs text-slate-900 bg-white px-2.5 py-1.5 rounded-lg border border-slate-300 focus:outline-none focus:border-[#DE7B3D] focus:ring-2 focus:ring-[#DE7B3D]/20 w-44 shadow-2xs"
+                                className="font-bold text-xs text-slate-900 bg-transparent hover:bg-slate-50 focus:bg-white px-2 py-1 rounded-md border border-transparent hover:border-slate-300 focus:border-[#DE7B3D] w-44 transition-all"
                                 placeholder="Sub-Item Title..."
                               />
+
+                              <button
+                                type="button"
+                                onClick={() => handleOpenEditModal(sub, top.id)}
+                                className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold transition-all cursor-pointer border max-w-sm truncate ${
+                                  subUrlInfo.type === 'product'
+                                    ? 'bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100'
+                                    : subUrlInfo.type === 'general'
+                                    ? 'bg-sky-50 text-sky-900 border-sky-200 hover:bg-sky-100'
+                                    : 'bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-200'
+                                }`}
+                                title="Click to edit sub-item link"
+                              >
+                                {subUrlInfo.type === 'product' && <ShoppingBag className="w-3 h-3 text-[#DE7B3D] shrink-0" />}
+                                {subUrlInfo.type === 'general' && <Globe className="w-3 h-3 text-sky-600 shrink-0" />}
+                                {subUrlInfo.type === 'custom' && <LinkIcon className="w-3 h-3 text-slate-600 shrink-0" />}
+                                <span className="truncate">{subUrlInfo.label}</span>
+                              </button>
                             </div>
 
-                            {/* SUB CATEGORY + TARGET */}
-                            <div className="flex items-center gap-2 flex-wrap flex-1 max-w-xl min-w-[260px]">
-                              <div className="flex items-center gap-0.5 bg-slate-100 p-0.5 rounded-lg border border-slate-300/80 shrink-0">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const def = combinedProductOptions[0]?.value || '/products/pure-cotton-shirts-supplier-in-uae'
-                                    handleUpdateSub(top.id, sub.id, 'url', def)
-                                  }}
-                                  className={`flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-bold transition-all cursor-pointer ${
-                                    subCat === 'product'
-                                      ? 'bg-[#DE7B3D] text-white shadow-xs'
-                                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200/60'
-                                  }`}
-                                  title="Product Page Link"
-                                >
-                                  <ShoppingBag className="w-3 h-3" />
-                                  <span>Product</span>
-                                </button>
-
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const def = dynamicGeneralOptions[0]?.value || '/'
-                                    handleUpdateSub(top.id, sub.id, 'url', def)
-                                  }}
-                                  className={`flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-bold transition-all cursor-pointer ${
-                                    subCat === 'general'
-                                      ? 'bg-slate-900 text-white shadow-xs'
-                                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200/60'
-                                  }`}
-                                  title="General Page Link"
-                                >
-                                  <Globe className="w-3 h-3 text-sky-400" />
-                                  <span>General</span>
-                                </button>
-
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    if (subCat !== 'custom') {
-                                      handleUpdateSub(top.id, sub.id, 'url', '#')
-                                    }
-                                  }}
-                                  className={`flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-bold transition-all cursor-pointer ${
-                                    subCat === 'custom'
-                                      ? 'bg-slate-800 text-white shadow-xs'
-                                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200/60'
-                                  }`}
-                                  title="Custom URL"
-                                >
-                                  <LinkIcon className="w-3 h-3 text-amber-300" />
-                                  <span>Custom</span>
-                                </button>
-                              </div>
-
-                              <div className="flex-1 min-w-[180px]">
-                                {subCat === 'product' && (
-                                  <select
-                                    value={sub.url}
-                                    onChange={(e) => handleUpdateSub(top.id, sub.id, 'url', e.target.value)}
-                                    className="w-full px-2.5 py-1 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:border-[#DE7B3D] cursor-pointer shadow-2xs"
-                                  >
-                                    {combinedProductOptions.map((opt) => (
-                                      <option key={`sub-p-${opt.value}`} value={opt.value}>
-                                        🛍️ {opt.label} ({opt.value})
-                                      </option>
-                                    ))}
-                                  </select>
-                                )}
-
-                                {subCat === 'general' && (
-                                  <select
-                                    value={sub.url}
-                                    onChange={(e) => handleUpdateSub(top.id, sub.id, 'url', e.target.value)}
-                                    className="w-full px-2.5 py-1 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:border-[#DE7B3D] cursor-pointer shadow-2xs"
-                                  >
-                                    {dynamicGeneralOptions.map((opt) => (
-                                      <option key={`sub-g-${opt.value}`} value={opt.value}>
-                                        🌐 {opt.label} ({opt.value})
-                                      </option>
-                                    ))}
-                                  </select>
-                                )}
-
-                                {subCat === 'custom' && (
-                                  <input
-                                    type="text"
-                                    value={sub.url}
-                                    onChange={(e) => handleUpdateSub(top.id, sub.id, 'url', e.target.value)}
-                                    placeholder="e.g. /custom or #"
-                                    className="w-full px-2.5 py-1 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-[#DE7B3D] shadow-2xs"
-                                  />
-                                )}
-                              </div>
-                            </div>
-
-                            {/* REORDER & DELETE */}
-                            <div className="flex items-center gap-0.5 shrink-0">
+                            <div className="flex items-center gap-1 shrink-0">
+                              <button
+                                onClick={() => handleOpenEditModal(sub, top.id)}
+                                className="p-1 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md cursor-pointer"
+                                title="Edit Sub-Item Link"
+                              >
+                                <Edit2 className="w-3 h-3" />
+                              </button>
                               <button
                                 onClick={() => handleMoveSub(topIdx, subIdx, 'up')}
                                 disabled={subIdx === 0}
@@ -709,7 +617,7 @@ export function WordPressMenuManager({
         </div>
       </div>
 
-      {/* REACT ADD MENU ITEM MODAL UI */}
+      {/* REACT ADD/EDIT MENU ITEM MODAL UI */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 border border-slate-200 space-y-5 animate-in fade-in zoom-in-95 duration-200">
@@ -720,7 +628,7 @@ export function WordPressMenuManager({
                   Header Navigation
                 </span>
                 <h3 className="text-lg font-extrabold text-slate-900">
-                  {addItemParentId === 'root' ? 'Add Top-Level Menu Item' : 'Add Sub-Menu Item'}
+                  {editingItemId ? 'Edit Menu Item' : addItemParentId === 'root' ? 'Add Top-Level Menu Item' : 'Add Sub-Menu Item'}
                 </h3>
               </div>
               <button
@@ -732,7 +640,7 @@ export function WordPressMenuManager({
               </button>
             </div>
 
-            <form onSubmit={handleCreateMenuItem} className="space-y-4">
+            <form onSubmit={handleSaveModalItem} className="space-y-4">
               
               {/* ITEM TITLE LABEL */}
               <div>
@@ -933,7 +841,8 @@ export function WordPressMenuManager({
                   type="submit"
                   className="px-5 py-2 bg-[#DE7B3D] hover:bg-[#c96a2e] text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-md transition-all cursor-pointer flex items-center gap-1.5"
                 >
-                  <Plus className="w-4 h-4" /> Add Menu Item
+                  {editingItemId ? <Save className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                  <span>{editingItemId ? 'Update Menu Item' : 'Add Menu Item'}</span>
                 </button>
               </div>
             </form>
