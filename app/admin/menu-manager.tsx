@@ -388,13 +388,9 @@ export function WordPressMenuManager({
                     />
 
                     {/* SUB-ITEM COUNT BADGE */}
-                    {hasChildren ? (
+                    {hasChildren && (
                       <span className="text-[11px] font-black text-emerald-800 bg-emerald-100/80 border border-emerald-300 px-2.5 py-0.5 rounded-full shrink-0">
                         {top.children?.length} sub-item{top.children?.length === 1 ? '' : 's'}
-                      </span>
-                    ) : (
-                      <span className="text-[11px] font-bold text-slate-700 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-full shrink-0">
-                        Direct Link
                       </span>
                     )}
                   </div>
