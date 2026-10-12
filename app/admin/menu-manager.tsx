@@ -20,7 +20,6 @@ export const GENERAL_PAGE_OPTIONS = [
   { label: 'About Us', value: '/about-us' },
   { label: 'Contact Us', value: '/contact-us' },
   { label: 'Request Quote Form', value: '#quote-form' },
-  { label: 'Header Only (Non-Clickable)', value: '#' },
 ]
 
 export const DEFAULT_PRODUCT_URL_OPTIONS = [
@@ -321,49 +320,41 @@ export function WordPressMenuManager({
   }
 
   return (
-    <div className="w-full space-y-6 font-sans pb-24">
-      
-      {/* HEADER BAR */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">Header Navigation Manager</h2>
-          <p className="text-slate-500 text-xs mt-1">Manage top navigation links and drop-down sub-menu items.</p>
-        </div>
+    <div className="w-full space-y-5 font-sans pb-24">
+      {/* UNIFIED HIGH-CONTRAST TOOLBAR & CARD */}
+      <div className="bg-white rounded-2xl border border-slate-300/90 shadow-sm p-6 space-y-5">
+        {/* HEADER BAR */}
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-5">
+          <div>
+            <div className="flex items-center gap-2.5">
+              <h2 className="text-xl font-black text-slate-900 tracking-tight">Navigation Menu Items</h2>
+              <span className="text-xs font-black px-2.5 py-0.5 rounded-full bg-slate-900 text-white shadow-2xs">
+                {menuTree.length} Items
+              </span>
+            </div>
+            <p className="text-slate-600 text-xs font-medium mt-1">Configure your main website navigation tabs, categories, and sub-menu links.</p>
+          </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => handleOpenAddModal('root')}
-            className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs"
-          >
-            <Plus className="w-4 h-4 text-[#DE7B3D]" /> Add Menu Item
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => handleOpenAddModal('root')}
+              className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black transition-all cursor-pointer shadow-sm hover:shadow"
+            >
+              <Plus className="w-4 h-4 text-[#DE7B3D]" /> Add Menu Item
+            </button>
 
-          <button
-            onClick={() => onSave(menuTree)}
-            disabled={isSaving}
-            className="flex items-center gap-2 px-6 py-2.5 bg-[#DE7B3D] hover:bg-[#c96a2e] text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-md transition-all cursor-pointer disabled:opacity-50"
-          >
-            <Save className="w-4 h-4" /> Save All Changes
-          </button>
-        </div>
-      </div>
-
-      {/* SINGLE COLUMN CLEAN LIST OF MENU ITEMS */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-          <h3 className="font-extrabold text-xs text-slate-800 uppercase tracking-wider">
-            Header Navigation Items ({menuTree.length})
-          </h3>
-          <button
-            onClick={() => handleOpenAddModal('root')}
-            className="text-xs font-bold text-[#DE7B3D] hover:underline flex items-center gap-1 cursor-pointer"
-          >
-            <Plus className="w-4 h-4" /> Add Top Menu Item
-          </button>
+            <button
+              onClick={() => onSave(menuTree)}
+              disabled={isSaving}
+              className="flex items-center gap-2 px-6 py-2.5 bg-[#DE7B3D] hover:bg-[#c96a2e] text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer disabled:opacity-50"
+            >
+              <Save className="w-4 h-4" /> Save All Changes
+            </button>
+          </div>
         </div>
 
         {/* LIST OF TOP-LEVEL ITEMS */}
-        <div className="space-y-4">
+        <div className="space-y-3.5">
           {menuTree.map((top, topIdx) => {
             const isExpanded = openTopId === top.id
             const hasChildren = top.children && top.children.length > 0
@@ -372,43 +363,58 @@ export function WordPressMenuManager({
             return (
               <div
                 key={top.id}
-                className="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-2xs hover:border-slate-300 transition-all"
+                className="border border-slate-300 rounded-xl bg-white shadow-xs hover:border-slate-400 transition-all overflow-hidden"
               >
-                {/* CARD HEADER */}
-                <div className="p-4 bg-slate-50/80 flex flex-wrap items-center justify-between gap-3 border-b border-slate-100">
-                  <div className="flex flex-wrap items-center gap-3 flex-1 min-w-[320px]">
+                {/* ROW: COMPACT & BALANCED (SINGLE LINE ON DESKTOP) */}
+                <div className="p-3.5 bg-white flex flex-wrap items-center justify-between gap-3">
+                  {/* LEFT SIDE: TOGGLE + TITLE + BADGE */}
+                  <div className="flex items-center gap-2.5 flex-wrap min-w-0">
                     <button
                       type="button"
                       onClick={() => setOpenTopId(isExpanded ? null : top.id)}
-                      className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-200/60 cursor-pointer transition-colors"
+                      className="p-1.5 text-slate-500 hover:text-slate-900 rounded-lg hover:bg-slate-100 cursor-pointer transition-colors shrink-0"
                       title={isExpanded ? 'Collapse Sub-Items' : 'Expand Sub-Items'}
                     >
-                      {isExpanded ? <ChevronDown className="w-4 h-4 text-[#DE7B3D]" /> : <ChevronRight className="w-4 h-4" />}
+                      {isExpanded ? <ChevronDown className="w-4 h-4 text-[#DE7B3D] stroke-[2.5]" /> : <ChevronRight className="w-4 h-4 text-slate-600 stroke-[2.5]" />}
                     </button>
 
-                    {/* MENU LABEL */}
+                    {/* MENU TITLE INPUT */}
                     <input
                       type="text"
                       value={top.title}
                       onChange={(e) => handleUpdateTop(top.id, 'title', e.target.value)}
-                      className="font-extrabold text-sm text-slate-900 bg-white px-3 py-1.5 rounded-xl border border-slate-200 focus:outline-none focus:border-[#DE7B3D] w-44 shrink-0 shadow-2xs"
-                      placeholder="Menu Name..."
+                      className="font-bold text-sm text-slate-900 bg-white px-3 py-1.5 rounded-lg border border-slate-300 focus:outline-none focus:border-[#DE7B3D] focus:ring-2 focus:ring-[#DE7B3D]/20 w-44 shadow-2xs transition-all"
+                      placeholder="Menu Label..."
                     />
 
-                    {/* CATEGORY SELECTOR CARDS (Product / General / Custom URL) */}
-                    <div className="flex items-center gap-1 bg-slate-200/70 p-1 rounded-xl border border-slate-300/60 shadow-2xs shrink-0">
+                    {/* SUB-ITEM COUNT BADGE */}
+                    {hasChildren ? (
+                      <span className="text-[11px] font-black text-emerald-800 bg-emerald-100/80 border border-emerald-300 px-2.5 py-0.5 rounded-full shrink-0">
+                        {top.children?.length} sub-item{top.children?.length === 1 ? '' : 's'}
+                      </span>
+                    ) : (
+                      <span className="text-[11px] font-bold text-slate-700 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-full shrink-0">
+                        Direct Link
+                      </span>
+                    )}
+                  </div>
+
+                  {/* MIDDLE: CATEGORY PILLS + TARGET URL */}
+                  <div className="flex items-center gap-2 flex-wrap flex-1 max-w-xl min-w-[280px]">
+                    {/* Category Pills */}
+                    <div className="flex items-center gap-0.5 bg-slate-100 p-1 rounded-lg border border-slate-300/80 shrink-0">
                       <button
                         type="button"
                         onClick={() => {
                           const def = combinedProductOptions[0]?.value || '/products/pure-cotton-shirts-supplier-in-uae'
                           handleUpdateTop(top.id, 'url', def)
                         }}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer ${
+                        className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold transition-all cursor-pointer ${
                           topCat === 'product'
                             ? 'bg-[#DE7B3D] text-white shadow-xs'
-                            : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                            : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200/60'
                         }`}
-                        title="Link to Product Page (CMS)"
+                        title="Link to Product Page"
                       >
                         <ShoppingBag className="w-3.5 h-3.5" />
                         <span>Product</span>
@@ -420,12 +426,12 @@ export function WordPressMenuManager({
                           const def = dynamicGeneralOptions[0]?.value || '/'
                           handleUpdateTop(top.id, 'url', def)
                         }}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer ${
+                        className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold transition-all cursor-pointer ${
                           topCat === 'general'
                             ? 'bg-slate-900 text-white shadow-xs'
-                            : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                            : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200/60'
                         }`}
-                        title="Link to General Page (Home, About, Contact)"
+                        title="Link to General Page"
                       >
                         <Globe className="w-3.5 h-3.5 text-sky-400" />
                         <span>General</span>
@@ -438,86 +444,74 @@ export function WordPressMenuManager({
                             handleUpdateTop(top.id, 'url', '#')
                           }
                         }}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer ${
+                        className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold transition-all cursor-pointer ${
                           topCat === 'custom'
-                            ? 'bg-slate-700 text-white shadow-xs'
-                            : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                            ? 'bg-slate-800 text-white shadow-xs'
+                            : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200/60'
                         }`}
-                        title="Custom URL or Header Only (#)"
+                        title="Custom URL"
                       >
                         <LinkIcon className="w-3.5 h-3.5 text-amber-300" />
-                        <span>Custom / #</span>
+                        <span>Custom</span>
                       </button>
                     </div>
 
-                    {/* DYNAMIC URL SELECTOR ACCORDING TO CATEGORY */}
-                    {topCat === 'product' && (
-                      <select
-                        value={top.url}
-                        onChange={(e) => handleUpdateTop(top.id, 'url', e.target.value)}
-                        className="px-3 py-1.5 bg-white border border-amber-300 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#DE7B3D]/30 cursor-pointer flex-1 min-w-[200px] shadow-2xs"
-                      >
-                        {combinedProductOptions.map((opt) => (
-                          <option key={`top-p-${opt.value}`} value={opt.value}>
-                            🛍️ {opt.label} ({opt.value})
-                          </option>
-                        ))}
-                      </select>
-                    )}
+                    {/* Target selector */}
+                    <div className="flex-1 min-w-[200px]">
+                      {topCat === 'product' && (
+                        <select
+                          value={top.url}
+                          onChange={(e) => handleUpdateTop(top.id, 'url', e.target.value)}
+                          className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:border-[#DE7B3D] focus:ring-2 focus:ring-[#DE7B3D]/20 cursor-pointer shadow-2xs"
+                        >
+                          {combinedProductOptions.map((opt) => (
+                            <option key={`top-p-${opt.value}`} value={opt.value}>
+                              🛍️ {opt.label} ({opt.value})
+                            </option>
+                          ))}
+                        </select>
+                      )}
 
-                    {topCat === 'general' && (
-                      <select
-                        value={top.url}
-                        onChange={(e) => handleUpdateTop(top.id, 'url', e.target.value)}
-                        className="px-3 py-1.5 bg-white border border-sky-300 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/30 cursor-pointer flex-1 min-w-[200px] shadow-2xs"
-                      >
-                        {dynamicGeneralOptions.map((opt) => (
-                          <option key={`top-g-${opt.value}`} value={opt.value}>
-                            🌐 {opt.label} ({opt.value})
-                          </option>
-                        ))}
-                      </select>
-                    )}
+                      {topCat === 'general' && (
+                        <select
+                          value={top.url}
+                          onChange={(e) => handleUpdateTop(top.id, 'url', e.target.value)}
+                          className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:border-[#DE7B3D] focus:ring-2 focus:ring-[#DE7B3D]/20 cursor-pointer shadow-2xs"
+                        >
+                          {dynamicGeneralOptions.map((opt) => (
+                            <option key={`top-g-${opt.value}`} value={opt.value}>
+                              🌐 {opt.label} ({opt.value})
+                            </option>
+                          ))}
+                        </select>
+                      )}
 
-                    {topCat === 'custom' && (
-                      <div className="flex items-center gap-1.5 flex-1 min-w-[200px]">
+                      {topCat === 'custom' && (
                         <input
                           type="text"
                           value={top.url}
                           onChange={(e) => handleUpdateTop(top.id, 'url', e.target.value)}
-                          placeholder="e.g. /custom or #"
-                          className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs font-mono text-slate-800 focus:outline-none focus:border-[#DE7B3D] shadow-2xs"
+                          placeholder="e.g. /custom or https://example.com or #"
+                          className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-[#DE7B3D] focus:ring-2 focus:ring-[#DE7B3D]/20 shadow-2xs"
                         />
-                        <button
-                          type="button"
-                          onClick={() => handleUpdateTop(top.id, 'url', '#')}
-                          className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase shrink-0 border cursor-pointer transition-colors ${
-                            top.url === '#'
-                              ? 'bg-amber-100 text-amber-900 border-amber-300'
-                              : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
-                          }`}
-                          title="Set as non-clickable header dropdown trigger"
-                        >
-                          # Header Only
-                        </button>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
 
                   {/* RIGHT CONTROLS */}
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     <button
                       onClick={() => handleOpenAddModal(top.id)}
-                      className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                      className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-black flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
                     >
                       <Plus className="w-3.5 h-3.5 text-[#DE7B3D]" /> Sub-Item
                     </button>
 
-                    <div className="flex items-center gap-1 border-l border-slate-200 pl-2">
+                    <div className="flex items-center gap-0.5 pl-1.5 border-l border-slate-300">
                       <button
                         onClick={() => handleMoveTop(topIdx, 'up')}
                         disabled={topIdx === 0}
-                        className="p-1.5 text-slate-400 hover:text-slate-800 disabled:opacity-20 rounded"
+                        className="p-1.5 text-slate-600 hover:text-slate-900 disabled:opacity-20 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors"
                         title="Move Up"
                       >
                         <ArrowUp className="w-4 h-4" />
@@ -525,14 +519,14 @@ export function WordPressMenuManager({
                       <button
                         onClick={() => handleMoveTop(topIdx, 'down')}
                         disabled={topIdx === menuTree.length - 1}
-                        className="p-1.5 text-slate-400 hover:text-slate-800 disabled:opacity-20 rounded"
+                        className="p-1.5 text-slate-600 hover:text-slate-900 disabled:opacity-20 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors"
                         title="Move Down"
                       >
                         <ArrowDown className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteItem(top.id)}
-                        className="p-1.5 text-red-500 hover:bg-red-50 rounded"
+                        className="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg cursor-pointer transition-colors"
                         title="Delete Item"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -543,13 +537,13 @@ export function WordPressMenuManager({
 
                 {/* SUB-ITEMS ACCORDION BODY */}
                 {isExpanded && (
-                  <div className="p-4 bg-slate-50 space-y-3 border-t border-slate-100">
+                  <div className="p-3.5 bg-slate-50/90 space-y-2.5 border-t border-slate-200">
                     {!hasChildren ? (
-                      <div className="text-center py-4 bg-white rounded-xl border border-dashed border-slate-200">
-                        <p className="text-xs text-slate-400 font-medium">No sub-menu items yet.</p>
+                      <div className="text-center py-4 bg-white rounded-lg border border-dashed border-slate-300">
+                        <p className="text-xs text-slate-600 font-semibold">No sub-menu items yet.</p>
                         <button
                           onClick={() => handleOpenAddModal(top.id)}
-                          className="mt-2 text-xs font-bold text-[#DE7B3D] hover:underline cursor-pointer"
+                          className="mt-1.5 text-xs font-bold text-[#DE7B3D] hover:underline cursor-pointer"
                         >
                           + Add Sub-Item to {top.title}
                         </button>
@@ -560,30 +554,33 @@ export function WordPressMenuManager({
                         return (
                           <div
                             key={sub.id}
-                            className="p-3 bg-white rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3 shadow-2xs hover:border-slate-300"
+                            className="p-3 bg-white rounded-xl border border-slate-300 shadow-2xs hover:border-slate-400 flex flex-wrap items-center justify-between gap-3 transition-all"
                           >
-                            <div className="flex flex-wrap items-center gap-2.5 flex-1 min-w-[280px]">
-                              <CornerDownRight className="w-4 h-4 text-[#DE7B3D] shrink-0" />
+                            {/* SUB TITLE */}
+                            <div className="flex items-center gap-2 min-w-0">
+                              <CornerDownRight className="w-4 h-4 text-[#DE7B3D] shrink-0 stroke-[2.5]" />
                               <input
                                 type="text"
                                 value={sub.title}
                                 onChange={(e) => handleUpdateSub(top.id, sub.id, 'title', e.target.value)}
-                                className="font-bold text-xs text-slate-900 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200 focus:bg-white focus:outline-none focus:border-[#DE7B3D] w-36 shrink-0"
+                                className="font-bold text-xs text-slate-900 bg-white px-2.5 py-1.5 rounded-lg border border-slate-300 focus:outline-none focus:border-[#DE7B3D] focus:ring-2 focus:ring-[#DE7B3D]/20 w-44 shadow-2xs"
                                 placeholder="Sub-Item Title..."
                               />
+                            </div>
 
-                              {/* SUB-ITEM CATEGORY SELECTOR CARDS */}
-                              <div className="flex items-center gap-0.5 bg-slate-200/70 p-0.5 rounded-lg border border-slate-300/60 shrink-0">
+                            {/* SUB CATEGORY + TARGET */}
+                            <div className="flex items-center gap-2 flex-wrap flex-1 max-w-xl min-w-[260px]">
+                              <div className="flex items-center gap-0.5 bg-slate-100 p-0.5 rounded-lg border border-slate-300/80 shrink-0">
                                 <button
                                   type="button"
                                   onClick={() => {
                                     const def = combinedProductOptions[0]?.value || '/products/pure-cotton-shirts-supplier-in-uae'
                                     handleUpdateSub(top.id, sub.id, 'url', def)
                                   }}
-                                  className={`flex items-center gap-1 px-2 py-1 rounded text-[11px] font-extrabold transition-all cursor-pointer ${
+                                  className={`flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-bold transition-all cursor-pointer ${
                                     subCat === 'product'
-                                      ? 'bg-[#DE7B3D] text-white shadow-2xs'
-                                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                                      ? 'bg-[#DE7B3D] text-white shadow-xs'
+                                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200/60'
                                   }`}
                                   title="Product Page Link"
                                 >
@@ -597,10 +594,10 @@ export function WordPressMenuManager({
                                     const def = dynamicGeneralOptions[0]?.value || '/'
                                     handleUpdateSub(top.id, sub.id, 'url', def)
                                   }}
-                                  className={`flex items-center gap-1 px-2 py-1 rounded text-[11px] font-extrabold transition-all cursor-pointer ${
+                                  className={`flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-bold transition-all cursor-pointer ${
                                     subCat === 'general'
-                                      ? 'bg-slate-900 text-white shadow-2xs'
-                                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                                      ? 'bg-slate-900 text-white shadow-xs'
+                                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200/60'
                                   }`}
                                   title="General Page Link"
                                 >
@@ -615,10 +612,10 @@ export function WordPressMenuManager({
                                       handleUpdateSub(top.id, sub.id, 'url', '#')
                                     }
                                   }}
-                                  className={`flex items-center gap-1 px-2 py-1 rounded text-[11px] font-extrabold transition-all cursor-pointer ${
+                                  className={`flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-bold transition-all cursor-pointer ${
                                     subCat === 'custom'
-                                      ? 'bg-slate-700 text-white shadow-2xs'
-                                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                                      ? 'bg-slate-800 text-white shadow-xs'
+                                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200/60'
                                   }`}
                                   title="Custom URL"
                                 >
@@ -627,64 +624,69 @@ export function WordPressMenuManager({
                                 </button>
                               </div>
 
-                              {/* SUB-ITEM DYNAMIC URL */}
-                              {subCat === 'product' && (
-                                <select
-                                  value={sub.url}
-                                  onChange={(e) => handleUpdateSub(top.id, sub.id, 'url', e.target.value)}
-                                  className="px-2.5 py-1.5 bg-slate-50 border border-amber-300 rounded-lg text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer flex-1 min-w-[170px]"
-                                >
-                                  {combinedProductOptions.map((opt) => (
-                                    <option key={`sub-p-${opt.value}`} value={opt.value}>
-                                      🛍️ {opt.label} ({opt.value})
-                                    </option>
-                                  ))}
-                                </select>
-                              )}
+                              <div className="flex-1 min-w-[180px]">
+                                {subCat === 'product' && (
+                                  <select
+                                    value={sub.url}
+                                    onChange={(e) => handleUpdateSub(top.id, sub.id, 'url', e.target.value)}
+                                    className="w-full px-2.5 py-1 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:border-[#DE7B3D] cursor-pointer shadow-2xs"
+                                  >
+                                    {combinedProductOptions.map((opt) => (
+                                      <option key={`sub-p-${opt.value}`} value={opt.value}>
+                                        🛍️ {opt.label} ({opt.value})
+                                      </option>
+                                    ))}
+                                  </select>
+                                )}
 
-                              {subCat === 'general' && (
-                                <select
-                                  value={sub.url}
-                                  onChange={(e) => handleUpdateSub(top.id, sub.id, 'url', e.target.value)}
-                                  className="px-2.5 py-1.5 bg-slate-50 border border-sky-300 rounded-lg text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer flex-1 min-w-[170px]"
-                                >
-                                  {dynamicGeneralOptions.map((opt) => (
-                                    <option key={`sub-g-${opt.value}`} value={opt.value}>
-                                      🌐 {opt.label} ({opt.value})
-                                    </option>
-                                  ))}
-                                </select>
-                              )}
+                                {subCat === 'general' && (
+                                  <select
+                                    value={sub.url}
+                                    onChange={(e) => handleUpdateSub(top.id, sub.id, 'url', e.target.value)}
+                                    className="w-full px-2.5 py-1 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:border-[#DE7B3D] cursor-pointer shadow-2xs"
+                                  >
+                                    {dynamicGeneralOptions.map((opt) => (
+                                      <option key={`sub-g-${opt.value}`} value={opt.value}>
+                                        🌐 {opt.label} ({opt.value})
+                                      </option>
+                                    ))}
+                                  </select>
+                                )}
 
-                              {subCat === 'custom' && (
-                                <input
-                                  type="text"
-                                  value={sub.url}
-                                  onChange={(e) => handleUpdateSub(top.id, sub.id, 'url', e.target.value)}
-                                  placeholder="e.g. /custom or #"
-                                  className="px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-mono text-slate-800 focus:outline-none focus:border-[#DE7B3D] flex-1 min-w-[170px]"
-                                />
-                              )}
+                                {subCat === 'custom' && (
+                                  <input
+                                    type="text"
+                                    value={sub.url}
+                                    onChange={(e) => handleUpdateSub(top.id, sub.id, 'url', e.target.value)}
+                                    placeholder="e.g. /custom or #"
+                                    className="w-full px-2.5 py-1 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-[#DE7B3D] shadow-2xs"
+                                  />
+                                )}
+                              </div>
                             </div>
 
-                            <div className="flex items-center gap-1 shrink-0">
+                            {/* REORDER & DELETE */}
+                            <div className="flex items-center gap-0.5 shrink-0">
                               <button
                                 onClick={() => handleMoveSub(topIdx, subIdx, 'up')}
                                 disabled={subIdx === 0}
-                                className="p-1 text-slate-400 hover:text-slate-800 disabled:opacity-20"
+                                className="p-1 text-slate-600 hover:text-slate-900 disabled:opacity-20 hover:bg-slate-100 rounded-md"
+                                title="Move Up"
                               >
                                 <ArrowUp className="w-3.5 h-3.5" />
                               </button>
                               <button
                                 onClick={() => handleMoveSub(topIdx, subIdx, 'down')}
                                 disabled={subIdx === top.children!.length - 1}
-                                className="p-1 text-slate-400 hover:text-slate-800 disabled:opacity-20"
+                                className="p-1 text-slate-600 hover:text-slate-900 disabled:opacity-20 hover:bg-slate-100 rounded-md"
+                                title="Move Down"
                               >
                                 <ArrowDown className="w-3.5 h-3.5" />
                               </button>
                               <button
                                 onClick={() => handleDeleteItem(sub.id)}
-                                className="p-1 text-red-500 hover:bg-red-50 rounded"
+                                className="p-1 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                                title="Delete Sub-Item"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
@@ -704,9 +706,9 @@ export function WordPressMenuManager({
         <div className="pt-2">
           <button
             onClick={() => handleOpenAddModal('root')}
-            className="w-full py-4 bg-[#DE7B3D]/10 hover:bg-[#DE7B3D]/20 text-[#DE7B3D] border-2 border-dashed border-[#DE7B3D]/40 rounded-2xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer"
+            className="w-full py-3.5 bg-slate-50 hover:bg-slate-100 text-slate-800 border-2 border-dashed border-slate-300 hover:border-[#DE7B3D] rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
-            <Plus className="w-4 h-4" /> Add New Header Menu Item
+            <Plus className="w-4 h-4 text-[#DE7B3D]" /> Add New Header Menu Item
           </button>
         </div>
       </div>
@@ -808,8 +810,8 @@ export function WordPressMenuManager({
                         : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                     }`}
                   >
-                    <LinkIcon className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Custom URL</span>
+                    <LinkIcon className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Custom</span>
                   </button>
                 </div>
               </div>

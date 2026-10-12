@@ -1585,7 +1585,7 @@ export function ClientDashboard({
 
         <div className="flex-1 overflow-y-auto w-full min-w-0 p-6 lg:p-8 pb-32">
           
-          {activeTab !== 'user-manager' && activeTab !== 'general-pages' && !(activeTab === 'product-pages' && productPageViewMode === 'list') && (
+          {activeTab !== 'user-manager' && activeTab !== 'general-pages' && activeTab !== 'menu-manager' && !(activeTab === 'product-pages' && productPageViewMode === 'list') && (
             <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
               <div>
                 <h1 className="text-[28px] font-bold text-[#1E293B] tracking-tight">
