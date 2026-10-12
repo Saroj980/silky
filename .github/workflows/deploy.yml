@@ -1,0 +1,91 @@
+name: Production Build & Deploy to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: silky
+          MYSQL_ROOT_PASSWORD: rootpassword
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install Node Dependencies
+        run: npm ci || npm install
+
+      - name: 🗄️ Populate Database for Next.js Static Export
+        run: |
+          mysql -h 127.0.0.1 -u root -prootpassword silky < backend/database/database_import.sql
+
+      - name: 🏗️ Build & Prerender Next.js Website
+        env:
+          DATABASE_URL: "mysql://root:rootpassword@127.0.0.1:3306/silky"
+          NEXT_EXPORT: "true"
+        run: npm run build
+
+      - name: 📁 Assemble Deployment Package (Code Only, Excluding Vendor)
+        run: |
+          mkdir -p deploy-package
+          
+          # 1. Copy complete static build output (HTML, CSS, JS, assets, .htaccess)
+          cp -a out/. deploy-package/
+          
+          # 2. Copy Laravel backend application files (strictly excluding vendor, storage, .env)
+          mkdir -p deploy-package/backend
+          rsync -av \
+            --exclude='vendor' \
+            --exclude='storage' \
+            --exclude='.env' \
+            --exclude='.env.local' \
+            --exclude='.env.production' \
+            --exclude='.git' \
+            --exclude='tests' \
+            backend/ deploy-package/backend/
+
+      - name: 🚀 Deploy Differential Changes to Hostinger FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST || secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT || 21 }}
+          protocol: ${{ secrets.FTP_PROTOCOL || 'ftp' }}
+          server-dir: ${{ secrets.FTP_REMOTE_DIR || './' }}
+          local-dir: ./deploy-package/
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            backend/vendor/**
+            backend/storage/**
+            backend/.env*

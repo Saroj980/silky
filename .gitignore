@@ -18,3 +18,7 @@ prisma/*.db
 *.db
 dev.db
 *.tsbuildinfo
+*.zip
+out/
+deploy-package/
+.env.deploy
