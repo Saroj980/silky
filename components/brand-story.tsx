@@ -13,9 +13,9 @@ export function BrandStory({ data }: { data?: any }) {
   const establishedText = data?.establishedText || "Established 1963 • Deira, Dubai"
 
   return (
-    <section id="heritage" className="bg-[#FFFFFF] py-28 lg:py-36 border-b border-slate-200/80 relative overflow-hidden select-none">
+    <section id="heritage" className="bg-[#FFFFFF] py-16 sm:py-20 lg:py-24 border-b border-slate-200/80 relative overflow-hidden select-none">
       <div className="max-w-[1380px] mx-auto px-6 sm:px-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           
           {/* Left: Master Tailoring Image from Client Site (Homepage (31).png) */}
           <div className="lg:col-span-6">
@@ -58,6 +58,17 @@ export function BrandStory({ data }: { data?: any }) {
                 {establishedText}
               </span>
             </div>
+
+            {data?.btnText && (
+              <div className="pt-2">
+                <a
+                  href={data?.btnHref || '#contact'}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#D97A42] hover:bg-[#c46833] text-white font-sans text-xs font-bold uppercase tracking-widest rounded-xl transition-all shadow-md"
+                >
+                  <span>{data.btnText}</span>
+                </a>
+              </div>
+            )}
           </div>
 
         </div>

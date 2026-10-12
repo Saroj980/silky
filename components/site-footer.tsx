@@ -6,8 +6,8 @@ import { FaFacebookF, FaInstagram, FaLinkedinIn } from 'react-icons/fa6'
 
 export function SiteFooter() {
   return (
-    <footer className="bg-[#0A0F1D] text-slate-300 pt-20 pb-10 font-inter border-t border-slate-800">
-      <div className="max-w-[1240px] mx-auto px-4 sm:px-6">
+    <footer className="bg-[#0A0F1D] text-slate-300 pt-16 sm:pt-20 pb-10 sm:pb-12 font-inter border-t border-slate-800">
+      <div className="max-w-[1380px] mx-auto px-6 sm:px-10">
         
         {/* Top 4 Information Columns */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 pb-16 border-b border-slate-800/80">

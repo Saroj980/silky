@@ -16,8 +16,8 @@ export function TrustStrip() {
   const ease = [0.16, 1, 0.3, 1] as const
 
   return (
-    <section aria-label="Silky Textiles Credentials" className="bg-[#FAF9F5] text-slate-900 border-b border-slate-200 select-none overflow-hidden">
-      <div className="mx-auto max-w-[1380px] px-6 lg:px-10">
+    <section aria-label="Silky Textiles Credentials" className="bg-[#FAF9F6] text-slate-900 border-b border-slate-200/80 select-none overflow-hidden">
+      <div className="mx-auto max-w-[1380px] px-6 sm:px-10">
         <ul className="grid grid-cols-2 divide-y divide-slate-200 sm:grid-cols-3 lg:grid-cols-5 lg:divide-y-0">
           {items.map((item, i) => {
             const IconComponent = item.icon

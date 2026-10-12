@@ -1,9 +1,6 @@
 import { getHeroSlides, getSiteConfig, getPageSections } from '@/lib/laravel-api'
 import { HomePageClient } from '@/components/home-page-client'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
-
 export default async function HomePage() {
   const slidesData = await getHeroSlides()
   const heroSlides = slidesData.map((s: any) => ({

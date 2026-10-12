@@ -111,6 +111,7 @@ export function HeroSection({
       description: s.description || '',
       image: s.image || '/images/hero_bespoke_suit.png',
       primaryBtnText: s.primaryBtnText || 'Request Custom Quote',
+      primaryBtnHref: s.primaryBtnHref || '',
       secondaryBtnText: s.secondaryBtnText || 'Visit Showroom',
       secondaryBtnHref: s.secondaryBtnHref || '#contact',
     }
@@ -207,7 +208,7 @@ export function HeroSection({
       </button>
 
       {/* Minimal, Spacious Editorial Content Overlay */}
-      <div className="relative z-20 max-w-[1380px] mx-auto px-6 sm:px-12 lg:px-16 w-full py-20 sm:py-28">
+      <div className="relative z-20 max-w-[1380px] mx-auto px-6 sm:px-10 w-full py-16 sm:py-24 lg:py-28">
         <AnimatePresence mode="wait">
           <motion.div
             key={index}
@@ -244,13 +245,23 @@ export function HeroSection({
 
             {/* CTAs */}
             <motion.div variants={childItem} className="mt-9 flex items-center gap-4 flex-wrap">
-              <button
-                onClick={onOpenQuoteModal}
-                className="group inline-flex items-center gap-2.5 bg-[#D97A42] hover:bg-[#c46833] px-8 py-4 font-sans text-xs font-bold uppercase tracking-widest text-white shadow-xl transition-all duration-300 hover:scale-105"
-              >
-                <span>{currentSlide.primaryBtnText}</span>
-                <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-              </button>
+              {currentSlide.primaryBtnHref && currentSlide.primaryBtnHref !== '#modal' && currentSlide.primaryBtnHref !== '#quote' ? (
+                <a
+                  href={currentSlide.primaryBtnHref}
+                  className="group inline-flex items-center gap-2.5 bg-[#D97A42] hover:bg-[#c46833] px-8 py-4 font-sans text-xs font-bold uppercase tracking-widest text-white shadow-xl transition-all duration-300 hover:scale-105"
+                >
+                  <span>{currentSlide.primaryBtnText}</span>
+                  <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                </a>
+              ) : (
+                <button
+                  onClick={onOpenQuoteModal}
+                  className="group inline-flex items-center gap-2.5 bg-[#D97A42] hover:bg-[#c46833] px-8 py-4 font-sans text-xs font-bold uppercase tracking-widest text-white shadow-xl transition-all duration-300 hover:scale-105"
+                >
+                  <span>{currentSlide.primaryBtnText}</span>
+                  <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                </button>
+              )}
 
               <a
                 href={currentSlide.secondaryBtnHref || '#services'}

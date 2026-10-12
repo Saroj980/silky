@@ -55,9 +55,10 @@ class HeroSlideController extends Controller
         return response()->json($slide);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id = null)
     {
-        $slide = HeroSlide::findOrFail($id);
+        $slideId = $id ?? $request->input('id') ?? $request->query('id');
+        $slide = HeroSlide::findOrFail($slideId);
         $data = $request->all();
 
         if (isset($data['trustBadges']) && is_array($data['trustBadges'])) {
@@ -72,10 +73,16 @@ class HeroSlideController extends Controller
         return response()->json($slide);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id = null)
     {
-        $slide = HeroSlide::findOrFail($id);
-        $slide->delete();
+        $slideId = $id ?? $request->query('id') ?? $request->input('id');
+        if (!$slideId) {
+            return response()->json(['error' => 'Slide ID required'], 400);
+        }
+        $slide = HeroSlide::find($slideId);
+        if ($slide) {
+            $slide->delete();
+        }
         return response()->json(['success' => true]);
     }
 }

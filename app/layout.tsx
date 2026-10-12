@@ -1,17 +1,17 @@
 import type { Metadata, Viewport } from 'next'
-import { Plus_Jakarta_Sans, Montserrat } from 'next/font/google'
+import { Poppins, Montserrat } from 'next/font/google'
 import './globals.css'
 
-const jakarta = Plus_Jakarta_Sans({
+const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700', '800'],
-  variable: '--font-jakarta',
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-poppins',
   display: 'swap',
 })
 
 const montserrat = Montserrat({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-montserrat',
   display: 'swap',
 })
@@ -52,7 +52,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${jakarta.variable} ${montserrat.variable} bg-[#FBF7F2] text-[#2B241E] scroll-smooth`}
+      className={`${poppins.variable} ${montserrat.variable} bg-[#FBF7F2] text-[#2B241E] scroll-smooth`}
     >
       <body className="antialiased selection:bg-[#D97A42] selection:text-white font-sans">
         {children}
@@ -60,3 +60,4 @@ export default function RootLayout({
     </html>
   )
 }
+

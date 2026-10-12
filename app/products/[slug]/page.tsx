@@ -4,15 +4,33 @@ import { getProductPageBySlug, getSiteConfig } from '@/lib/laravel-api'
 import { prisma } from '@/lib/prisma'
 import { ProductPageClient } from './product-page-client'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const dynamicParams = false
+
+const KNOWN_PRODUCT_SLUGS = [
+  'pure-cotton-shirts-supplier-in-uae',
+]
+
+export async function generateStaticParams() {
+  const slugs = new Set(KNOWN_PRODUCT_SLUGS)
+  try {
+    const dbPages = await prisma.productPage.findMany({
+      select: { slug: true },
+    })
+    dbPages.forEach((p) => {
+      if (p.slug) slugs.add(p.slug)
+    })
+  } catch (e) {
+    console.error('generateStaticParams error:', e)
+  }
+  return Array.from(slugs).map((slug) => ({ slug }))
+}
 
 async function getProductPageData(slug: string) {
   // 1. Primary Source of Truth: MySQL (Laravel API)
   const apiPage = await getProductPageBySlug(slug)
   if (apiPage) return apiPage
 
-  // 2. Fallback: Prisma SQLite
+  // 2. Fallback: Prisma MySQL
   try {
     const dbPage = await prisma.productPage.findUnique({
       where: { slug },
@@ -27,18 +45,19 @@ async function getProductPageData(slug: string) {
     console.error('Error reading product page from Prisma:', e)
   }
 
-  if (slug === 'pure-cotton-shirts-supplier-in-uae') {
-    return {
-      id: 1,
-      slug: 'pure-cotton-shirts-supplier-in-uae',
-      title: '100% Pure Cotton Shirts Supplier in UAE',
-      category: 'Corporate Apparel',
-      heroImage: '/images/textile_fabric_rolls.png',
-      sections: [],
-    }
-  }
+  const formattedTitle = slug
+    .split('-')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ')
 
-  return null
+  return {
+    id: 1,
+    slug,
+    title: formattedTitle,
+    category: 'Corporate Apparel & Textiles',
+    heroImage: '/images/textile_fabric_rolls.png',
+    sections: [],
+  }
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {

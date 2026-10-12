@@ -4,38 +4,24 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { Award, Factory, Scissors, Clock, ShieldCheck } from 'lucide-react'
 
-const pillars = [
-  {
-    icon: Award,
-    title: 'ISO 9001:2015 Quality Certified',
-    desc: 'Strict quality assurance controls ensuring fabric color-fastness, reinforced seam stitching, and shrinkage resistance.',
-  },
-  {
-    icon: Factory,
-    title: 'In-House Embroidery & Screen Printing',
-    desc: 'State-of-the-art embroidery machinery for high-density corporate logo badges, insignia, and customized branding.',
-  },
-  {
-    icon: Scissors,
-    title: 'Bespoke Pattern Tailoring',
-    desc: 'Individual pattern cutting and trial fittings by experienced Dubai master tailors for perfect corporate fit.',
-  },
-  {
-    icon: Clock,
-    title: 'Express UAE Delivery & Support',
-    desc: 'Rapid production lead times, on-site employee measurement trials, and direct door-to-door delivery across all 7 Emirates.',
-  },
+const defaultPoints = [
+  { title: 'Established in 1963', desc: 'Over six decades of master tailoring heritage in Dubai, specializing in custom suiting and enterprise textile supply.' },
+  { title: '24-Hour Express Service', desc: 'Rapid express suiting and garment alterations for urgent corporate events, summits, and tight deadlines.' },
+  { title: 'Bulk Uniform Production', desc: 'In-house embroidery and garment production facilities capable of delivering large corporate uniform orders across the UAE.' },
+  { title: 'Deira Creek Showroom', desc: 'Visit our physical showroom on Baniyas Road in Deira Creek to view fabric swatches and meet our master tailors.' }
 ]
 
 export function WhySilky({ data }: { data?: any }) {
   const label = data?.label || 'THE SILKY DISTINCTION'
   const title = data?.title || 'Bespoke Tailoring Heritage & Industrial Scale'
-  const pointsList = data?.points?.length > 0 ? data.points : pillars
+  const description = data?.description || 'Since our founding in Dubai in 1963, Silky Textiles has combined old-world master tailoring precision with modern manufacturing capacity to supply uniforms and custom apparel for corporate fleets, luxury hospitality groups, and healthcare facilities.'
+  const image = data?.image || '/images/craftsmanship_tailoring.png'
+  const pointsList = data?.points?.length > 0 ? data.points : defaultPoints
 
   const ease = [0.16, 1, 0.3, 1] as const
 
   return (
-    <section id="why-silky" className="bg-[#FAF9F6] text-slate-900 py-28 lg:py-36 border-b border-slate-200/80 relative overflow-hidden select-none">
+    <section id="why-silky" className="bg-[#FAF9F6] text-slate-900 py-16 sm:py-20 lg:py-24 border-b border-slate-200/80 relative overflow-hidden select-none">
       
       {/* Dynamic Animated Background Grid Pattern */}
       <motion.div
@@ -87,7 +73,7 @@ export function WhySilky({ data }: { data?: any }) {
 
       <div className="max-w-[1380px] mx-auto px-6 sm:px-10 relative z-10">
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           
           {/* Left Column: Image & Floating Atelier Badges (Slides in from LEFT x: -70) */}
           <motion.div
@@ -99,7 +85,7 @@ export function WhySilky({ data }: { data?: any }) {
           >
             <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden border-4 border-white shadow-2xl group">
               <img
-                src="/images/craftsmanship_tailoring.png"
+                src={image}
                 alt="Master Tailoring & Fabric Craftsmanship Dubai"
                 className="w-full h-full object-cover object-center filter contrast-[1.04] brightness-[0.96] group-hover:scale-105 transition-transform duration-700"
                 onError={(e) => {
@@ -147,7 +133,7 @@ export function WhySilky({ data }: { data?: any }) {
                 {title}
               </h2>
               <p className="font-sans text-sm sm:text-base text-slate-600 leading-relaxed font-medium pt-2">
-                Since our founding in Dubai in 1963, Silky Textiles has combined old-world master tailoring precision with modern manufacturing capacity to supply uniforms and custom apparel for corporate fleets, luxury hospitality groups, and healthcare facilities.
+                {description}
               </p>
             </div>
 

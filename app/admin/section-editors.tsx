@@ -1,11 +1,40 @@
 import React, { useRef, useState } from 'react'
-import { ImageIcon, Plus, Trash2, Settings, Layout, UploadCloud } from 'lucide-react'
+import { ImageIcon, Plus, Trash2, Settings, Layout, UploadCloud, Star } from 'lucide-react'
 
 export function CategoryShowcaseEditor({ data, onChange, onUpload }: any) {
   const defaultCategories = [
-    { title: 'Corporate Uniform Shirting', subtitle: 'Executive Fleet Fitting', description: 'Handcrafted combed cotton formal dress shirts for corporate management, banking, and DIFC office teams in Dubai.', image: '/images/hero_corporate_uniforms.png' },
-    { title: 'Hospitality & Hotel Staff Suits', subtitle: '5-Star Resort Attire', description: 'Bespoke front-desk waistcoats, concierge blazers, and luxury banquet server uniforms tailored for Dubai hospitality.', image: '/images/hotel_uniform_luxury.png' },
-    { title: 'Industrial & Workwear Fleets', subtitle: 'High-Durability Garments', description: 'Heavy-duty cotton coveralls, high-visibility safety jackets, and reinforced trousers engineered for UAE site conditions.', image: '/images/textile_fabric_rolls.png' },
+    {
+      title: 'Executive & Corporate Suiting',
+      category: 'Corporate Identity',
+      subtitle: 'Corporate Identity',
+      description: 'Bespoke executive suits, blazers, dress shirts, and tailored corporate attire designed for boardrooms, luxury fleets, and financial institutions.',
+      image: '/images/hero_luxury_uniforms.png',
+      badge: 'Super 150s Wool',
+    },
+    {
+      title: 'Hospitality & 5-Star Hotel Wear',
+      category: 'Luxury Hotels & Resorts',
+      subtitle: 'Luxury Hotels & Resorts',
+      description: 'Ergonomic chef coats, aprons, front-desk waistcoats, and housekeeping uniforms crafted for premier UAE hotels & fine dining.',
+      image: '/images/category_hospitality.png',
+      badge: 'Hot Sector',
+    },
+    {
+      title: 'Healthcare & Clinical Wear',
+      category: 'Medical & Wellness',
+      subtitle: 'Medical & Wellness',
+      description: 'Antimicrobial medical scrubs, lab coats, and clinic staff uniforms engineered for durability, comfort, and professional hygiene.',
+      image: '/images/sector_healthcare.png',
+      badge: 'Antimicrobial',
+    },
+    {
+      title: 'Fine Textiles & In-House Embroidery',
+      category: 'Bespoke Fabric Sourcing',
+      subtitle: 'Bespoke Fabric Sourcing',
+      description: 'Direct importer of Italian Super wool blends, 100% Egyptian cottons, linen blends, and 3D high-density brand logo embroidery.',
+      image: '/images/hero_textile_sourcing.png',
+      badge: 'Mill Direct',
+    },
   ]
 
   const rawCats = (data.categories && Array.isArray(data.categories) && data.categories.length > 0)
@@ -19,6 +48,12 @@ export function CategoryShowcaseEditor({ data, onChange, onUpload }: any) {
   const updateCategory = (idx: number, key: string, value: any) => {
     const newCats = [...categories]
     newCats[idx] = { ...newCats[idx], [key]: value }
+    if (key === 'subtitle') {
+      newCats[idx].category = value
+    }
+    if (key === 'category') {
+      newCats[idx].subtitle = value
+    }
     onChange('categories', newCats)
     onChange('items', newCats)
   }
@@ -71,7 +106,7 @@ export function CategoryShowcaseEditor({ data, onChange, onUpload }: any) {
                   {cat.image ? <img src={cat.image} className="w-full h-full object-cover" /> : <ImageIcon className="w-8 h-8 text-slate-300" />}
                   <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity">
                      <label className="cursor-pointer text-white text-xs font-bold bg-[#DE7B3D] hover:bg-[#C96A30] px-3 py-1.5 rounded flex items-center gap-1">
-                       <UploadCloud className="w-3.5 h-3.5" /> Upload PNG/JPG/SVG
+                       <UploadCloud className="w-3.5 h-3.5" /> Upload Image
                        <input type="file" className="hidden" accept=".png,.jpg,.jpeg,.svg,.webp,image/*" onChange={async (e) => {
                          if(e.target.files?.[0]) {
                            const url = await onUpload(e.target.files[0])
@@ -92,6 +127,16 @@ export function CategoryShowcaseEditor({ data, onChange, onUpload }: any) {
                       <input type="text" value={cat.subtitle || ''} onChange={(e) => updateCategory(idx, 'subtitle', e.target.value)} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white" />
                     </div>
                   </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 mb-1">Button Text (Optional)</label>
+                      <input type="text" value={cat.btnText || ''} onChange={(e) => updateCategory(idx, 'btnText', e.target.value)} placeholder="Request Sector Quote" className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 mb-1">Button Link / URL (Optional)</label>
+                      <input type="text" value={cat.btnHref || cat.link || ''} onChange={(e) => { updateCategory(idx, 'btnHref', e.target.value); updateCategory(idx, 'link', e.target.value); }} placeholder="Leave blank for Modal, or /products/..." className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white font-mono text-slate-700" />
+                    </div>
+                  </div>
                   <div>
                     <label className="block text-xs font-bold text-slate-500 mb-1">Description</label>
                     <textarea value={cat.description || ''} onChange={(e) => updateCategory(idx, 'description', e.target.value)} rows={2} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white" />
@@ -107,9 +152,10 @@ export function CategoryShowcaseEditor({ data, onChange, onUpload }: any) {
 
 export function UniformSolutionsEditor({ data, onChange, onUpload }: any) {
   const defaultUniforms = [
-    { title: 'Corporate Executives', desc: 'Crisp white & sky blue formal shirts for boardrooms, banks, and DIFC firms.', image: '/images/hero_corporate_uniforms.png', iconName: 'Briefcase' },
-    { title: 'Luxury Hotel Front-Desk', desc: 'Elegant front-desk concierge and waiter shirts for 5-star Dubai resorts.', image: '/images/hotel_uniform_luxury.png', iconName: 'Building2' },
-    { title: 'Aviation & Valet Fleets', desc: 'Durable easy-iron uniforms designed for high-frequency daily wear.', image: '/images/sector_corporate.png', iconName: 'Truck' },
+    { title: 'Corporate Executives', desc: 'Crisp white & sky blue formal shirts for boardrooms, banks, and DIFC firms.', image: '/homepage-image/Homepage (9).jpg', iconName: 'Briefcase' },
+    { title: 'Luxury Hotel Front-Desk', desc: 'Elegant front-desk concierge and waiter shirts for 5-star Dubai resorts.', image: '/homepage-image/Homepage (11).jpg', iconName: 'Hotel' },
+    { title: 'Medical Scrubs & Wellness', desc: 'Antimicrobial doctor coats, nursing scrubs, lab gowns, and surgical headwear for UAE clinics.', image: '/homepage-image/Homepage (8).jpg', iconName: 'Stethoscope' },
+    { title: 'Construction & Safety Workwear', desc: 'High-visibility safety jackets, heavy-duty coveralls, flame-retardant vests, and site trousers.', image: '/homepage-image/Homepage (6).jpg', iconName: 'HardHat' },
   ]
 
   const rawList = (data.uniforms && Array.isArray(data.uniforms) && data.uniforms.length > 0)
@@ -152,6 +198,53 @@ export function UniformSolutionsEditor({ data, onChange, onUpload }: any) {
           <label className="block text-sm font-bold text-slate-700 mb-2">Main Heading</label>
           <input type="text" value={data.title || ''} onChange={(e) => onChange('title', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
         </div>
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Section Description</label>
+          <textarea value={data.description || ''} onChange={(e) => onChange('description', e.target.value)} rows={3} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="Silky Textiles manufactures and supplies bespoke commercial uniform collections..." />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-1">
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Header Button Text</label>
+            <input type="text" value={data.btnText || ''} onChange={(e) => onChange('btnText', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-bold" placeholder="Request Bulk Pricing" />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Header Button Link / URL</label>
+            <input type="text" value={data.btnHref || ''} onChange={(e) => onChange('btnHref', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-mono text-slate-700" placeholder="e.g. #contact or /contact" />
+          </div>
+        </div>
+      </div>
+
+      {/* Cards per Screen Selector - Clean & Compact */}
+      <div className="bg-white rounded-xl border border-gray-200 px-5 py-3.5 flex items-center justify-between gap-4">
+        <span className="text-sm font-bold text-slate-800">Cards per Screen</span>
+        <div className="inline-flex items-center p-1 bg-slate-100 rounded-lg border border-slate-200">
+          {[
+            { id: 'auto', label: 'Auto' },
+            { id: '3', label: '3 Cards' },
+            { id: '4', label: '4 Cards' },
+            { id: '5', label: '5 Cards' },
+          ].map((opt) => {
+            const current = data.columns || data.cardsPerRow || 'auto'
+            const isSelected = String(current) === opt.id || (!data.columns && !data.cardsPerRow && opt.id === 'auto')
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => {
+                  onChange('columns', opt.id)
+                  onChange('cardsPerRow', opt.id)
+                }}
+                className={`px-3 py-1 rounded-md text-xs font-bold transition-all duration-150 cursor-pointer ${
+                  isSelected
+                    ? 'bg-[#D97A42] text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                }`}
+              >
+                {opt.label}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -173,7 +266,7 @@ export function UniformSolutionsEditor({ data, onChange, onUpload }: any) {
                  {unif.image ? <img src={unif.image} className="w-full h-full object-cover" /> : <ImageIcon className="w-8 h-8 text-slate-300" />}
                  <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity">
                     <label className="cursor-pointer text-white text-xs font-bold bg-[#DE7B3D] hover:bg-[#C96A30] px-3 py-2 rounded-lg flex items-center gap-1.5 shadow">
-                      <UploadCloud className="w-4 h-4" /> Upload Local Image (PNG / JPG / SVG / WebP)
+                      <UploadCloud className="w-4 h-4" /> Upload Image
                       <input type="file" className="hidden" accept=".png,.jpg,.jpeg,.svg,.webp,image/*" onChange={async (e) => {
                         if(e.target.files?.[0]) {
                           const url = await onUpload(e.target.files[0])
@@ -192,10 +285,14 @@ export function UniformSolutionsEditor({ data, onChange, onUpload }: any) {
                  <label className="block text-xs font-bold text-slate-500 mb-1">Description</label>
                  <textarea value={unif.desc || ''} onChange={(e) => updateUniform(idx, 'desc', e.target.value)} rows={2} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white" />
                </div>
+               <div>
+                 <label className="block text-xs font-bold text-slate-500 mb-1">Item Link / URL (Optional)</label>
+                 <input type="text" value={unif.link || unif.btnHref || ''} onChange={(e) => { updateUniform(idx, 'link', e.target.value); updateUniform(idx, 'btnHref', e.target.value); }} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white font-mono text-slate-700" placeholder="e.g. #contact or /products" />
+               </div>
                
                {/* Custom Local Vector / Image Icon Upload */}
                <div>
-                 <label className="block text-xs font-bold text-slate-500 mb-1">Custom Icon File (Vector SVG, PNG, JPG)</label>
+                 <label className="block text-xs font-bold text-slate-500 mb-1">Custom Icon</label>
                  <div className="flex items-center gap-2">
                    {unif.iconImage ? (
                      <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-300">
@@ -206,7 +303,7 @@ export function UniformSolutionsEditor({ data, onChange, onUpload }: any) {
                    ) : (
                      <label className="cursor-pointer text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold inline-flex items-center gap-1.5">
                        <UploadCloud className="w-3.5 h-3.5 text-[#D97A42]" />
-                       <span>Upload Local Icon File</span>
+                       <span>Upload Icon</span>
                        <input type="file" className="hidden" accept=".png,.jpg,.jpeg,.svg,.webp,image/*" onChange={async (e) => {
                          if (e.target.files?.[0]) {
                            const url = await onUpload(e.target.files[0])
@@ -272,6 +369,49 @@ export function OurWorkEditor({ data, onChange, onUpload }: any) {
           <label className="block text-sm font-bold text-slate-700 mb-2">Main Heading</label>
           <input type="text" value={data.title || ''} onChange={(e) => onChange('title', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none" />
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-1">
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Header Button Text</label>
+            <input type="text" value={data.btnText || ''} onChange={(e) => onChange('btnText', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none font-bold" placeholder="View All Projects" />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Header Button Link / URL</label>
+            <input type="text" value={data.btnHref || ''} onChange={(e) => onChange('btnHref', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none font-mono text-slate-700" placeholder="e.g. #contact or /projects" />
+          </div>
+        </div>
+      </div>
+
+      {/* Cards per Screen Selector - Clean & Compact */}
+      <div className="bg-white rounded-xl border border-gray-200 px-5 py-3.5 flex items-center justify-between gap-4">
+        <span className="text-sm font-bold text-slate-800">Cards per Screen</span>
+        <div className="inline-flex items-center p-1 bg-slate-100 rounded-lg border border-slate-200">
+          {[
+            { id: 'auto', label: 'Auto' },
+            { id: '2', label: '2 Cards' },
+            { id: '3', label: '3 Cards' },
+            { id: '4', label: '4 Cards' },
+          ].map((opt) => {
+            const current = data.columns || data.cardsPerRow || 'auto'
+            const isSelected = String(current) === opt.id || (!data.columns && !data.cardsPerRow && opt.id === 'auto')
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => {
+                  onChange('columns', opt.id)
+                  onChange('cardsPerRow', opt.id)
+                }}
+                className={`px-3 py-1 rounded-md text-xs font-bold transition-all duration-150 cursor-pointer ${
+                  isSelected
+                    ? 'bg-[#D97A42] text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                }`}
+              >
+                {opt.label}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -293,7 +433,7 @@ export function OurWorkEditor({ data, onChange, onUpload }: any) {
                  {(proj.image || proj.url) ? <img src={proj.image || proj.url} className="w-full h-full object-cover" /> : <ImageIcon className="w-8 h-8 text-slate-300" />}
                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                     <label className="cursor-pointer text-white text-xs font-bold bg-[#DE7B3D] hover:bg-[#C96A30] px-4 py-2 rounded-lg shadow-md flex items-center gap-1.5">
-                      <UploadCloud className="w-4 h-4" /> Upload Local File (PNG / JPG / SVG / WebP)
+                      <UploadCloud className="w-4 h-4" /> Upload Image
                       <input type="file" className="hidden" accept=".png,.jpg,.jpeg,.svg,.webp,image/*" onChange={async (e) => {
                         if(e.target.files?.[0]) {
                           const url = await onUpload(e.target.files[0])
@@ -357,7 +497,32 @@ export function WhySilkyEditor({ data, onChange, onUpload }: any) {
   return (
     <div className="space-y-8">
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-8 space-y-6">
-        <h3 className="font-bold text-slate-800 border-b border-gray-100 pb-4">Section Header</h3>
+        <h3 className="font-bold text-slate-800 border-b border-gray-100 pb-4">Section Header & Media</h3>
+        
+        {/* Main Left Image */}
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Main Left Section Image</label>
+          <div className="flex items-center gap-6">
+            <div className="w-36 h-28 rounded-xl bg-slate-100 border border-gray-200 overflow-hidden flex items-center justify-center relative group shrink-0">
+              {data.image ? <img src={data.image} className="w-full h-full object-cover" /> : <ImageIcon className="w-8 h-8 text-slate-300" />}
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                <label className="cursor-pointer text-white text-xs font-bold bg-[#DE7B3D] hover:bg-[#C96A30] px-3 py-1.5 rounded flex items-center gap-1 shadow">
+                  <UploadCloud className="w-3.5 h-3.5" /> Upload Image
+                  <input type="file" className="hidden" accept=".png,.jpg,.jpeg,.svg,.webp,image/*" onChange={async (e) => {
+                    if (e.target.files?.[0]) {
+                      const url = await onUpload(e.target.files[0])
+                      onChange('image', url)
+                    }
+                  }} />
+                </label>
+              </div>
+            </div>
+            <div className="flex-1">
+              <input type="text" value={data.image || ''} onChange={(e) => onChange('image', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="/images/craftsmanship_tailoring.png" />
+            </div>
+          </div>
+        </div>
+
         <div>
           <label className="block text-sm font-bold text-slate-700 mb-2">Section Label (Orange text)</label>
           <input type="text" value={data.label || ''} onChange={(e) => onChange('label', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="DUBAI TAILORING & UNIFORM ADVANTAGE" />
@@ -365,6 +530,10 @@ export function WhySilkyEditor({ data, onChange, onUpload }: any) {
         <div>
           <label className="block text-sm font-bold text-slate-700 mb-2">Main Heading</label>
           <input type="text" value={data.title || ''} onChange={(e) => onChange('title', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="Why Leading UAE Businesses Choose Silky" />
+        </div>
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Sub Heading / Narrative Description</label>
+          <textarea value={data.description || ''} onChange={(e) => onChange('description', e.target.value)} rows={3} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="Since our founding in Dubai in 1963, Silky Textiles has combined..." />
         </div>
       </div>
 
@@ -394,7 +563,7 @@ export function WhySilkyEditor({ data, onChange, onUpload }: any) {
               {/* Custom Icon/Image Upload */}
               {onUpload && (
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">Custom Icon / Graphic (PNG, JPG, Vector SVG)</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Custom Icon</label>
                   <div className="flex items-center gap-2">
                     {pt.iconImage ? (
                       <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-300">
@@ -405,7 +574,7 @@ export function WhySilkyEditor({ data, onChange, onUpload }: any) {
                     ) : (
                       <label className="cursor-pointer text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold inline-flex items-center gap-1.5">
                         <UploadCloud className="w-3.5 h-3.5 text-[#D97A42]" />
-                        <span>Upload PNG / JPG / SVG / WebP</span>
+                        <span>Upload Image</span>
                         <input type="file" className="hidden" accept=".png,.jpg,.jpeg,.svg,.webp,image/*" onChange={async (e) => {
                           if (e.target.files?.[0]) {
                             const url = await onUpload(e.target.files[0])
@@ -452,14 +621,18 @@ export function ProcessEditor({ data, onChange, onUpload }: any) {
     <div className="space-y-8">
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-8 space-y-6">
         <h3 className="font-bold text-slate-800 border-b border-gray-100 pb-4">Section Header & CTA</h3>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className="block text-sm font-bold text-slate-700 mb-2">Section Label</label>
             <input type="text" value={data.label || ''} onChange={(e) => onChange('label', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="HOW WE WORK" />
           </div>
           <div>
             <label className="block text-sm font-bold text-slate-700 mb-2">Button Text</label>
-            <input type="text" value={data.ctaText || ''} onChange={(e) => onChange('ctaText', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="Request Consultation" />
+            <input type="text" value={data.ctaText || data.btnText || ''} onChange={(e) => { onChange('ctaText', e.target.value); onChange('btnText', e.target.value); }} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-bold" placeholder="Request Consultation" />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Button Link / URL</label>
+            <input type="text" value={data.ctaHref || data.btnHref || ''} onChange={(e) => { onChange('ctaHref', e.target.value); onChange('btnHref', e.target.value); }} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-mono text-slate-700" placeholder="e.g. #contact or /contact" />
           </div>
         </div>
         <div>
@@ -502,7 +675,7 @@ export function ProcessEditor({ data, onChange, onUpload }: any) {
               {/* Local Icon/Graphic Upload */}
               {onUpload && (
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">Custom Step Icon (PNG, JPG, Vector SVG)</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Step Icon</label>
                   <div className="flex items-center gap-2">
                     {st.iconImage ? (
                       <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-300">
@@ -513,7 +686,7 @@ export function ProcessEditor({ data, onChange, onUpload }: any) {
                     ) : (
                       <label className="cursor-pointer text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold inline-flex items-center gap-1.5">
                         <UploadCloud className="w-3.5 h-3.5 text-[#D97A42]" />
-                        <span>Upload PNG / JPG / SVG / WebP</span>
+                        <span>Upload Image</span>
                         <input type="file" className="hidden" accept=".png,.jpg,.jpeg,.svg,.webp,image/*" onChange={async (e) => {
                           if (e.target.files?.[0]) {
                             const url = await onUpload(e.target.files[0])
@@ -634,8 +807,29 @@ export function TestimonialsEditor({ data, onChange, onUpload }: any) {
                     <input type="text" value={t.author || ''} onChange={(e) => updateTestimonial(idx, 'author', e.target.value)} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white font-bold" />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-1">Star Rating (1-5)</label>
-                    <input type="number" min="1" max="5" value={t.rating || 5} onChange={(e) => updateTestimonial(idx, 'rating', parseInt(e.target.value) || 5)} className="w-full px-3 py-2 text-sm bg-slate-50 border border-gray-200 rounded-lg focus:bg-white font-bold text-[#D97A42]" />
+                    <label className="block text-xs font-bold text-slate-500 mb-1 flex items-center gap-1">
+                      <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0" />
+                      <span>Rating</span>
+                    </label>
+                    <div className="flex items-center gap-1 bg-slate-50 border border-gray-200 rounded-lg p-1.5 justify-between">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => updateTestimonial(idx, 'rating', star)}
+                          className="p-0.5 hover:scale-110 transition-transform cursor-pointer"
+                          title={`Set rating to ${star} stars`}
+                        >
+                          <Star 
+                            className={`w-4 h-4 ${
+                              star <= (t.rating || 5) 
+                                ? 'text-amber-400 fill-amber-400' 
+                                : 'text-slate-300 fill-slate-100'
+                            }`} 
+                          />
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 <div>
@@ -648,7 +842,7 @@ export function TestimonialsEditor({ data, onChange, onUpload }: any) {
                 </div>
                 {onUpload && (
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-1">Author Avatar File (PNG, JPG, Vector SVG)</label>
+                    <label className="block text-xs font-bold text-slate-500 mb-1">Author Avatar</label>
                     <div className="flex items-center gap-2">
                       {t.avatar ? (
                         <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-300">
@@ -681,95 +875,154 @@ export function TestimonialsEditor({ data, onChange, onUpload }: any) {
 }
 
 export function ContactBandEditor({ data, onChange, onUpload }: any) {
-  const bgInputRef = useRef<HTMLInputElement>(null)
+  const label = data.label || data.rightTag || data.tagline || ''
+  const title = data.title || data.rightTitle || ''
+  const description = data.description || data.rightSubtitle || data.subtitle || ''
+  const buildingName = data.buildingName || data.addressTitle || ''
+  const address = data.address || data.addressDetail || ''
+  const phone = data.phone || ''
+  const email = data.email || ''
+  const whatsapp = data.whatsapp || ''
+
+  const handleUpdate = (field: string, val: string) => {
+    onChange(field, val)
+    if (field === 'label') {
+      onChange('rightTag', val)
+      onChange('tagline', val)
+    }
+    if (field === 'title') {
+      onChange('rightTitle', val)
+    }
+    if (field === 'description') {
+      onChange('rightSubtitle', val)
+      onChange('subtitle', val)
+    }
+    if (field === 'buildingName') {
+      onChange('addressTitle', val)
+    }
+    if (field === 'address') {
+      onChange('addressDetail', val)
+    }
+  }
 
   return (
     <div className="space-y-8">
-      {/* Form Left Side Header */}
+      {/* Section Overview Header */}
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 space-y-6">
-        <h3 className="font-bold text-slate-800 border-b border-gray-100 pb-4">Quotation Form Header (Left Card)</h3>
+        <h3 className="font-bold text-slate-800 border-b border-gray-100 pb-4">Section Header & Overview</h3>
         <div>
-          <label className="block text-sm font-bold text-slate-700 mb-2">Eyebrow Tagline</label>
-          <input type="text" value={data.label || ''} onChange={(e) => onChange('label', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white" placeholder="DEIRA CREEK SHOWROOM • DUBAI EST. 1963" />
+          <label className="block text-sm font-bold text-slate-700 mb-2">Section Label (Orange text)</label>
+          <input
+            type="text"
+            value={label}
+            onChange={(e) => handleUpdate('label', e.target.value)}
+            className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            placeholder="DUBAI SHOWROOM & ATELIER HEADQUARTERS"
+          />
         </div>
         <div>
-          <label className="block text-sm font-bold text-slate-700 mb-2">Main Form Heading</label>
-          <input type="text" value={data.title || ''} onChange={(e) => onChange('title', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white font-serif font-bold text-lg" placeholder="Request A Custom Quotation" />
+          <label className="block text-sm font-bold text-slate-700 mb-2">Main Heading</label>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => handleUpdate('title', e.target.value)}
+            className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-serif font-bold text-lg"
+            placeholder="Elevate Your Corporate Identity Today"
+          />
         </div>
         <div>
-          <label className="block text-sm font-bold text-slate-700 mb-2">Subtitle / Instruction</label>
-          <textarea value={data.subtitle || ''} onChange={(e) => onChange('subtitle', e.target.value)} rows={2} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white leading-relaxed" placeholder="Send us your quantity & custom shirt details..." />
+          <label className="block text-sm font-bold text-slate-700 mb-2">Section Description</label>
+          <textarea
+            value={description}
+            onChange={(e) => handleUpdate('description', e.target.value)}
+            rows={3}
+            className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 leading-relaxed"
+            placeholder="Get custom fabric swatches, volume pricing, and personalized design consultation directly from our Dubai master tailoring specialists."
+          />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-1">
+          <div>
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Quote Button Text</label>
+            <input
+              type="text"
+              value={data.quoteBtnText || data.btnText || ''}
+              onChange={(e) => { onChange('quoteBtnText', e.target.value); onChange('btnText', e.target.value); }}
+              className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-bold"
+              placeholder="Request Custom Quote & Swatches"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Quote Button Link / URL</label>
+            <input
+              type="text"
+              value={data.quoteBtnHref || data.btnHref || ''}
+              onChange={(e) => { onChange('quoteBtnHref', e.target.value); onChange('btnHref', e.target.value); }}
+              className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-mono text-slate-700"
+              placeholder="Leave blank for Quote Modal or e.g. #contact"
+            />
+            <span className="text-[11px] text-slate-400 mt-1 block">Leave blank to open Quote popup modal, or enter page/anchor link</span>
+          </div>
         </div>
       </div>
 
-      {/* Showroom Right Side Information */}
+      {/* Showroom & Location Contact Info */}
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 space-y-6">
-        <h3 className="font-bold text-slate-800 border-b border-gray-100 pb-4">Showroom & Contact Card (Right Card)</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Right Eyebrow Tag</label>
-            <input type="text" value={data.rightTag || ''} onChange={(e) => onChange('rightTag', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white" placeholder="DEIRA CREEK SHOWROOM • DUBAI EST. 1963" />
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Company / Atelier Title</label>
-            <input type="text" value={data.rightTitle || ''} onChange={(e) => onChange('rightTitle', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white font-serif font-bold" placeholder="Silky Textiles & Garments LLC" />
-          </div>
-        </div>
-        <div>
-          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Showroom Subtitle</label>
-          <input type="text" value={data.rightSubtitle || ''} onChange={(e) => onChange('rightSubtitle', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white" placeholder="Dubai's trusted bespoke tailors & corporate uniform partner." />
-        </div>
+        <h3 className="font-bold text-slate-800 border-b border-gray-100 pb-4">Showroom & Location Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Building / Atelier Name</label>
-            <input type="text" value={data.addressTitle || ''} onChange={(e) => onChange('addressTitle', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white" placeholder="Main Showroom & Atelier" />
+            <input
+              type="text"
+              value={buildingName}
+              onChange={(e) => handleUpdate('buildingName', e.target.value)}
+              className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-bold"
+              placeholder="Showroom No. 1, Al Zarooni Building"
+            />
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Full Address Location</label>
-            <input type="text" value={data.addressDetail || ''} onChange={(e) => onChange('addressDetail', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white" placeholder="Deira Creek District, Al Ras, Dubai, UAE" />
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Direct Phone Number</label>
-            <input type="text" value={data.phone || ''} onChange={(e) => onChange('phone', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white font-mono" placeholder="+971 4 228 1234" />
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Response Guarantee Text</label>
-            <input type="text" value={data.guaranteeText || ''} onChange={(e) => onChange('guaranteeText', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white text-green-700 font-bold" placeholder="⚡ Average reply in under 2 hours" />
+            <input
+              type="text"
+              value={address}
+              onChange={(e) => handleUpdate('address', e.target.value)}
+              className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              placeholder="Next to HBL, Baniyas Road (D85), Deira Creek, Dubai, UAE"
+            />
           </div>
         </div>
 
-        {/* Right Card Background Image Upload */}
-        {onUpload && (
-          <div className="pt-2 border-t border-gray-100">
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Showroom Card Background Image (PNG, JPG, Vector SVG, WebP)</label>
-            <div className="flex items-center gap-4">
-              <div className="w-32 h-20 bg-slate-100 rounded-xl border border-slate-300 overflow-hidden shrink-0 flex items-center justify-center">
-                {data.bgImage ? (
-                  <img src={data.bgImage} alt="Background" className="w-full h-full object-cover" />
-                ) : (
-                  <ImageIcon className="w-6 h-6 text-slate-400" />
-                )}
-              </div>
-              <div className="space-y-2">
-                <button
-                  type="button"
-                  onClick={() => bgInputRef.current?.click()}
-                  className="cursor-pointer text-slate-800 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-xl border border-slate-300 text-xs font-bold inline-flex items-center gap-1.5"
-                >
-                  <UploadCloud className="w-4 h-4 text-[#D97A42]" /> Upload Background Graphic
-                </button>
-                <input type="file" ref={bgInputRef} className="hidden" accept=".png,.jpg,.jpeg,.svg,.webp,image/*" onChange={async (e) => {
-                  if (e.target.files?.[0]) {
-                    const url = await onUpload(e.target.files[0])
-                    if (url) onChange('bgImage', url)
-                  }
-                }} />
-              </div>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Direct Phone Number</label>
+            <input
+              type="text"
+              value={phone}
+              onChange={(e) => onChange('phone', e.target.value)}
+              className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-mono"
+              placeholder="+971 4 355 8453"
+            />
           </div>
-        )}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Sales Email Address</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => onChange('email', e.target.value)}
+              className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-mono"
+              placeholder="sales@silky.ae"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">WhatsApp Concierge Number</label>
+            <input
+              type="text"
+              value={whatsapp}
+              onChange={(e) => onChange('whatsapp', e.target.value)}
+              className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-mono text-green-700 font-bold"
+              placeholder="+971 4 226 1050"
+            />
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -843,7 +1096,7 @@ export function SpecsMatrixEditor({ data, onChange, onUpload }: any) {
                 {/* Local Custom Icon Upload */}
                 {onUpload && (
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-1">Custom Icon Graphic (PNG, JPG, Vector SVG)</label>
+                    <label className="block text-xs font-bold text-slate-500 mb-1">Custom Icon</label>
                     <div className="flex items-center gap-2">
                       {spec.iconImage ? (
                         <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-300">
@@ -854,7 +1107,7 @@ export function SpecsMatrixEditor({ data, onChange, onUpload }: any) {
                       ) : (
                         <label className="cursor-pointer text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold inline-flex items-center gap-1.5">
                           <UploadCloud className="w-3.5 h-3.5 text-[#D97A42]" />
-                          <span>Upload PNG / JPG / SVG / WebP</span>
+                          <span>Upload Image</span>
                           <input type="file" className="hidden" accept=".png,.jpg,.jpeg,.svg,.webp,image/*" onChange={async (e) => {
                             if (e.target.files?.[0]) {
                               const url = await onUpload(e.target.files[0])
@@ -988,6 +1241,16 @@ export function FabricSwatchesEditor({ data, onChange, onUpload }: any) {
           <label className="block text-sm font-bold text-slate-700 mb-2">Main Heading</label>
           <input type="text" value={data.title || ''} onChange={(e) => onChange('title', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white" placeholder="Explore Available Colors & Weaves" />
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-1">
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Sample Request Button Text</label>
+            <input type="text" value={data.swatchBtnText || data.btnText || ''} onChange={(e) => { onChange('swatchBtnText', e.target.value); onChange('btnText', e.target.value); }} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white font-bold" placeholder="Request Sample Swatch" />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Sample Request Button Link / URL</label>
+            <input type="text" value={data.swatchBtnHref || data.btnHref || ''} onChange={(e) => { onChange('swatchBtnHref', e.target.value); onChange('btnHref', e.target.value); }} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white font-mono text-slate-700" placeholder="Leave blank for Quote Modal or enter URL" />
+          </div>
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -1021,7 +1284,7 @@ export function FabricSwatchesEditor({ data, onChange, onUpload }: any) {
                 {/* Local Fabric Swatch Image Upload */}
                 {onUpload && (
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-1">Swatch Image / Fabric Texture File (PNG, JPG, Vector SVG)</label>
+                    <label className="block text-xs font-bold text-slate-500 mb-1">Swatch Image</label>
                     <div className="flex items-center gap-2">
                       {swatch.image ? (
                         <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-300">
@@ -1261,7 +1524,7 @@ export function QualityControlEditor({ data, onChange, onUpload }: any) {
                 {/* Quality Stage Local Image Upload */}
                 {onUpload && (
                   <div className="pt-2 border-t border-gray-100">
-                    <label className="block text-xs font-bold text-slate-500 mb-1">Stage Inspection Image (PNG, JPG, Vector SVG)</label>
+                    <label className="block text-xs font-bold text-slate-500 mb-1">Inspection Image</label>
                     <div className="flex items-center gap-2">
                       {st.image ? (
                         <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-300">
@@ -1501,9 +1764,15 @@ export function BulkPricingEditor({ data, onChange }: any) {
           <label className="block text-sm font-bold text-slate-700 mb-2">Banner Description</label>
           <textarea value={data.calloutDesc || ''} onChange={(e) => onChange('calloutDesc', e.target.value)} rows={2} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white leading-relaxed" placeholder="Our Dubai manufacturing atelier produces over 50,000 corporate shirts annually..." />
         </div>
-        <div>
-          <label className="block text-sm font-bold text-slate-700 mb-2">Button Action Text</label>
-          <input type="text" value={data.calloutBtnText || ''} onChange={(e) => onChange('calloutBtnText', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white font-bold" placeholder="Contact Wholesale Director" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Button Action Text</label>
+            <input type="text" value={data.calloutBtnText || ''} onChange={(e) => onChange('calloutBtnText', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white font-bold" placeholder="Contact Wholesale Director" />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Button Link / URL</label>
+            <input type="text" value={data.calloutBtnHref || ''} onChange={(e) => onChange('calloutBtnHref', e.target.value)} className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white font-mono text-slate-700" placeholder="Leave blank for Quote Modal or e.g. #contact" />
+          </div>
         </div>
       </div>
     </div>
@@ -1614,7 +1883,7 @@ export function LogisticsEditor({ data, onChange, onUpload }: any) {
               {/* Local Logistics Custom Icon Upload */}
               {onUpload && (
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">Custom Route Icon (PNG, JPG, Vector SVG)</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Route Icon</label>
                   <div className="flex items-center gap-2">
                     {rt.iconImage ? (
                       <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-300">
@@ -1729,30 +1998,60 @@ export function ProductHeroEditor({ data, onChange, onUpload }: any) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-              Primary Button Text (Request Quote)
-            </label>
-            <input
-              type="text"
-              value={data.primaryBtnText || ''}
-              onChange={(e) => onChange('primaryBtnText', e.target.value)}
-              placeholder="Request Bulk Quote"
-              className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-            />
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                Primary Button Text (Request Quote)
+              </label>
+              <input
+                type="text"
+                value={data.primaryBtnText || ''}
+                onChange={(e) => onChange('primaryBtnText', e.target.value)}
+                placeholder="Request Bulk Quote"
+                className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-bold"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                Primary Button Link / URL
+              </label>
+              <input
+                type="text"
+                value={data.primaryBtnHref || ''}
+                onChange={(e) => onChange('primaryBtnHref', e.target.value)}
+                placeholder="e.g. #contact, /contact, or leave blank for Modal"
+                className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-mono text-slate-700"
+              />
+              <span className="text-[11px] text-slate-400 mt-1 block">Leave empty to open Quote Modal popup, or enter a URL/anchor</span>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-              Secondary Button Text (View Specs)
-            </label>
-            <input
-              type="text"
-              value={data.secondaryBtnText || ''}
-              onChange={(e) => onChange('secondaryBtnText', e.target.value)}
-              placeholder="View Specifications"
-              className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-            />
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                Secondary Button Text (View Specs)
+              </label>
+              <input
+                type="text"
+                value={data.secondaryBtnText || ''}
+                onChange={(e) => onChange('secondaryBtnText', e.target.value)}
+                placeholder="View Specifications"
+                className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-bold"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                Secondary Button Link / URL
+              </label>
+              <input
+                type="text"
+                value={data.secondaryBtnHref || ''}
+                onChange={(e) => onChange('secondaryBtnHref', e.target.value)}
+                placeholder="e.g. #specs, /products, or #details"
+                className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-mono text-slate-700"
+              />
+              <span className="text-[11px] text-slate-400 mt-1 block">Destination anchor (e.g. #specs) or page URL</span>
+            </div>
           </div>
         </div>
       </div>
@@ -1760,7 +2059,7 @@ export function ProductHeroEditor({ data, onChange, onUpload }: any) {
       {/* Hero Featured Image */}
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 space-y-6">
         <h3 className="font-bold text-slate-800 text-lg border-b border-gray-100 pb-4">
-          Hero Display Image (PNG, JPG, Vector SVG, WebP)
+          Display Image
         </h3>
         <div className="flex flex-col sm:flex-row items-start gap-6">
           <div className="w-full sm:w-64 h-48 rounded-2xl bg-slate-100 border border-gray-200 overflow-hidden flex items-center justify-center relative shadow-inner shrink-0">
@@ -1789,7 +2088,7 @@ export function ProductHeroEditor({ data, onChange, onUpload }: any) {
                 onClick={() => fileInputRef.current?.click()}
                 className="flex items-center gap-2 text-sm font-bold text-slate-800 bg-slate-100 hover:bg-slate-200 px-5 py-2.5 rounded-xl transition-all border border-slate-300 cursor-pointer"
               >
-                <UploadCloud className="w-4 h-4 text-[#D97A42]" /> Upload PNG / JPG / SVG / WebP File
+                <UploadCloud className="w-4 h-4 text-[#D97A42]" /> Upload Image
               </button>
               {data.heroImage && (
                 <button
@@ -1992,7 +2291,7 @@ export function CustomizationEditor({ data, onChange, onUpload }: any) {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                        Service Title
+                        Title
                       </label>
                       <input
                         type="text"
@@ -2003,7 +2302,7 @@ export function CustomizationEditor({ data, onChange, onUpload }: any) {
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                        Service Icon (Preset or Custom File)
+                        Service Icon
                       </label>
                       <div className="space-y-2">
                         <select
@@ -2016,7 +2315,7 @@ export function CustomizationEditor({ data, onChange, onUpload }: any) {
                           <option value="Award">🏆 Award (Buttons & Construction)</option>
                           <option value="Ruler">📐 Ruler (Made-to-Measure Sizing)</option>
                           <option value="ShieldCheck">🛡️ Shield Check (Quality Guarantee)</option>
-                          <option value="Sparkles">✨ Sparkles (Luxury Details)</option>
+                          <option value="Shirt">👔 Shirt (Custom Shirting & Apparel)</option>
                           <option value="Layers">🥞 Layers (Fabric Weave)</option>
                           <option value="Building2">🏢 Building (Corporate Fleet)</option>
                           <option value="Truck">🚚 Truck (Express Logistics)</option>
@@ -2024,7 +2323,7 @@ export function CustomizationEditor({ data, onChange, onUpload }: any) {
                           <option value="PhoneCall">📞 Phone (Direct Concierge)</option>
                         </select>
 
-                        {/* Custom Local Icon File Upload (PNG, JPG, Vector SVG) */}
+                        {/* Custom Icon Upload */}
                         <div className="flex items-center gap-2">
                           {opt.iconImage ? (
                             <div className="flex items-center gap-2 bg-slate-100 p-1.5 px-3 rounded-lg border border-slate-300">
@@ -2034,7 +2333,7 @@ export function CustomizationEditor({ data, onChange, onUpload }: any) {
                                 type="button"
                                 onClick={() => updateOption(idx, 'iconImage', '')}
                                 className="text-red-500 hover:text-red-700 text-xs font-bold ml-1 cursor-pointer"
-                                title="Remove Custom Icon File"
+                                title="Remove Icon"
                               >
                                 ×
                               </button>
@@ -2042,7 +2341,7 @@ export function CustomizationEditor({ data, onChange, onUpload }: any) {
                           ) : (
                             <label className="cursor-pointer text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold inline-flex items-center gap-1.5 transition-all">
                               <UploadCloud className="w-3.5 h-3.5 text-[#D97A42]" />
-                              <span>Upload PNG / JPG / SVG / WebP</span>
+                              <span>Upload Image</span>
                               <input
                                 type="file"
                                 className="hidden"
@@ -2061,7 +2360,7 @@ export function CustomizationEditor({ data, onChange, onUpload }: any) {
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                        Badge Text
+                        Badge
                       </label>
                       <input
                         type="text"

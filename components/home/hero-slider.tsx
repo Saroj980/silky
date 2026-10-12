@@ -13,6 +13,7 @@ export interface HeroSlideData {
   image: string
   imageAlt: string
   primaryBtnText: string
+  primaryBtnHref?: string
   secondaryBtnText: string
   secondaryBtnHref: string
   statLabel?: string
@@ -137,6 +138,7 @@ export function HeroSlider({
         image: s.image || defaultRef.image,
         imageAlt: s.imageAlt || defaultRef.imageAlt,
         primaryBtnText: s.primaryBtnText || defaultRef.primaryBtnText,
+        primaryBtnHref: s.primaryBtnHref || defaultRef.primaryBtnHref || '',
         secondaryBtnText: s.secondaryBtnText || defaultRef.secondaryBtnText,
         secondaryBtnHref: s.secondaryBtnHref || defaultRef.secondaryBtnHref,
         statLabel: defaultRef.statLabel,
@@ -301,21 +303,39 @@ export function HeroSlider({
             {/* Fill-Sweep CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
               {/* Primary CTA button with fill-sweep hover */}
-              <button
-                onClick={onOpenQuoteModal}
-                className="relative group overflow-hidden bg-slate-900 text-white px-8 py-4 font-inter text-xs font-semibold uppercase tracking-widest flex items-center justify-center gap-3 rounded-none cursor-pointer border border-slate-900 shadow-sm"
-              >
-                <motion.span
-                  className="absolute inset-0 bg-[#DE7B3D] z-0 origin-left"
-                  initial={{ scaleX: 0 }}
-                  whileHover={{ scaleX: shouldReduceMotion ? 0 : 1 }}
-                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                />
-                <span className="relative z-10 flex items-center gap-2 text-white">
-                  {activeSlideData.primaryBtnText}
-                  <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </span>
-              </button>
+              {activeSlideData.primaryBtnHref && activeSlideData.primaryBtnHref !== '#modal' ? (
+                <a
+                  href={activeSlideData.primaryBtnHref}
+                  className="relative group overflow-hidden bg-slate-900 text-white px-8 py-4 font-inter text-xs font-semibold uppercase tracking-widest flex items-center justify-center gap-3 rounded-none cursor-pointer border border-slate-900 shadow-sm"
+                >
+                  <motion.span
+                    className="absolute inset-0 bg-[#DE7B3D] z-0 origin-left"
+                    initial={{ scaleX: 0 }}
+                    whileHover={{ scaleX: shouldReduceMotion ? 0 : 1 }}
+                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  />
+                  <span className="relative z-10 flex items-center gap-2 text-white">
+                    {activeSlideData.primaryBtnText}
+                    <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </span>
+                </a>
+              ) : (
+                <button
+                  onClick={onOpenQuoteModal}
+                  className="relative group overflow-hidden bg-slate-900 text-white px-8 py-4 font-inter text-xs font-semibold uppercase tracking-widest flex items-center justify-center gap-3 rounded-none cursor-pointer border border-slate-900 shadow-sm"
+                >
+                  <motion.span
+                    className="absolute inset-0 bg-[#DE7B3D] z-0 origin-left"
+                    initial={{ scaleX: 0 }}
+                    whileHover={{ scaleX: shouldReduceMotion ? 0 : 1 }}
+                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  />
+                  <span className="relative z-10 flex items-center gap-2 text-white">
+                    {activeSlideData.primaryBtnText}
+                    <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </span>
+                </button>
+              )}
 
               {/* Secondary CTA button with fill-sweep hover */}
               <a

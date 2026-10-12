@@ -82,7 +82,7 @@ export function CategoryShowcase({ data, onOpenQuoteModal }: { data?: any, onOpe
   }
 
   return (
-    <section id="services" className="bg-[#FAF9F6] py-28 lg:py-36 border-b border-slate-200/80 relative overflow-hidden select-none">
+    <section id="services" className="bg-[#FAF9F6] py-16 sm:py-20 lg:py-24 border-b border-slate-200/80 relative overflow-hidden select-none">
       
       <div className="max-w-[1380px] mx-auto px-6 sm:px-10 relative z-10">
         
@@ -92,9 +92,9 @@ export function CategoryShowcase({ data, onOpenQuoteModal }: { data?: any, onOpe
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.65, ease }}
-          className="flex flex-col md:flex-row md:items-end justify-between mb-16 lg:mb-20 gap-8"
+          className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-12 lg:mb-14 gap-6 sm:gap-8"
         >
-          <div className="space-y-4 max-w-2xl">
+          <div className="space-y-2.5 sm:space-y-3 max-w-2xl">
             <div className="inline-flex items-center space-x-2">
               <span className="text-xs font-sans font-extrabold uppercase tracking-[0.25em] text-[#D97A42]">
                 {label}
@@ -121,7 +121,7 @@ export function CategoryShowcase({ data, onOpenQuoteModal }: { data?: any, onOpe
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
         >
           {sectors.map((sector: any, idx: number) => {
             const isWide = idx === 0 || idx === 3
@@ -147,7 +147,7 @@ export function CategoryShowcase({ data, onOpenQuoteModal }: { data?: any, onOpe
                   
                   {/* Category Pill Top Left (Silky Logo Forest Green #1C7A4C) */}
                   <div className="absolute top-4 left-4 bg-[#1C7A4C] text-white text-[10px] uppercase font-sans font-bold tracking-wider px-3 py-1.5 rounded-md shadow-md">
-                    {sector.category || 'Specialized Sector'}
+                    {sector.subtitle || sector.category || 'Specialized Sector'}
                   </div>
 
                   {/* Badge Top Right (Silky Logo Terracotta #D97A42) */}
@@ -163,7 +163,7 @@ export function CategoryShowcase({ data, onOpenQuoteModal }: { data?: any, onOpe
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#1C7A4C] block font-sans">
-                        {isWide ? 'FEATURED COLLECTION' : 'SPECIALIZED SECTOR'}
+                        {sector.subtitle || sector.category || (isWide ? 'FEATURED COLLECTION' : 'SPECIALIZED SECTOR')}
                       </span>
                       <span className="text-[11px] font-bold text-[#D97A42] uppercase tracking-wider font-sans">
                         DUBAI DIRECT
@@ -196,13 +196,23 @@ export function CategoryShowcase({ data, onOpenQuoteModal }: { data?: any, onOpe
 
                   {/* Action Button */}
                   <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                    <button
-                      onClick={onOpenQuoteModal}
-                      className="inline-flex items-center space-x-2 text-xs font-bold uppercase tracking-widest font-sans text-slate-900 group-hover:text-[#D97A42] transition-colors"
-                    >
-                      <span>Request Sector Quote</span>
-                      <ArrowUpRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 text-[#D97A42]" />
-                    </button>
+                    {sector.btnHref || sector.link ? (
+                      <a
+                        href={sector.btnHref || sector.link}
+                        className="inline-flex items-center space-x-2 text-xs font-bold uppercase tracking-widest font-sans text-slate-900 group-hover:text-[#D97A42] transition-colors cursor-pointer"
+                      >
+                        <span>{sector.btnText || 'Request Sector Quote'}</span>
+                        <ArrowUpRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 text-[#D97A42]" />
+                      </a>
+                    ) : (
+                      <button
+                        onClick={onOpenQuoteModal}
+                        className="inline-flex items-center space-x-2 text-xs font-bold uppercase tracking-widest font-sans text-slate-900 group-hover:text-[#D97A42] transition-colors cursor-pointer"
+                      >
+                        <span>{sector.btnText || 'Request Sector Quote'}</span>
+                        <ArrowUpRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 text-[#D97A42]" />
+                      </button>
+                    )}
                   </div>
                 </div>
 

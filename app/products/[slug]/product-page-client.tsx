@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { QuoteFormModal } from '@/components/quote-form'
-import { ArrowUpRight, CheckCircle2, ShieldCheck, ChevronDown, Layers, Scissors, Award, Clock, ArrowRight, Sparkles, Send, UserCheck, Ruler, Users, Truck, Box, Star, MapPin, Building2, PhoneCall, Check } from 'lucide-react'
+import { ArrowUpRight, CheckCircle2, ShieldCheck, ChevronDown, Layers, Scissors, Award, Clock, ArrowRight, Shirt, Send, UserCheck, Ruler, Users, Truck, Box, Star, MapPin, Building2, PhoneCall, Check } from 'lucide-react'
 import { FaWhatsapp } from 'react-icons/fa6'
 
 const ease: any = [0.16, 1, 0.3, 1]
@@ -33,7 +33,7 @@ function ProductHeroSection({ data, onOpenQuote }: { data: any, onOpenQuote: () 
     { label: 'Dubai Direct Manufacturer' },
   ]
 
-  const containerVariants = {
+  const containerVariants: any = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -41,7 +41,7 @@ function ProductHeroSection({ data, onOpenQuote }: { data: any, onOpenQuote: () 
     },
   }
 
-  const itemVariants = {
+  const itemVariants: any = {
     hidden: { opacity: 0, y: 28 },
     visible: {
       opacity: 1,
@@ -51,7 +51,7 @@ function ProductHeroSection({ data, onOpenQuote }: { data: any, onOpenQuote: () 
   }
 
   return (
-    <section className="relative bg-white text-slate-900 pt-8 sm:pt-16 pb-12 sm:pb-20 border-b border-slate-200/80 overflow-hidden select-none">
+    <section className="relative bg-white text-slate-900 py-14 sm:py-18 lg:py-20 border-b border-slate-200/80 overflow-hidden select-none">
       
       {/* Dynamic Animated Ambient Background Orbs */}
       <motion.div
@@ -71,7 +71,7 @@ function ProductHeroSection({ data, onOpenQuote }: { data: any, onOpenQuote: () 
         className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#1C7A4C] rounded-full blur-3xl pointer-events-none"
       />
 
-      <div className="max-w-[1380px] mx-auto px-4 sm:px-8 lg:px-10 relative z-10">
+      <div className="max-w-[1380px] mx-auto px-6 sm:px-10 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           
           {/* Left Text Column */}
@@ -122,23 +122,37 @@ function ProductHeroSection({ data, onOpenQuote }: { data: any, onOpenQuote: () 
 
             {/* CTAs with Magnetic Spring physics */}
             <motion.div variants={itemVariants} className="pt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4">
-              <motion.button
-                whileHover={{ scale: 1.04, y: -2 }}
-                whileTap={{ scale: 0.97 }}
-                transition={{ type: 'spring', stiffness: 350, damping: 18 }}
-                onClick={onOpenQuote}
-                className="group relative inline-flex items-center justify-center gap-3 bg-[#D97A42] hover:bg-[#c46833] px-8 sm:px-9 py-4 font-sans text-xs font-bold uppercase tracking-widest text-white rounded-xl shadow-2xl overflow-hidden cursor-pointer w-full sm:w-auto"
-              >
-                <div className="absolute inset-0 w-1/2 bg-white/20 skew-x-12 -translate-x-full group-hover:translate-x-[300%] transition-transform duration-1000 ease-in-out pointer-events-none" />
-                <span className="relative z-10">{data?.primaryBtnText || 'Request Bulk Quote'}</span>
-                <ArrowUpRight className="w-4.5 h-4.5 relative z-10 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 text-white" />
-              </motion.button>
+              {data?.primaryBtnHref && data.primaryBtnHref !== '#modal' ? (
+                <motion.a
+                  whileHover={{ scale: 1.04, y: -2 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ type: 'spring', stiffness: 350, damping: 18 }}
+                  href={data.primaryBtnHref}
+                  className="group relative inline-flex items-center justify-center gap-3 bg-[#D97A42] hover:bg-[#c46833] px-8 sm:px-9 py-4 font-sans text-xs font-bold uppercase tracking-widest text-white rounded-xl shadow-2xl overflow-hidden cursor-pointer w-full sm:w-auto text-center"
+                >
+                  <div className="absolute inset-0 w-1/2 bg-white/20 skew-x-12 -translate-x-full group-hover:translate-x-[300%] transition-transform duration-1000 ease-in-out pointer-events-none" />
+                  <span className="relative z-10">{data?.primaryBtnText || 'Request Bulk Quote'}</span>
+                  <ArrowUpRight className="w-4.5 h-4.5 relative z-10 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 text-white" />
+                </motion.a>
+              ) : (
+                <motion.button
+                  whileHover={{ scale: 1.04, y: -2 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ type: 'spring', stiffness: 350, damping: 18 }}
+                  onClick={onOpenQuote}
+                  className="group relative inline-flex items-center justify-center gap-3 bg-[#D97A42] hover:bg-[#c46833] px-8 sm:px-9 py-4 font-sans text-xs font-bold uppercase tracking-widest text-white rounded-xl shadow-2xl overflow-hidden cursor-pointer w-full sm:w-auto"
+                >
+                  <div className="absolute inset-0 w-1/2 bg-white/20 skew-x-12 -translate-x-full group-hover:translate-x-[300%] transition-transform duration-1000 ease-in-out pointer-events-none" />
+                  <span className="relative z-10">{data?.primaryBtnText || 'Request Bulk Quote'}</span>
+                  <ArrowUpRight className="w-4.5 h-4.5 relative z-10 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 text-white" />
+                </motion.button>
+              )}
 
               <motion.a
                 whileHover={{ scale: 1.03, y: -2 }}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: 'spring', stiffness: 350, damping: 18 }}
-                href="#specs"
+                href={data?.secondaryBtnHref || '#specs'}
                 className="inline-flex items-center justify-center gap-2 border-2 border-slate-900 hover:bg-slate-900 hover:text-white px-7 sm:px-8 py-3.5 sm:py-4 font-sans text-xs font-bold uppercase tracking-widest text-slate-900 rounded-xl transition-colors duration-300 w-full sm:w-auto text-center"
               >
                 <span>{data?.secondaryBtnText || 'View Specifications'}</span>
@@ -243,8 +257,8 @@ function SpecsMatrixSection({ data }: { data: any }) {
   }
 
   return (
-    <section id="specs" className="bg-[#FAF9F6] py-14 sm:py-20 lg:py-28 border-b border-slate-200/80 relative overflow-hidden select-none">
-      <div className="max-w-[1380px] mx-auto px-4 sm:px-8 lg:px-10 space-y-12 sm:space-y-16">
+    <section id="specs" className="bg-[#FAF9F6] py-16 sm:py-20 lg:py-24 border-b border-slate-200/80 relative overflow-hidden select-none">
+      <div className="max-w-[1380px] mx-auto px-6 sm:px-10 space-y-10 sm:space-y-12 lg:space-y-14">
         
         {/* Section Header */}
         <motion.div
@@ -372,7 +386,7 @@ function CustomizationShowcaseSection({ data }: { data: any }) {
     Award,
     Ruler,
     ShieldCheck,
-    Sparkles,
+    Shirt,
     Layers,
     Building2,
     Truck,
@@ -403,12 +417,12 @@ function CustomizationShowcaseSection({ data }: { data: any }) {
   const ActiveIcon = activeOption.icon || Scissors
 
   return (
-    <section className="bg-white py-14 sm:py-20 lg:py-28 border-b border-slate-200/80 relative overflow-hidden select-none">
+    <section className="bg-white py-16 sm:py-20 lg:py-24 border-b border-slate-200/80 relative overflow-hidden select-none">
       
       {/* Background Ambient Blur */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#D97A42]/5 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="max-w-[1380px] mx-auto px-4 sm:px-8 lg:px-10 relative z-10 space-y-10 sm:space-y-14">
+      <div className="max-w-[1380px] mx-auto px-6 sm:px-10 relative z-10 space-y-10 sm:space-y-12 lg:space-y-14">
         
         {/* Section Header */}
         <motion.div
@@ -437,7 +451,7 @@ function CustomizationShowcaseSection({ data }: { data: any }) {
             transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-6 space-y-3.5"
           >
-            {options.map((opt, idx) => {
+            {options.map((opt: any, idx: number) => {
               const isActive = activeTab === idx
               const Icon = opt.icon
 
@@ -581,19 +595,19 @@ function SectorsSection({ data, onOpenQuote }: { data: any, onOpenQuote: () => v
 
   const items = rawItems
 
-  const containerVariants = {
+  const containerVariants: any = {
     hidden: {},
     visible: { transition: { staggerChildren: 0.2 } },
   }
 
-  const cardVariants = {
+  const cardVariants: any = {
     hidden: { opacity: 0, y: 45 },
     visible: { opacity: 1, y: 0, transition: { duration: 1.1, ease: [0.16, 1, 0.3, 1] } },
   }
 
   return (
-    <section className="bg-[#FAF9F6] py-14 sm:py-20 lg:py-28 border-b border-slate-200/80 relative overflow-hidden select-none">
-      <div className="max-w-[1380px] mx-auto px-4 sm:px-8 lg:px-10 space-y-12 sm:space-y-16">
+    <section className="bg-[#FAF9F6] py-16 sm:py-20 lg:py-24 border-b border-slate-200/80 relative overflow-hidden select-none">
+      <div className="max-w-[1380px] mx-auto px-6 sm:px-10 space-y-10 sm:space-y-12 lg:space-y-14">
         
         {/* Section Header */}
         <motion.div
@@ -617,7 +631,7 @@ function SectorsSection({ data, onOpenQuote }: { data: any, onOpenQuote: () => v
           initial="hidden"
           whileInView="visible"
           viewport={{ once: false, amount: 0.2 }}
-          className={`${getDynamicGridClass(items.length, 4)} gap-8 sm:gap-10`}
+          className={`${getDynamicGridClass(items.length, 4)} gap-6 sm:gap-8`}
         >
           {items.map((item: any, idx: number) => (
             <motion.div
@@ -625,19 +639,26 @@ function SectorsSection({ data, onOpenQuote }: { data: any, onOpenQuote: () => v
               variants={cardVariants}
               whileHover={{ y: -8 }}
               transition={{ type: 'spring', stiffness: 280, damping: 20 }}
-              className="bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-xs hover:shadow-2xl hover:border-[#D97A42]/40 transition-all duration-300 group flex flex-col justify-between cursor-pointer"
+              className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs hover:shadow-2xl hover:border-[#D97A42]/40 transition-all duration-300 group flex flex-col justify-between cursor-pointer"
             >
               <div className="aspect-[16/10] w-full overflow-hidden bg-slate-100 relative">
                 <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter contrast-[1.02]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none" />
               </div>
-              <div className="p-8 space-y-4">
+              <div className="p-6 sm:p-7 space-y-3">
                 <h3 className="font-serif text-2xl font-extrabold text-[#0F172A] group-hover:text-[#D97A42] transition-colors">{item.title}</h3>
                 <p className="font-sans text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">{item.desc}</p>
-                <button onClick={onOpenQuote} className="pt-2 text-xs font-bold uppercase tracking-widest text-[#D97A42] inline-flex items-center gap-2 group-hover:translate-x-1 transition-transform">
-                  <span>Request Sector Quote</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                {item.btnHref || item.link ? (
+                  <a href={item.btnHref || item.link} className="pt-2 text-xs font-bold uppercase tracking-widest text-[#D97A42] inline-flex items-center gap-2 group-hover:translate-x-1 transition-transform">
+                    <span>{item.btnText || 'Request Sector Quote'}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </a>
+                ) : (
+                  <button onClick={onOpenQuote} className="pt-2 text-xs font-bold uppercase tracking-widest text-[#D97A42] inline-flex items-center gap-2 group-hover:translate-x-1 transition-transform cursor-pointer">
+                    <span>{item.btnText || 'Request Sector Quote'}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                )}
               </div>
             </motion.div>
           ))}
@@ -670,8 +691,8 @@ function ProductFaqSection({ data, openIndex, onToggle }: { data: any, openIndex
   }
 
   return (
-    <section className="bg-white py-14 sm:py-20 lg:py-28 border-b border-slate-200/80 relative overflow-hidden select-none">
-      <div className="max-w-[1000px] mx-auto px-4 sm:px-8 lg:px-10 space-y-10 sm:space-y-14">
+    <section className="bg-white py-16 sm:py-20 lg:py-24 border-b border-slate-200/80 relative overflow-hidden select-none">
+      <div className="max-w-[1000px] mx-auto px-6 sm:px-10 space-y-10 sm:space-y-12 lg:space-y-14">
         
         {/* Section Header */}
         <motion.div
@@ -784,9 +805,9 @@ function QuoteBandSection({ data, onOpenQuote }: { data: any, onOpenQuote: () =>
   }
 
   return (
-    <section id="quote-form-section" className="bg-[#FAF9F6] py-14 sm:py-20 lg:py-28 border-b border-slate-200/80 relative overflow-hidden select-none">
+    <section id="quote-form-section" className="bg-[#FAF9F6] py-16 sm:py-20 lg:py-24 border-b border-slate-200/80 relative overflow-hidden select-none">
       
-      <div className="max-w-[1380px] mx-auto px-4 sm:px-8 lg:px-10 relative z-10">
+      <div className="max-w-[1380px] mx-auto px-6 sm:px-10 relative z-10">
         
         {/* Main 2-Column Warm Human Atelier Studio Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-stretch">
@@ -797,7 +818,7 @@ function QuoteBandSection({ data, onOpenQuote }: { data: any, onOpenQuote: () =>
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false, amount: 0.2 }}
             transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-7 bg-white text-slate-900 p-8 sm:p-12 rounded-3xl shadow-xl space-y-6 border border-slate-200/90 relative overflow-hidden"
+            className="lg:col-span-7 bg-white text-slate-900 p-6 sm:p-10 rounded-2xl shadow-xl space-y-6 border border-slate-200/90 relative overflow-hidden"
           >
             {/* Top Warm Gold Accent Bar */}
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-[#D97A42]" />
@@ -1080,8 +1101,8 @@ function FabricSwatchesSection({ data, onOpenQuote }: { data: any, onOpenQuote: 
   ]
 
   return (
-    <section className="bg-white py-20 sm:py-24 lg:py-28 border-b border-slate-200/80 relative overflow-hidden select-none">
-      <div className="max-w-[1380px] mx-auto px-6 sm:px-10 space-y-16">
+    <section className="bg-white py-16 sm:py-20 lg:py-24 border-b border-slate-200/80 relative overflow-hidden select-none">
+      <div className="max-w-[1380px] mx-auto px-6 sm:px-10 space-y-10 sm:space-y-12 lg:space-y-14">
         
         {/* Header */}
         <motion.div
@@ -1102,7 +1123,7 @@ function FabricSwatchesSection({ data, onOpenQuote }: { data: any, onOpenQuote: 
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           
           {/* Left: Swatch Color Selector */}
           <motion.div
@@ -1134,10 +1155,17 @@ function FabricSwatchesSection({ data, onOpenQuote }: { data: any, onOpenQuote: 
                 <span className="text-[10px] font-extrabold text-[#D97A42] uppercase tracking-widest block">{colors[selectedColor].tag}</span>
                 <span className="text-sm font-serif font-bold text-slate-900">{colors[selectedColor].name} Standard Fabric Swatch</span>
               </div>
-              <button onClick={onOpenQuote} className="text-xs font-bold uppercase tracking-wider text-[#D97A42] inline-flex items-center gap-1.5 hover:underline">
-                <span>Request Sample Swatch</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+              {data?.swatchBtnHref && data.swatchBtnHref !== '#modal' ? (
+                <a href={data.swatchBtnHref} className="text-xs font-bold uppercase tracking-wider text-[#D97A42] inline-flex items-center gap-1.5 hover:underline cursor-pointer">
+                  <span>{data?.swatchBtnText || data?.btnText || 'Request Sample Swatch'}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </a>
+              ) : (
+                <button onClick={onOpenQuote} className="text-xs font-bold uppercase tracking-wider text-[#D97A42] inline-flex items-center gap-1.5 hover:underline cursor-pointer">
+                  <span>{data?.swatchBtnText || data?.btnText || 'Request Sample Swatch'}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
           </motion.div>
 
@@ -1254,7 +1282,7 @@ function QualityCraftsmanshipSection({ data }: { data: any }) {
   const current = steps[activeStep] || steps[0]
 
   return (
-    <section className="bg-slate-950 text-white py-14 sm:py-20 lg:py-28 border-b border-slate-800 relative overflow-hidden select-none">
+    <section className="bg-slate-950 text-white py-16 sm:py-20 lg:py-24 border-b border-slate-800 relative overflow-hidden select-none">
       
       {/* Ambient Lighting Orbs */}
       <motion.div
@@ -1263,7 +1291,7 @@ function QualityCraftsmanshipSection({ data }: { data: any }) {
         className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-[radial-gradient(circle,#1C7A4C_0%,transparent_70%)] pointer-events-none"
       />
 
-      <div className="max-w-[1380px] mx-auto px-4 sm:px-8 lg:px-10 relative z-10 space-y-10 sm:space-y-16">
+      <div className="max-w-[1380px] mx-auto px-6 sm:px-10 relative z-10 space-y-10 sm:space-y-12 lg:space-y-14">
         
         {/* Section Header */}
         <motion.div
@@ -1285,11 +1313,11 @@ function QualityCraftsmanshipSection({ data }: { data: any }) {
         </motion.div>
 
         {/* Main 2-Column Split Interactive Studio */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           
           {/* Left Column: Interactive Step Selector */}
           <div className="lg:col-span-5 space-y-3">
-            {steps.map((s, idx) => {
+            {steps.map((s: any, idx: number) => {
               const isActive = activeStep === idx
               return (
                 <motion.div
@@ -1384,7 +1412,7 @@ function QualityCraftsmanshipSection({ data }: { data: any }) {
                     STAGE AUDIT SPECIFICATIONS:
                   </span>
                   <div className={`${getDynamicGridClass(current.points.length, 3)} gap-3`}>
-                    {current.points.map((pt, i) => (
+                    {current.points.map((pt: any, i: number) => (
                       <div key={i} className="bg-slate-950/80 border border-slate-800 p-3 rounded-xl flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-[#1C7A4C] shrink-0" />
                         <span className="text-[11px] font-sans font-semibold text-slate-200 leading-tight">
@@ -1468,8 +1496,8 @@ function BulkPricingTiersSection({ data, onOpenQuote }: { data: any, onOpenQuote
   const tiers = (data?.tiers && data.tiers.length > 0) ? data.tiers : defaultTiers
 
   return (
-    <section id="pricing" className="bg-white py-14 sm:py-20 lg:py-28 border-b border-slate-200/80 relative overflow-hidden select-none">
-      <div className="max-w-[1380px] mx-auto px-4 sm:px-8 lg:px-10 space-y-12 sm:space-y-16">
+    <section id="pricing" className="bg-white py-16 sm:py-20 lg:py-24 border-b border-slate-200/80 relative overflow-hidden select-none">
+      <div className="max-w-[1380px] mx-auto px-6 sm:px-10 space-y-10 sm:space-y-12 lg:space-y-14">
         
         {/* Header */}
         <motion.div
@@ -1493,7 +1521,7 @@ function BulkPricingTiersSection({ data, onOpenQuote }: { data: any, onOpenQuote
         </motion.div>
 
         {/* Tier Cards */}
-        <div className={`${getDynamicGridClass(tiers.length, 4)} gap-8 items-stretch`}>
+        <div className={`${getDynamicGridClass(tiers.length, 4)} gap-6 sm:gap-8 items-stretch`}>
           {tiers.map((t: any, idx: number) => {
             const isHighlighted = Boolean(t.highlight || t.highlighted)
             const featureList = t.features || t.points || (idx === 0 ? defaultTiers[0].features : idx === 1 ? defaultTiers[1].features : defaultTiers[2].features)
@@ -1506,7 +1534,7 @@ function BulkPricingTiersSection({ data, onOpenQuote }: { data: any, onOpenQuote
                 viewport={{ once: false, amount: 0.2 }}
                 transition={{ duration: 1.05, ease: [0.16, 1, 0.3, 1], delay: idx * 0.15 }}
                 whileHover={{ y: -6 }}
-                className={`p-8 rounded-3xl border flex flex-col justify-between space-y-8 transition-all duration-300 ${
+                className={`p-6 sm:p-7 rounded-2xl border flex flex-col justify-between space-y-6 transition-all duration-300 ${
                   isHighlighted
                     ? 'bg-[#FAF9F6] border-[#D97A42] shadow-xl ring-2 ring-[#D97A42]/20'
                     : 'bg-white border-slate-200 shadow-xs'
@@ -1583,13 +1611,23 @@ function BulkPricingTiersSection({ data, onOpenQuote }: { data: any, onOpenQuote
               {calloutDesc}
             </p>
           </div>
-          <button
-            onClick={onOpenQuote}
-            className="px-8 py-4 bg-[#D97A42] hover:bg-[#c46833] text-white text-xs font-bold uppercase tracking-widest rounded-xl transition-all shadow-lg shrink-0 cursor-pointer flex items-center gap-2"
-          >
-            <span>{calloutBtnText}</span>
-            <ArrowUpRight className="w-4 h-4" />
-          </button>
+          {data?.calloutBtnHref && data.calloutBtnHref !== '#modal' ? (
+            <a
+              href={data.calloutBtnHref}
+              className="px-8 py-4 bg-[#D97A42] hover:bg-[#c46833] text-white text-xs font-bold uppercase tracking-widest rounded-xl transition-all shadow-lg shrink-0 cursor-pointer flex items-center gap-2"
+            >
+              <span>{calloutBtnText}</span>
+              <ArrowUpRight className="w-4 h-4" />
+            </a>
+          ) : (
+            <button
+              onClick={onOpenQuote}
+              className="px-8 py-4 bg-[#D97A42] hover:bg-[#c46833] text-white text-xs font-bold uppercase tracking-widest rounded-xl transition-all shadow-lg shrink-0 cursor-pointer flex items-center gap-2"
+            >
+              <span>{calloutBtnText}</span>
+              <ArrowUpRight className="w-4 h-4" />
+            </button>
+          )}
         </motion.div>
 
       </div>
@@ -1619,7 +1657,7 @@ function LogisticsCoverageSection({ data }: { data: any }) {
   const routes = (data?.routes && data.routes.length > 0) ? data.routes : defaultRoutes
 
   return (
-    <section className="bg-[#0F172A] text-white py-14 sm:py-20 lg:py-28 border-b border-slate-800 relative overflow-hidden select-none">
+    <section className="bg-[#0F172A] text-white py-16 sm:py-20 lg:py-24 border-b border-slate-800 relative overflow-hidden select-none">
       
       {/* Dynamic Ambient Glowing Background Orbs */}
       <motion.div
@@ -1659,7 +1697,7 @@ function LogisticsCoverageSection({ data }: { data: any }) {
         </svg>
       </div>
 
-      <div className="max-w-[1380px] mx-auto px-4 sm:px-8 lg:px-10 relative z-10 space-y-12 sm:space-y-16">
+      <div className="max-w-[1380px] mx-auto px-6 sm:px-10 relative z-10 space-y-10 sm:space-y-12 lg:space-y-14">
         
         {/* Header */}
         <motion.div
@@ -1686,7 +1724,7 @@ function LogisticsCoverageSection({ data }: { data: any }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false, amount: 0.2 }}
             transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-5 bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-8 rounded-3xl space-y-6 shadow-2xl relative overflow-hidden group hover:border-[#D97A42]/60 hover:shadow-[0_0_35px_rgba(217,122,66,0.15)] transition-all duration-500"
+            className="lg:col-span-5 bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-6 sm:p-7 rounded-2xl space-y-6 shadow-2xl relative overflow-hidden group hover:border-[#D97A42]/60 hover:shadow-[0_0_35px_rgba(217,122,66,0.15)] transition-all duration-500"
           >
             <div className="absolute -right-12 -bottom-12 w-48 h-48 border-2 stroke-dasharray border-[#D97A42]/10 rounded-full pointer-events-none group-hover:scale-125 transition-transform duration-700" />
 
@@ -1830,8 +1868,8 @@ function ClientTestimonialsSection({ data }: { data: any }) {
   const marqueeReviews = [...reviews, ...reviews]
 
   return (
-    <section className="bg-white py-14 sm:py-20 lg:py-28 border-b border-slate-200/80 relative overflow-hidden select-none">
-      <div className="max-w-[1380px] mx-auto px-4 sm:px-8 lg:px-10 space-y-8 sm:space-y-12 mb-8 sm:mb-10">
+    <section className="bg-white py-16 sm:py-20 lg:py-24 border-b border-slate-200/80 relative overflow-hidden select-none">
+      <div className="max-w-[1380px] mx-auto px-6 sm:px-10 space-y-8 sm:space-y-10 mb-8 sm:mb-10">
         
         {/* Header */}
         <motion.div
@@ -2062,6 +2100,59 @@ export function ProductPageClient({ page, config }: { page: any, config?: any })
     </div>
   )
 }
+
+// ----------------------------------------------------------------------
+// EXPORT LIVE SECTION PREVIEW RENDERER FOR ADMIN CMS
+// ----------------------------------------------------------------------
+export function ProductSectionLiveRenderer({ sectionType, data }: { sectionType: string; data: any }) {
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0)
+
+  let parsedData = data || {}
+  if (typeof data === 'string') {
+    try {
+      parsedData = JSON.parse(data)
+    } catch (e) {}
+  }
+
+  switch (sectionType) {
+    case 'HERO':
+      return <ProductHeroSection data={parsedData} onOpenQuote={() => {}} />
+    case 'SPECS_MATRIX':
+      return <SpecsMatrixSection data={parsedData} />
+    case 'CUSTOMIZATION':
+      return <CustomizationShowcaseSection data={parsedData} />
+    case 'SECTORS':
+    case 'UNIFORM_SOLUTIONS':
+      return <SectorsSection data={parsedData} onOpenQuote={() => {}} />
+    case 'FABRIC_SWATCHES':
+      return <FabricSwatchesSection data={parsedData} onOpenQuote={() => {}} />
+    case 'QUALITY_CONTROL':
+      return <QualityCraftsmanshipSection data={parsedData} />
+    case 'BULK_PRICING':
+      return <BulkPricingTiersSection data={parsedData} onOpenQuote={() => {}} />
+    case 'LOGISTICS':
+      return <LogisticsCoverageSection data={parsedData} />
+    case 'TESTIMONIALS':
+      return <ClientTestimonialsSection data={parsedData} />
+    case 'FAQ':
+      return (
+        <ProductFaqSection
+          data={parsedData}
+          openIndex={openFaqIndex}
+          onToggle={(idx) => setOpenFaqIndex(openFaqIndex === idx ? null : idx)}
+        />
+      )
+    case 'QUOTE_BAND':
+      return <QuoteBandSection data={parsedData} onOpenQuote={() => {}} />
+    default:
+      return (
+        <div className="p-8 text-center text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+          No live preview available for section type: {sectionType}
+        </div>
+      )
+  }
+}
+
 
 
 

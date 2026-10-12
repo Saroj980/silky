@@ -6,17 +6,24 @@ import { Phone, MapPin, Mail, ArrowRight } from 'lucide-react'
 import { FaWhatsapp } from 'react-icons/fa6'
 
 export function ContactBand({ data, onOpenQuoteModal }: { data?: any, onOpenQuoteModal?: () => void }) {
-  const label = data?.label || 'DUBAI SHOWROOM & ATELIER HEADQUARTERS'
-  const title = data?.title || 'Elevate Your Corporate Identity Today'
-  const buildingName = data?.buildingName || 'Showroom No. 1, Al Zarooni Building'
-  const address = data?.address || 'Next to HBL, Baniyas Road (D85), Deira Creek, Dubai, UAE'
+  const label = data?.label || data?.rightTag || data?.tagline || 'DUBAI SHOWROOM & ATELIER HEADQUARTERS'
+  const title = data?.title || data?.rightTitle || 'Elevate Your Corporate Identity Today'
+  const description = data?.description || data?.rightSubtitle || data?.subtitle || 'Get custom fabric swatches, volume pricing, and personalized design consultation directly from our Dubai master tailoring specialists.'
+  const buildingName = data?.buildingName || data?.addressTitle || 'Showroom No. 1, Al Zarooni Building'
+  const address = data?.address || data?.addressDetail || 'Next to HBL, Baniyas Road (D85), Deira Creek, Dubai, UAE'
   const phone = data?.phone || '+971 4 355 8453'
   const email = data?.email || 'sales@silky.ae'
+  const whatsapp = data?.whatsapp || '+971 4 226 1050'
+
+  const whatsappClean = whatsapp.replace(/[^\d+]/g, '')
+  const whatsappUrl = whatsappClean.startsWith('http')
+    ? whatsappClean
+    : `https://wa.me/${whatsappClean.replace('+', '')}`
 
   const ease = [0.16, 1, 0.3, 1] as const
 
   return (
-    <section id="contact" className="bg-[#FAF9F5] text-slate-900 py-20 lg:py-24 border-b border-slate-200 relative overflow-hidden select-none">
+    <section id="contact" className="bg-[#FAF9F6] text-slate-900 py-16 sm:py-20 lg:py-24 border-b border-slate-200/80 relative overflow-hidden select-none">
       
       {/* Subtle Ambient Brand Glow */}
       <div className="absolute top-1/2 right-10 -translate-y-1/2 w-[500px] h-[500px] bg-[#D97A42]/5 blur-[150px] pointer-events-none rounded-full" />
@@ -42,7 +49,7 @@ export function ContactBand({ data, onOpenQuoteModal }: { data?: any, onOpenQuot
                 {title}
               </h2>
               <p className="font-sans text-sm sm:text-base text-slate-600 leading-relaxed max-w-xl font-medium">
-                Get custom fabric swatches, volume pricing, and personalized design consultation directly from our Dubai master tailoring specialists.
+                {description}
               </p>
             </div>
 
@@ -85,18 +92,30 @@ export function ContactBand({ data, onOpenQuoteModal }: { data?: any, onOpenQuot
             transition={{ duration: 0.7, delay: 0.1, ease }}
             className="lg:col-span-5 flex flex-col gap-4 justify-center"
           >
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={onOpenQuoteModal}
-              className="h-[54px] px-8 bg-[#D97A42] hover:bg-[#c46833] text-white font-sans font-bold text-xs uppercase tracking-widest transition-all duration-300 rounded-full flex items-center justify-center gap-2.5 shadow-xl"
-            >
-              <span>Request Custom Quote & Swatches</span>
-              <ArrowRight className="w-4 h-4" />
-            </motion.button>
+            {data?.quoteBtnHref && data.quoteBtnHref !== '#modal' ? (
+              <motion.a
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                href={data.quoteBtnHref}
+                className="h-[54px] px-8 bg-[#D97A42] hover:bg-[#c46833] text-white font-sans font-bold text-xs uppercase tracking-widest transition-all duration-300 rounded-full flex items-center justify-center gap-2.5 shadow-xl cursor-pointer"
+              >
+                <span>{data?.quoteBtnText || data?.btnText || 'Request Custom Quote & Swatches'}</span>
+                <ArrowRight className="w-4 h-4" />
+              </motion.a>
+            ) : (
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={onOpenQuoteModal}
+                className="h-[54px] px-8 bg-[#D97A42] hover:bg-[#c46833] text-white font-sans font-bold text-xs uppercase tracking-widest transition-all duration-300 rounded-full flex items-center justify-center gap-2.5 shadow-xl cursor-pointer"
+              >
+                <span>{data?.quoteBtnText || data?.btnText || 'Request Custom Quote & Swatches'}</span>
+                <ArrowRight className="w-4 h-4" />
+              </motion.button>
+            )}
 
             <a
-              href="https://wa.me/97142261050"
+              href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="h-[54px] px-8 bg-[#25D366] hover:bg-[#1eb857] text-white font-sans font-bold text-xs uppercase tracking-widest transition-all duration-300 rounded-full flex items-center justify-center gap-2.5 shadow-xl hover:scale-105"

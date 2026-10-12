@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, X, Sparkles } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 
 interface SearchModalProps {
   isOpen: boolean

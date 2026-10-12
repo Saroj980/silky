@@ -261,12 +261,21 @@ class ProductPageController extends Controller
         return response()->json($page->load('sections'));
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id = null)
     {
-        $page = ProductPage::findOrFail($id);
-        $page->delete();
+        $identifier = $id ?? $request->query('slug') ?? $request->query('id') ?? $request->input('id');
+        if (is_numeric($identifier)) {
+            $page = ProductPage::find($identifier);
+        } else {
+            $page = ProductPage::where('slug', $identifier)->first();
+        }
 
-        return response()->json(['message' => 'Product page deleted']);
+        if ($page) {
+            $page->sections()->delete();
+            $page->delete();
+        }
+
+        return response()->json(['success' => true, 'message' => 'Product page deleted']);
     }
 
     public function addSection(Request $request, $pageId)

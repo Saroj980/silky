@@ -7,3 +7,12 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+# Server Deployment Zip Rule
+Whenever the user asks to "make server ready zip" or create a deployment zip:
+- Run `npm run build` and include all static assets from `out/` at the root of the ZIP.
+- Include `out/.htaccess` for cPanel/Apache clean URL routing.
+- Include the `backend/` folder pre-packaged with `vendor/` and production `.env` (`.env.production`).
+- Exclude all existing `.zip` files so no zip files are nested inside.
+- Ensure ZERO commands need to be run on the target server.
+

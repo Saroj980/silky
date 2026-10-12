@@ -1,0 +1,29 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 1. Forward all /api requests to Laravel Backend
+    RewriteCond %{REQUEST_URI} ^/api [NC]
+    RewriteRule ^api/(.*)$ backend/public/index.php [L,QSA]
+
+    # 2. Forward /storage requests to Laravel Storage
+    RewriteCond %{REQUEST_URI} ^/storage [NC]
+    RewriteRule ^storage/(.*)$ backend/storage/app/public/ [L]
+
+    # 3. Route /admin route directly to admin.html
+    RewriteRule ^admin/?$ admin.html [L]
+
+    # 4. Route /login route directly to login.html
+    RewriteRule ^login/?$ login.html [L]
+
+    # 5. Serve existing files/directories directly
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # 6. Serve HTML files if extension omitted
+    RewriteCond %{REQUEST_FILENAME}.html -f
+    RewriteRule ^(.*)$ $1.html [L]
+
+    # 7. Fallback to index.html
+    RewriteRule ^ index.html [L]
+</IfModule>

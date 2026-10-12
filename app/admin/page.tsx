@@ -2,9 +2,6 @@ import { getHeroSlides, getSiteConfig, getPageSections, getProductPages } from '
 import { prisma } from '@/lib/prisma'
 import { ClientDashboard } from './client-dashboard'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
-
 export default async function AdminPage() {
   const slides = await getHeroSlides()
   const config = await getSiteConfig()

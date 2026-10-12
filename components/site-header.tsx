@@ -1,102 +1,16 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Phone, ChevronDown, Menu, X, ArrowRight, Scissors, Ruler, Award, ChevronRight, Clock, ShieldCheck, CheckCircle2, Sparkles } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { Phone, ChevronDown, Menu, X, ArrowRight, CheckCircle2 } from 'lucide-react'
 import { FaWhatsapp } from 'react-icons/fa6'
 import { motion, AnimatePresence } from 'framer-motion'
 
-interface MegaMenuData {
+export interface NavItem {
+  id: string
   title: string
-  subCategories: Array<{ name: string; tag?: string; href: string }>
-  popularItems: Array<{ name: string; detail: string; href: string; icon: React.ElementType }>
-  featured: {
-    title: string
-    subtitle: string
-    image: string
-    badge: string
-    href: string
-  }
-}
-
-// Exactly 3 Master Pillar Categories consolidating ALL product sectors & tailoring services
-const MEGA_MENUS: Record<string, MegaMenuData> = {
-  'UNIFORM FLEETS': {
-    title: 'Commercial & Fleet Uniform Solutions',
-    subCategories: [
-      { name: '100% Pure Cotton Shirts', tag: 'Egyptian Cotton', href: '/products/pure-cotton-shirts-supplier-in-uae' },
-      { name: 'Oxford Button-Down Shirts', tag: 'Pinpoint Weave', href: '/products/oxford-shirts-supplier-in-uae' },
-      { name: 'Poly Cotton Shirts', tag: 'Easy Care', href: '/products/poly-cotton-shirts-supplier-in-uae' },
-      { name: 'Twill Shirts', tag: 'Durable Weave', href: '/products/twill-shirts-supplier-in-uae' },
-      { name: 'Corporate Uniforms', tag: 'Executive Fleets', href: '/products/corporate-uniforms-supplier-in-uae' },
-      { name: 'Healthcare Uniforms', tag: 'Medical Scrubs', href: '/products/healthcare-uniforms-supplier-in-uae' },
-      { name: 'F&B & Restaurant Apparel', tag: 'Stain Resistant', href: '/products/fb-uniforms-supplier-in-uae' },
-      { name: 'Hospitality & Hotel Fleets', tag: '5-Star Resort', href: '/products/hospitality-uniforms-supplier-in-uae' },
-      { name: 'Logistics Workwear', tag: 'Heavy Duty', href: '/products/logistics-uniforms-supplier-in-uae' },
-      { name: 'Industrial Safety Wear', tag: 'High-Vis Safety', href: '/products/industrial-safety-wear-supplier-in-uae' },
-    ],
-    popularItems: [
-      { name: 'On-Site Staff Fitting', detail: 'Available across all 7 Emirates', href: '/products/pure-cotton-shirts-supplier-in-uae', icon: Ruler },
-      { name: '24-Hour Express Fitting', detail: 'For VIP executive suites', href: '/products/oxford-shirts-supplier-in-uae', icon: Clock },
-      { name: 'Custom Logo Embroidery', detail: '3D high-density stitching', href: '/products/custom-polo-tshirts-supplier-dubai', icon: Scissors },
-    ],
-    featured: {
-      title: '100% Pure Cotton Shirting Fleet',
-      subtitle: 'Handcrafted luxury staff uniforms with Italian fabric options.',
-      image: '/images/textile_fabric_rolls.png',
-      badge: 'Individual Product Page',
-      href: '/products/pure-cotton-shirts-supplier-in-uae',
-    },
-  },
-  'CUSTOM APPAREL': {
-    title: 'Enterprise T-Shirts, Polos & Winter Wear',
-    subCategories: [
-      { name: 'Custom Polo T-Shirts', tag: 'Best Seller', href: '/products/custom-polo-tshirts-supplier-dubai' },
-      { name: 'Round Neck T-Shirts', tag: 'Combed Cotton', href: '/products/round-neck-tshirt-supplier-in-uae' },
-      { name: 'V-Neck T-Shirts', tag: 'Soft Cotton', href: '/products/v-neck-tshirt-supplier-in-uae' },
-      { name: 'Hooded T-Shirts', tag: 'Modern Fit', href: '/products/hooded-tshirt-supplier-in-uae' },
-      { name: 'Long Sleeve T-Shirts', tag: 'Full Coverage', href: '/products/long-sleeve-tshirt-supplier-in-uae' },
-      { name: 'Sports T-Shirts', tag: 'Dri-Fit Mesh', href: '/products/sports-tshirt-supplier-in-uae' },
-      { name: '300 GSM Heavyweight Hoodies', tag: 'Premium Fleece', href: '/products/300-gsm-hoodies-supplier-in-uae' },
-      { name: 'Fleece & Cotton Hoodies', tag: 'Winter Fleets', href: '/products/fleece-hoodies-supplier-in-uae' },
-      { name: 'Zipper & Oversized Hoodies', tag: 'Streetwear Fit', href: '/products/hoodies-with-zipper-supplier-in-uae' },
-    ],
-    popularItems: [
-      { name: 'Screen Printing & DTG', detail: 'Vibrant multi-color prints', href: '/products/round-neck-tshirt-supplier-in-uae', icon: Scissors },
-      { name: '3D Rubberized Badges', detail: 'Durable corporate logos', href: '/products/custom-polo-tshirts-supplier-dubai', icon: Award },
-      { name: 'Volume Order Discounts', detail: 'Direct mill wholesale pricing', href: '/products/oxford-shirts-supplier-in-uae', icon: ShieldCheck },
-    ],
-    featured: {
-      title: 'Custom Polo T-Shirts',
-      subtitle: 'Color-fast, anti-shrink pique cotton for corporate teams.',
-      image: '/images/slide-polo.png',
-      badge: 'Bulk Supply',
-      href: '/products/custom-polo-tshirts-supplier-dubai',
-    },
-  },
-  'TROUSERS & TAILORING': {
-    title: 'Executive Trousers & Textile Sourcing',
-    subCategories: [
-      { name: 'Chino Trousers', tag: 'Best Seller', href: '/products/chino-pants-supplier-uae' },
-      { name: 'Formal Corporate Trousers', tag: 'Executive Fit', href: '/products/formal-trousers-supplier-in-uae' },
-      { name: 'Cargo Trousers & Shorts', tag: 'Workwear', href: '/products/cargo-pants-supplier-in-uae' },
-      { name: 'Chef Trousers', tag: 'Kitchen Workwear', href: '/products/chef-trousers-supplier-in-uae' },
-      { name: 'Premium Active Joggers', tag: 'Athleisure', href: '/products/premium-joggers-supplier-in-uae' },
-      { name: '100% Egyptian Cotton Shirting', tag: 'Custom Mill', href: '/products/pure-cotton-shirts-supplier-in-uae' },
-      { name: 'Pinpoint Oxford Fabrics', tag: 'Textured Weave', href: '/products/oxford-shirts-supplier-in-uae' },
-    ],
-    popularItems: [
-      { name: 'Free Swatch Book Delivery', detail: 'Delivered to your office in UAE', href: '/products/pure-cotton-shirts-supplier-in-uae', icon: Award },
-      { name: 'Bespoke Master Tailoring', detail: 'Hand-cut by Dubai master tailors', href: '/products/oxford-shirts-supplier-in-uae', icon: Scissors },
-      { name: 'Showroom Consultation', detail: 'Baniyas Road, Deira Creek', href: '/products/custom-polo-tshirts-supplier-dubai', icon: Ruler },
-    ],
-    featured: {
-      title: 'Oxford Button-Down Shirting',
-      subtitle: 'Six decades of Dubai master tailoring craftsmanship.',
-      image: '/homepage-image/Homepage (9).jpg',
-      badge: 'Master Atelier',
-      href: '/products/oxford-shirts-supplier-in-uae',
-    },
-  },
+  url: string
+  badge?: string
+  children?: NavItem[]
 }
 
 interface SiteHeaderProps {
@@ -104,34 +18,99 @@ interface SiteHeaderProps {
   config?: any
 }
 
+function parseNavItems(raw: any): NavItem[] {
+  if (!raw) return []
+  let parsed = raw
+  if (typeof raw === 'string') {
+    try {
+      parsed = JSON.parse(raw)
+    } catch {
+      return []
+    }
+  }
+  if (Array.isArray(parsed) && parsed.length > 0) {
+    return parsed.map((item: any, idx: number) => ({
+      id: String(item.id || `nav-${idx}-${item.title}`),
+      title: String(item.title || ''),
+      url: String(item.url || '#'),
+      badge: item.badge ? String(item.badge) : undefined,
+      children: Array.isArray(item.children)
+        ? item.children.map((child: any, cIdx: number) => ({
+            id: String(child.id || `sub-${cIdx}-${child.title}`),
+            title: String(child.title || ''),
+            url: String(child.url || '#'),
+            badge: child.badge ? String(child.badge) : undefined,
+          }))
+        : [],
+    }))
+  }
+  return []
+}
+
+const DEFAULT_NAV: NavItem[] = [
+  { id: 'm-home', title: 'HOME', url: '/' },
+  { id: 'm-uniform-fleets', title: 'UNIFORM FLEETS', url: '/products/pure-cotton-shirts-supplier-in-uae' },
+  { id: 'm-custom-apparel', title: 'CUSTOM APPAREL', url: '#' },
+  { id: 'm-contact', title: 'CONTACT US', url: '/contact-us' },
+]
+
 export function SiteHeader({ onOpenQuoteModal, config }: SiteHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [activeCategory, setActiveCategory] = useState<string | null>(null)
+  const [mobileExpandedId, setMobileExpandedId] = useState<string | null>(null)
+  const [hoveredMenuId, setHoveredMenuId] = useState<string | null>(null)
+  const [navItems, setNavItems] = useState<NavItem[]>(() => {
+    const initial = parseNavItems(config?.navLinks)
+    return initial.length > 0 ? initial : DEFAULT_NAV
+  })
+
+  // Synchronize when config prop changes
+  useEffect(() => {
+    if (config?.navLinks) {
+      const parsed = parseNavItems(config.navLinks)
+      if (parsed.length > 0) {
+        setNavItems(parsed)
+      }
+    }
+  }, [config?.navLinks])
+
+  // Client-side auto-sync to ensure changes saved in Admin reflect in real-time
+  useEffect(() => {
+    fetch('/api/site-config', { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.navLinks) {
+          const parsed = parseNavItems(data.navLinks)
+          if (parsed.length > 0) {
+            setNavItems(parsed)
+          }
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   const logoUrl = config?.logoUrl || '/silky-logo.png'
   const phone = config?.phone || '+971 4 355 8453'
   const whatsapp = config?.whatsapp || '97142261050'
 
-  // Master Navigation Tabs (HOME + 3 Master Mega Categories + CONTACT US)
-  const categories = [
-    { label: 'HOME', hasDropdown: false, href: '/' },
-    { label: 'UNIFORM FLEETS', hasDropdown: true },
-    { label: 'CUSTOM APPAREL', hasDropdown: true },
-    { label: 'TROUSERS & TAILORING', hasDropdown: true },
-    { label: 'CONTACT US', hasDropdown: false, href: '/products/pure-cotton-shirts-supplier-in-uae' },
-  ]
+  // Active mega menu parent
+  const activeParent = hoveredMenuId ? navItems.find((n) => n.id === hoveredMenuId && n.children && n.children.length > 0) : null
 
-  const megaData = activeCategory ? MEGA_MENUS[activeCategory] || null : null
+  // Featured Spotlight dynamically based on active item
+  const firstChild = activeParent?.children?.[0]
+  const featuredTitle = activeParent?.title || 'UNIFORM FLEETS'
+  const featuredHref = firstChild?.url || activeParent?.url || '/products/pure-cotton-shirts-supplier-in-uae'
+  const featuredImage = activeParent?.title?.toLowerCase().includes('apparel')
+    ? '/images/slide-polo.png'
+    : '/images/textile_fabric_rolls.png'
 
   return (
     <header
       className="sticky top-0 left-0 right-0 z-50 w-full font-sans select-none"
-      onMouseLeave={() => setActiveCategory(null)}
+      onMouseLeave={() => setHoveredMenuId(null)}
     >
       {/* Executive Top Announcement & Credentials Bar (#141414) */}
       <div className="bg-[#141414] text-gray-300 text-xs py-2 px-4 sm:px-8 border-b border-[#262626]">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between gap-4">
-          
           {/* Left Trust Statement */}
           <div className="flex items-center space-x-2 text-gray-300 font-medium overflow-hidden">
             <span className="w-2 h-2 rounded-full bg-[#1C7A4C] animate-pulse shrink-0" />
@@ -160,19 +139,17 @@ export function SiteHeader({ onOpenQuoteModal, config }: SiteHeaderProps) {
               <span>WhatsApp Direct</span>
             </a>
           </div>
-
         </div>
       </div>
 
       {/* Main Glassmorphic Navigation Bar (#1A1A1A) */}
-      <div className="bg-[#1A1A1A]/95 backdrop-blur-xl text-white border-b border-[#292929] py-3.5 px-4 sm:px-8 shadow-2xl">
+      <div className="bg-[#1A1A1A]/95 backdrop-blur-xl text-white border-b border-[#292929] py-3.5 px-4 sm:px-8 shadow-2xl relative">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between gap-6">
-          
           {/* Mobile Menu Toggle & Logo */}
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-1.5 text-gray-300 hover:text-[#D97A42] focus:outline-none"
+              className="lg:hidden p-1.5 text-gray-300 hover:text-[#D97A42] focus:outline-none cursor-pointer"
               aria-label="Toggle Navigation"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -189,38 +166,44 @@ export function SiteHeader({ onOpenQuoteModal, config }: SiteHeaderProps) {
           </div>
 
           {/* Master Navigation Tabs */}
-          <nav className="hidden lg:flex items-center space-x-6 text-xs font-black tracking-widest uppercase">
-            {categories.map((cat) => {
-              const isActive = activeCategory === cat.label
-              return (
-                <a
-                  key={cat.label}
-                  href={cat.href || '#'}
-                  className={`relative cursor-pointer py-2.5 px-4 rounded-xl flex items-center gap-2 transition-all duration-200 ${
-                    isActive
-                      ? 'text-[#D97A42] bg-white/10 shadow-sm'
-                      : 'text-gray-200 hover:text-[#D97A42] hover:bg-white/5'
-                  }`}
-                  onMouseEnter={() => cat.hasDropdown ? setActiveCategory(cat.label) : setActiveCategory(null)}
-                >
-                  <span>{cat.label}</span>
-                  {cat.hasDropdown && (
-                    <ChevronDown
-                      className={`w-4 h-4 transition-transform duration-200 ${
-                        isActive ? 'rotate-180 text-[#D97A42]' : 'text-gray-400'
-                      }`}
-                    />
-                  )}
+          <nav className="hidden lg:flex items-center space-x-3 xl:space-x-5 text-xs font-black tracking-widest uppercase">
+            {navItems.map((item) => {
+              const hasChildren = Boolean(item.children && item.children.length > 0)
+              const isOpen = hoveredMenuId === item.id
 
-                  {/* Active Indicator Underline */}
-                  {isActive && (
-                    <motion.span
-                      layoutId="activeNavLine"
-                      className="absolute bottom-0 left-4 right-4 h-[2px] bg-[#D97A42] rounded-full"
-                      transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-                    />
-                  )}
-                </a>
+              return (
+                <div
+                  key={item.id}
+                  className="relative"
+                  onMouseEnter={() => {
+                    if (hasChildren) setHoveredMenuId(item.id)
+                    else setHoveredMenuId(null)
+                  }}
+                >
+                  <a
+                    href={hasChildren && item.url === '#' ? '#' : item.url}
+                    onClick={(e) => {
+                      if (hasChildren && item.url === '#') {
+                        e.preventDefault()
+                        setHoveredMenuId(isOpen ? null : item.id)
+                      }
+                    }}
+                    className={`relative cursor-pointer transition-all duration-200 flex items-center gap-1.5 ${
+                      isOpen
+                        ? 'bg-[#D97A42] text-white px-5 py-2 rounded-full font-bold shadow-md'
+                        : 'text-gray-200 hover:text-[#D97A42] py-2 px-3.5 font-bold'
+                    }`}
+                  >
+                    <span>{item.title}</span>
+                    {hasChildren && (
+                      <ChevronDown
+                        className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                          isOpen ? 'rotate-180 text-white' : 'text-gray-400'
+                        }`}
+                      />
+                    )}
+                  </a>
+                </div>
               )
             })}
           </nav>
@@ -231,121 +214,87 @@ export function SiteHeader({ onOpenQuoteModal, config }: SiteHeaderProps) {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.96 }}
               onClick={onOpenQuoteModal}
-              className="bg-[#D97A42] hover:bg-[#c46833] text-white font-bold text-xs uppercase tracking-widest px-7 py-3 rounded-full shadow-lg shadow-[#D97A42]/20 transition-all duration-300 flex items-center gap-2"
+              className="bg-[#D97A42] hover:bg-[#c46833] text-white font-bold text-xs uppercase tracking-widest px-6 sm:px-7 py-3 rounded-full shadow-lg shadow-[#D97A42]/20 transition-all duration-300 flex items-center gap-2 cursor-pointer"
             >
               <span>Get Quote</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </motion.button>
           </div>
-
         </div>
 
-        {/* 3-Column Luxury Light Executive Mega-Menu Popover */}
+        {/* Full-Width Luxury Executive Mega-Menu Popover */}
         <AnimatePresence>
-          {activeCategory && megaData && (
+          {activeParent && activeParent.children && activeParent.children.length > 0 && (
             <motion.div
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
               className="absolute left-0 right-0 top-full bg-[#FAF9F5] border-t-4 border-[#D97A42] border-b border-slate-300 shadow-2xl z-50 text-slate-900"
             >
               <div className="max-w-[1400px] mx-auto p-8 lg:p-10">
-                
-                <div className="grid grid-cols-12 gap-8 pb-8 border-b border-slate-200">
-                  
-                  {/* Column 1: Sub-Categories */}
-                  <div className="col-span-5 border-r border-slate-200 pr-8">
-                    <div className="flex items-center gap-2 mb-5">
-                      <span className="w-2 h-2 rounded-full bg-[#1C7A4C]" />
-                      <h3 className="text-xs font-extrabold uppercase tracking-widest text-[#D97A42] font-sans">
-                        {megaData.title}
+                {/* 2-Column Main Structure: 70% Sub-Items, 30% Featured Card */}
+                <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 pb-8 border-b border-slate-200">
+                  {/* Left Section (70%): Dynamic sub-items from CMS Menu Manager (Zero Fake Items) */}
+                  <div className="flex-1 min-w-0 pr-0 lg:pr-10 lg:border-r border-slate-200">
+                    <div className="flex items-center gap-2 mb-8">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#1C7A4C]" />
+                      <h3 className="text-xs font-black uppercase tracking-widest text-[#D97A42] font-sans">
+                        {activeParent.title}
                       </h3>
                     </div>
 
-                    <ul className="space-y-3">
-                      {megaData.subCategories.map((sub) => (
-                        <li key={sub.name}>
-                          <a
-                            href={sub.href}
-                            className="group flex items-center justify-between text-xs sm:text-sm font-bold text-slate-800 hover:text-[#D97A42] transition-colors py-1.5 px-3 rounded-lg hover:bg-slate-100/80"
-                          >
-                            <span className="flex items-center gap-2.5">
-                              <ChevronRight className="w-3.5 h-3.5 text-[#D97A42] group-hover:translate-x-1.5 transition-transform" />
-                              <span>{sub.name}</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-4">
+                      {activeParent.children.map((sub) => (
+                        <a
+                          key={sub.id}
+                          href={sub.url}
+                          className="group flex items-center justify-between text-sm font-extrabold text-slate-900 hover:text-[#D97A42] transition-colors py-1.5"
+                        >
+                          <span className="truncate">{sub.title}</span>
+                          {sub.badge && (
+                            <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 bg-[#1C7A4C] text-white rounded-full ml-2 shrink-0">
+                              {sub.badge}
                             </span>
-
-                            {sub.tag && (
-                              <span className="text-[9px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 bg-[#1C7A4C] text-white rounded-full shadow-xs">
-                                {sub.tag}
-                              </span>
-                            )}
-                          </a>
-                        </li>
+                          )}
+                        </a>
                       ))}
-                    </ul>
-                  </div>
-
-                  {/* Column 2: Atelier Services */}
-                  <div className="col-span-3 border-r border-slate-200 pr-8">
-                    <h3 className="text-xs font-extrabold uppercase tracking-widest text-slate-500 mb-5 flex items-center gap-2 font-sans">
-                      <Scissors className="w-4 h-4 text-[#D97A42]" />
-                      <span>Specialized Services</span>
-                    </h3>
-
-                    <div className="space-y-3.5">
-                      {megaData.popularItems.map((item) => {
-                        const ItemIcon = item.icon || Scissors
-                        return (
-                          <a
-                            key={item.name}
-                            href={item.href}
-                            className="block p-3.5 rounded-xl bg-white border border-slate-200 hover:border-[#D97A42]/60 hover:shadow-md transition-all group"
-                          >
-                            <div className="text-xs font-extrabold text-slate-900 group-hover:text-[#D97A42] transition-colors flex items-center justify-between">
-                              <span className="flex items-center gap-2">
-                                <ItemIcon className="w-4 h-4 text-[#D97A42] shrink-0" />
-                                <span>{item.name}</span>
-                              </span>
-                              <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#D97A42] group-hover:translate-x-1 transition-transform" />
-                            </div>
-                            <p className="text-[11px] text-slate-500 mt-1 font-sans pl-6">{item.detail}</p>
-                          </a>
-                        )
-                      })}
                     </div>
                   </div>
 
-                  {/* Column 3: Featured Spotlight Card */}
-                  <div className="col-span-4 pl-2">
-                    <div className="relative rounded-2xl overflow-hidden bg-white border border-slate-200 p-6 group shadow-lg">
-                      <div className="absolute top-4 left-4 z-10">
-                        <span className="text-[9px] font-black uppercase tracking-wider bg-[#D97A42] text-white px-3 py-1 rounded-full shadow-md">
-                          {megaData.featured.badge}
-                        </span>
-                      </div>
+                  {/* Right Section (30%): Featured Spotlight Card */}
+                  <div className="w-full lg:w-80 shrink-0">
+                    <div className="relative rounded-2xl overflow-hidden bg-white border border-slate-200 p-6 group shadow-md hover:shadow-xl transition-all flex flex-col justify-between h-full min-h-[320px]">
+                      <div>
+                        <div className="absolute top-4 left-4 z-10">
+                          <span className="text-[9px] font-black uppercase tracking-wider bg-[#D97A42] text-white px-3 py-1 rounded-full shadow-sm">
+                            FEATURED
+                          </span>
+                        </div>
 
-                      <div className="w-full h-40 rounded-xl overflow-hidden mb-4 relative bg-slate-100">
-                        <img
-                          src={megaData.featured.image}
-                          alt={megaData.featured.title}
-                          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 filter contrast-[1.02]"
-                          onError={(e) => {
-                            (e.target as HTMLElement).style.display = 'none'
-                          }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                      </div>
+                        {/* Spotlight Image */}
+                        <div className="w-full h-44 rounded-xl overflow-hidden mb-4 relative bg-slate-100">
+                          <img
+                            src={featuredImage}
+                            alt={featuredTitle}
+                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                            onError={(e) => {
+                              (e.target as HTMLElement).style.display = 'none'
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                        </div>
 
-                      <h4 className="text-base font-extrabold text-slate-900 group-hover:text-[#D97A42] transition-colors font-serif">
-                        {megaData.featured.title}
-                      </h4>
-                      <p className="text-xs text-slate-600 mt-1.5 line-clamp-2 font-sans leading-relaxed">
-                        {megaData.featured.subtitle}
-                      </p>
+                        <h4 className="text-base font-extrabold text-slate-900 group-hover:text-[#D97A42] transition-colors font-serif">
+                          {featuredTitle}
+                        </h4>
+                        <p className="text-xs text-slate-600 mt-1.5 font-sans leading-relaxed">
+                          Enterprise uniform solutions.
+                        </p>
+                      </div>
 
                       <a
-                        href={megaData.featured.href}
+                        href={featuredHref}
                         className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D97A42] mt-4 group-hover:translate-x-1 transition-transform"
                       >
                         <span>Explore Collection</span>
@@ -353,12 +302,11 @@ export function SiteHeader({ onOpenQuoteModal, config }: SiteHeaderProps) {
                       </a>
                     </div>
                   </div>
-
                 </div>
 
                 {/* Bottom Trust Strip */}
                 <div className="pt-4 flex items-center justify-between text-xs text-slate-600 font-sans flex-wrap gap-4">
-                  <div className="flex items-center space-x-6">
+                  <div className="flex items-center space-x-6 flex-wrap gap-y-2">
                     <span className="flex items-center gap-1.5 font-bold text-slate-800">
                       <CheckCircle2 className="w-4 h-4 text-[#1C7A4C]" />
                       <span>60+ Years Master Atelier Heritage</span>
@@ -373,14 +321,14 @@ export function SiteHeader({ onOpenQuoteModal, config }: SiteHeaderProps) {
                     </span>
                   </div>
 
-                  <a
-                    href="#contact"
-                    className="font-bold text-[#D97A42] hover:underline uppercase text-[11px] tracking-wider"
+                  <button
+                    type="button"
+                    onClick={onOpenQuoteModal}
+                    className="font-bold text-[#D97A42] hover:underline uppercase text-[11px] tracking-wider cursor-pointer"
                   >
-                    Visit Dubai Showroom →
-                  </a>
+                    VISIT DUBAI SHOWROOM →
+                  </button>
                 </div>
-
               </div>
             </motion.div>
           )}
@@ -396,15 +344,69 @@ export function SiteHeader({ onOpenQuoteModal, config }: SiteHeaderProps) {
             exit={{ opacity: 0, height: 0 }}
             className="lg:hidden bg-[#141414] border-b border-[#292929] text-white px-6 py-6 space-y-4"
           >
-            <div className="space-y-3">
-              {categories.map((cat) => (
-                <div key={cat.label} className="border-b border-[#262626] pb-2">
-                  <div className="flex items-center justify-between text-sm font-bold text-gray-200">
-                    <span>{cat.label}</span>
-                    {cat.hasDropdown && <ChevronDown className="w-4 h-4 text-gray-400" />}
+            <div className="space-y-2">
+              {navItems.map((item) => {
+                const hasChildren = Boolean(item.children && item.children.length > 0)
+                const isExpanded = mobileExpandedId === item.id
+
+                return (
+                  <div key={item.id} className="border-b border-[#262626] pb-2">
+                    <div className="flex items-center justify-between">
+                      <a
+                        href={hasChildren && item.url === '#' ? '#' : item.url}
+                        onClick={(e) => {
+                          if (hasChildren && item.url === '#') {
+                            e.preventDefault()
+                            setMobileExpandedId(isExpanded ? null : item.id)
+                          } else {
+                            setMobileMenuOpen(false)
+                          }
+                        }}
+                        className="text-sm font-bold text-gray-200 hover:text-[#D97A42] flex-1 py-1"
+                      >
+                        {item.title}
+                      </a>
+                      {hasChildren && (
+                        <button
+                          type="button"
+                          onClick={() => setMobileExpandedId(isExpanded ? null : item.id)}
+                          className="p-1.5 text-gray-400 hover:text-[#D97A42] cursor-pointer"
+                          aria-label={`Toggle ${item.title}`}
+                        >
+                          <ChevronDown
+                            className={`w-4 h-4 transition-transform duration-200 ${
+                              isExpanded ? 'rotate-180 text-[#D97A42]' : ''
+                            }`}
+                          />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Accordion Sub-items */}
+                    <AnimatePresence>
+                      {hasChildren && isExpanded && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="mt-2 pl-3 space-y-1.5 border-l-2 border-[#D97A42]/50"
+                        >
+                          {item.children!.map((child) => (
+                            <a
+                              key={child.id}
+                              href={child.url}
+                              onClick={() => setMobileMenuOpen(false)}
+                              className="block text-xs font-semibold text-gray-300 hover:text-[#D97A42] py-1.5 transition-colors"
+                            >
+                              {child.title}
+                            </a>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
 
             <button
@@ -412,7 +414,7 @@ export function SiteHeader({ onOpenQuoteModal, config }: SiteHeaderProps) {
                 setMobileMenuOpen(false)
                 if (onOpenQuoteModal) onOpenQuoteModal()
               }}
-              className="w-full py-3.5 bg-[#D97A42] hover:bg-[#c46833] text-white font-bold text-xs uppercase tracking-widest rounded-full flex items-center justify-center gap-2 shadow-lg"
+              className="w-full py-3.5 bg-[#D97A42] hover:bg-[#c46833] text-white font-bold text-xs uppercase tracking-widest rounded-full flex items-center justify-center gap-2 shadow-lg cursor-pointer transition-all"
             >
               <span>Request Quote</span>
               <ArrowRight className="w-4 h-4" />

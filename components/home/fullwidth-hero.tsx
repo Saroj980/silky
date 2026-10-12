@@ -13,6 +13,7 @@ export interface FullwidthHeroSlide {
   image: string
   imageAlt: string
   primaryBtnText: string
+  primaryBtnHref?: string
   secondaryBtnText: string
   secondaryBtnHref: string
   statChipText: string
@@ -289,25 +290,47 @@ export function FullwidthHero({
                       {/* CTA Row & Inline Stat Chip with Animated Underline */}
                       <div className="flex flex-wrap items-center gap-4 sm:gap-6 pt-2">
                         {/* Primary CTA with Brand Orange Fill-Sweep */}
-                        <button
-                          onClick={onOpenQuoteModal}
-                          className="relative group overflow-hidden px-7 py-3.5 font-inter text-xs font-bold uppercase tracking-widest text-white rounded-none cursor-pointer border"
-                          style={{
-                            backgroundColor: 'var(--brand-orange, #D97A42)',
-                            borderColor: 'var(--brand-orange, #D97A42)'
-                          }}
-                        >
-                          <motion.span
-                            className="absolute inset-0 bg-[#c46933] z-0 origin-left"
-                            initial={{ scaleX: 0 }}
-                            whileHover={{ scaleX: shouldReduceMotion ? 0 : 1 }}
-                            transition={{ duration: 0.3, ease: [0.65, 0, 0.35, 1] }}
-                          />
-                          <span className="relative z-10 flex items-center gap-2">
-                            {slide.primaryBtnText}
-                            <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                          </span>
-                        </button>
+                        {slide.primaryBtnHref && slide.primaryBtnHref !== '#modal' ? (
+                          <a
+                            href={slide.primaryBtnHref}
+                            className="relative group overflow-hidden px-7 py-3.5 font-inter text-xs font-bold uppercase tracking-widest text-white rounded-none cursor-pointer border inline-flex items-center gap-2"
+                            style={{
+                              backgroundColor: 'var(--brand-orange, #D97A42)',
+                              borderColor: 'var(--brand-orange, #D97A42)'
+                            }}
+                          >
+                            <motion.span
+                              className="absolute inset-0 bg-[#c46933] z-0 origin-left"
+                              initial={{ scaleX: 0 }}
+                              whileHover={{ scaleX: shouldReduceMotion ? 0 : 1 }}
+                              transition={{ duration: 0.3, ease: [0.65, 0, 0.35, 1] }}
+                            />
+                            <span className="relative z-10 flex items-center gap-2">
+                              {slide.primaryBtnText}
+                              <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                            </span>
+                          </a>
+                        ) : (
+                          <button
+                            onClick={onOpenQuoteModal}
+                            className="relative group overflow-hidden px-7 py-3.5 font-inter text-xs font-bold uppercase tracking-widest text-white rounded-none cursor-pointer border"
+                            style={{
+                              backgroundColor: 'var(--brand-orange, #D97A42)',
+                              borderColor: 'var(--brand-orange, #D97A42)'
+                            }}
+                          >
+                            <motion.span
+                              className="absolute inset-0 bg-[#c46933] z-0 origin-left"
+                              initial={{ scaleX: 0 }}
+                              whileHover={{ scaleX: shouldReduceMotion ? 0 : 1 }}
+                              transition={{ duration: 0.3, ease: [0.65, 0, 0.35, 1] }}
+                            />
+                            <span className="relative z-10 flex items-center gap-2">
+                              {slide.primaryBtnText}
+                              <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                            </span>
+                          </button>
+                        )}
 
                         {/* Secondary CTA */}
                         <a

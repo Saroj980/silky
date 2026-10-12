@@ -6,18 +6,33 @@ use App\Http\Controllers\Api\HeroSlideController;
 use App\Http\Controllers\Api\SiteConfigController;
 use App\Http\Controllers\Api\PageSectionController;
 use App\Http\Controllers\Api\ProductPageController;
+use App\Http\Controllers\Api\GeneralPageController;
 use App\Http\Controllers\Api\UploadController;
+use App\Http\Controllers\Api\UserController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
+// Authentication & Users API
+Route::post('/login', [UserController::class, 'login']);
+Route::post('/auth/login', [UserController::class, 'login']);
+Route::get('/users', [UserController::class, 'index']);
+Route::post('/users', [UserController::class, 'store']);
+Route::delete('/users/{id}', [UserController::class, 'destroy']);
+Route::delete('/users', function (Request $request) {
+    $id = $request->input('id') ?? $request->query('id');
+    return app(UserController::class)->destroy($id);
+});
 
 // Hero Slides
 Route::get('/hero-slides', [HeroSlideController::class, 'index']);
 Route::post('/hero-slides', [HeroSlideController::class, 'store']);
 Route::get('/hero-slides/{id}', [HeroSlideController::class, 'show']);
 Route::put('/hero-slides/{id}', [HeroSlideController::class, 'update']);
+Route::put('/hero-slides', [HeroSlideController::class, 'update']);
 Route::delete('/hero-slides/{id}', [HeroSlideController::class, 'destroy']);
+Route::delete('/hero-slides', [HeroSlideController::class, 'destroy']);
 
 // Site Config
 Route::get('/site-config', [SiteConfigController::class, 'show']);
@@ -37,11 +52,23 @@ Route::post('/product-pages', [ProductPageController::class, 'store']);
 Route::get('/product-pages/slug/{slug}', [ProductPageController::class, 'showBySlug']);
 Route::put('/product-pages/{id}', [ProductPageController::class, 'update']);
 Route::delete('/product-pages/{id}', [ProductPageController::class, 'destroy']);
+Route::delete('/product-pages', [ProductPageController::class, 'destroy']);
 Route::post('/product-pages/{id}/sections', [ProductPageController::class, 'addSection']);
 Route::post('/product-pages/{id}/save-sections', [ProductPageController::class, 'saveSections']);
 Route::put('/product-pages/sections/{sectionId}', [ProductPageController::class, 'updateSection']);
 Route::delete('/product-pages/sections/{sectionId}', [ProductPageController::class, 'deleteSection']);
 Route::post('/product-pages/{id}/reorder', [ProductPageController::class, 'reorderSections']);
+
+// General Pages & Blogs (MySQL)
+Route::get('/general-pages', [GeneralPageController::class, 'index']);
+Route::post('/general-pages', [GeneralPageController::class, 'store']);
+Route::get('/general-pages/slug/{slug}', [GeneralPageController::class, 'showBySlug']);
+Route::put('/general-pages/{id}', [GeneralPageController::class, 'update']);
+Route::delete('/general-pages/{id}', [GeneralPageController::class, 'destroy']);
+Route::delete('/general-pages', function (Request $request) {
+    $id = $request->input('id') ?? $request->query('id');
+    return app(GeneralPageController::class)->destroy($id);
+});
 
 // Upload
 Route::post('/upload', [UploadController::class, 'store']);
