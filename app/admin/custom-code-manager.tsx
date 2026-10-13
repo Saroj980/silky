@@ -5,7 +5,8 @@ import {
   Code, Plus, Trash2, Edit3, Star, Check, X, Globe,
   Smartphone, Monitor, ShieldAlert, Sparkles, Copy,
   CheckCircle2, ArrowUpDown, Filter, Search, Terminal,
-  ExternalLink, FileCode, Layers, Info
+  ExternalLink, FileCode, Layers, Info, ChevronRight,
+  Eye, MousePointerClick, Sliders, Hash
 } from 'lucide-react'
 import {
   CustomCodeSnippet,
@@ -22,11 +23,84 @@ interface CustomCodeManagerProps {
 
 type FilterType = 'all' | 'css' | 'js' | 'html' | 'active' | 'inactive'
 
+interface SectionDef {
+  id: string
+  name: string
+  description: string
+  tag: string
+}
+
+interface PageDef {
+  id: string
+  name: string
+  path: string
+  sections: SectionDef[]
+}
+
+const PAGE_SECTION_REGISTRY: PageDef[] = [
+  {
+    id: 'home',
+    name: 'Homepage',
+    path: '/',
+    sections: [
+      { id: 'header', tag: 'header', name: 'Header Navigation', description: 'Top navigation bar, logo, phone & menu' },
+      { id: '#hero', tag: '#hero', name: 'Hero Slider', description: 'Full-width hero carousel with slides & badges' },
+      { id: '#heritage', tag: '#heritage', name: 'Brand Story (Heritage)', description: 'Established 1963 atelier narrative' },
+      { id: '#services', tag: '#services', name: 'Category Showcase', description: 'Corporate, Hospitality, Medical cards' },
+      { id: '#uniforms', tag: '#uniforms', name: 'Uniform Solutions', description: 'Interactive uniform category showcase' },
+      { id: '#work', tag: '#work', name: 'Our Work & Portfolio', description: 'Client showcase & production gallery' },
+      { id: '#why-silky', tag: '#why-silky', name: 'Why Silky (Stats)', description: 'Trust pillars & atelier metrics' },
+      { id: '#process', tag: '#process', name: '4-Step Process', description: 'Bespoke manufacturing timeline' },
+      { id: '#testimonials', tag: '#testimonials', name: 'Client Testimonials', description: 'Reviews & client quotes' },
+      { id: '#contact', tag: '#contact', name: 'Showroom & Contact', description: 'Showroom map, address & inquiry form' },
+      { id: 'footer', tag: 'footer', name: 'Site Footer', description: 'Bottom columns, copyright & legal' },
+    ],
+  },
+  {
+    id: 'products',
+    name: 'Product Pages',
+    path: '/products/*',
+    sections: [
+      { id: 'header', tag: 'header', name: 'Header Navigation', description: 'Top navigation bar, logo, phone & menu' },
+      { id: '#product-hero', tag: '#product-hero', name: 'Product Hero', description: 'Breadcrumb, title, badges & hero photo' },
+      { id: '#specs-matrix', tag: '#specs-matrix', name: 'Specs Matrix', description: 'Fabric weight, composition, weaves' },
+      { id: '#customization', tag: '#customization', name: 'Custom Embroidery', description: 'Embroidery, buttons & monogramming' },
+      { id: '#sectors', tag: '#sectors', name: 'Industries We Supply', description: 'Sectors & commercial use-cases' },
+      { id: '#fabric-swatches', tag: '#fabric-swatches', name: 'Fabric Swatches', description: 'Color palette & texture swatches' },
+      { id: '#quality-control', tag: '#quality-control', name: 'Quality Control', description: '4-step inspection badges' },
+      { id: '#bulk-pricing', tag: '#bulk-pricing', name: 'Bulk Pricing Tiers', description: 'MOQ & tiered discount cards' },
+      { id: '#logistics', tag: '#logistics', name: 'Logistics & Delivery', description: 'UAE & GCC express shipping band' },
+      { id: '#faq', tag: '#faq', name: 'Product FAQ', description: 'Collapsible accordion questions' },
+      { id: '#quote-band', tag: '#quote-band', name: 'Instant Quote Band', description: 'Bottom inquiry & call-to-action' },
+      { id: 'footer', tag: 'footer', name: 'Site Footer', description: 'Bottom columns, copyright & legal' },
+    ],
+  },
+  {
+    id: 'about',
+    name: 'About Us',
+    path: '/about-us',
+    sections: [
+      { id: 'header', tag: 'header', name: 'Header Navigation', description: 'Top navigation bar & menu' },
+      { id: '.general-page-content', tag: '.general-page-content', name: 'About Page Body', description: 'Main narrative & article content' },
+      { id: 'footer', tag: 'footer', name: 'Site Footer', description: 'Bottom columns, copyright & legal' },
+    ],
+  },
+  {
+    id: 'contact',
+    name: 'Contact Us',
+    path: '/contact-us',
+    sections: [
+      { id: 'header', tag: 'header', name: 'Header Navigation', description: 'Top navigation bar & menu' },
+      { id: '.general-page-content', tag: '.general-page-content', name: 'Contact Page Body', description: 'Address, map & inquiry form' },
+      { id: 'footer', tag: 'footer', name: 'Site Footer', description: 'Bottom columns, copyright & legal' },
+    ],
+  },
+]
+
 const CODE_TEMPLATES = {
   google_verification: `<!-- Google Search Console Verification Meta Tag -->\n<meta name="google-site-verification" content="PASTE_YOUR_VERIFICATION_CODE_HERE" />`,
   gtm_head: `<!-- Google Tag Manager -->\n<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':\nnew Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],\nj=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=\n'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);\n})(window,document,'script','dataLayer','GTM-XXXXXXX');</script>\n<!-- End Google Tag Manager -->`,
-  responsive_css: `/* Mobile Header Adjustments */\n@media (max-width: 768px) {\n  .site-header {\n    padding: 10px 16px !important;\n  }\n  \n  /* Custom text sizing on mobile */\n  h1 {\n    font-size: 1.75rem !important;\n    line-height: 1.25 !important;\n  }\n}`,
-  custom_js: `// Custom Event Tracking or UI Script\ndocument.addEventListener('DOMContentLoaded', function() {\n  console.log('Custom JS initialized.');\n});`
+  custom_js: `// Custom Event Tracking or UI Script\ndocument.addEventListener('DOMContentLoaded', function() {\n  console.log('Custom JS initialized.');\n});`,
 }
 
 export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
@@ -43,9 +117,14 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
   const [formCode, setFormCode] = useState('')
   const [formPlacement, setFormPlacement] = useState<'head' | 'body_start' | 'footer'>('head')
   const [formTargetDevice, setFormTargetDevice] = useState<'all' | 'desktop' | 'mobile'>('all')
+  const [formTargetPage, setFormTargetPage] = useState<string>('all')
+  const [formTargetSection, setFormTargetSection] = useState<string>('')
   const [formIsActive, setFormIsActive] = useState(true)
   const [formIsFavorite, setFormIsFavorite] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Active Section Helper Tab in Modal
+  const [helperSelectedSection, setHelperSelectedSection] = useState<string | null>(null)
 
   // Delete Confirm State
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -86,6 +165,9 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
     )
     setFormPlacement(type === 'js' ? 'footer' : 'head')
     setFormTargetDevice('all')
+    setFormTargetPage('all')
+    setFormTargetSection('')
+    setHelperSelectedSection(null)
     setFormIsActive(true)
     setFormIsFavorite(false)
     setIsModalOpen(true)
@@ -98,6 +180,9 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
     setFormCode(snip.code)
     setFormPlacement(snip.placement || 'head')
     setFormTargetDevice(snip.targetDevice || 'all')
+    setFormTargetPage(snip.targetPage || 'all')
+    setFormTargetSection(snip.targetSection || '')
+    setHelperSelectedSection(snip.targetSection || null)
     setFormIsActive(snip.isActive ?? true)
     setFormIsFavorite(snip.isFavorite ?? false)
     setIsModalOpen(true)
@@ -112,27 +197,23 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
 
     try {
       setIsSubmitting(true)
+      const payload = {
+        title: formTitle,
+        codeType: formCodeType,
+        code: formCode,
+        placement: formPlacement,
+        targetDevice: formTargetDevice,
+        targetPage: formTargetPage,
+        targetSection: formTargetSection,
+        isActive: formIsActive,
+        isFavorite: formIsFavorite,
+      }
+
       if (editingSnippetId) {
-        await updateCustomCodeSnippet(editingSnippetId, {
-          title: formTitle,
-          codeType: formCodeType,
-          code: formCode,
-          placement: formPlacement,
-          targetDevice: formTargetDevice,
-          isActive: formIsActive,
-          isFavorite: formIsFavorite,
-        })
+        await updateCustomCodeSnippet(editingSnippetId, payload)
         onToast?.('Snippet updated successfully!')
       } else {
-        await createCustomCodeSnippet({
-          title: formTitle,
-          codeType: formCodeType,
-          code: formCode,
-          placement: formPlacement,
-          targetDevice: formTargetDevice,
-          isActive: formIsActive,
-          isFavorite: formIsFavorite,
-        })
+        await createCustomCodeSnippet(payload)
         onToast?.('New snippet added successfully!')
       }
       setIsModalOpen(false)
@@ -184,6 +265,48 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
     }
   }
 
+  // Section Recipe Inserter
+  const insertRecipe = (selector: string, recipeType: 'blank' | 'hide_mobile' | 'padding_mobile' | 'heading_size' | 'bg_color') => {
+    setFormTargetSection(selector)
+    let snippetToAdd = ''
+    switch (recipeType) {
+      case 'blank':
+        snippetToAdd = `\n/* Scoped to ${selector} */\n${selector} {\n  /* write styles here */\n}\n`
+        break
+      case 'hide_mobile':
+        snippetToAdd = `\n/* Hide ${selector} on Mobile Screens */\n@media (max-width: 768px) {\n  ${selector} {\n    display: none !important;\n  }\n}\n`
+        break
+      case 'padding_mobile':
+        snippetToAdd = `\n/* Adjust Mobile Padding for ${selector} */\n@media (max-width: 768px) {\n  ${selector} {\n    padding: 24px 16px !important;\n  }\n}\n`
+        break
+      case 'heading_size':
+        snippetToAdd = `\n/* Heading Font Size in ${selector} */\n${selector} h2 {\n  font-size: 26px !important;\n  line-height: 1.25 !important;\n}\n`
+        break
+      case 'bg_color':
+        snippetToAdd = `\n/* Background Color for ${selector} */\n${selector} {\n  background-color: #FAF9F6 !important;\n}\n`
+        break
+    }
+    setFormCode((prev) => prev.trim() + '\n' + snippetToAdd)
+    onToast?.(`Inserted CSS rules for ${selector}`)
+  }
+
+  // Active Page Sections Helper
+  const currentSectionsList = (() => {
+    if (formTargetPage === 'all' || formTargetPage === '/') {
+      return PAGE_SECTION_REGISTRY.find((p) => p.id === 'home')?.sections || []
+    }
+    if (formTargetPage === '/products/*') {
+      return PAGE_SECTION_REGISTRY.find((p) => p.id === 'products')?.sections || []
+    }
+    if (formTargetPage === '/about-us') {
+      return PAGE_SECTION_REGISTRY.find((p) => p.id === 'about')?.sections || []
+    }
+    if (formTargetPage === '/contact-us') {
+      return PAGE_SECTION_REGISTRY.find((p) => p.id === 'contact')?.sections || []
+    }
+    return PAGE_SECTION_REGISTRY[0].sections
+  })()
+
   // Filter & Search Logic
   const filteredSnippets = snippets.filter((s) => {
     if (filter === 'css' && s.codeType !== 'css') return false
@@ -197,6 +320,8 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
       return (
         s.title.toLowerCase().includes(q) ||
         s.code.toLowerCase().includes(q) ||
+        (s.targetPage && s.targetPage.toLowerCase().includes(q)) ||
+        (s.targetSection && s.targetSection.toLowerCase().includes(q)) ||
         s.codeType.toLowerCase().includes(q)
       )
     }
@@ -226,7 +351,7 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
               Custom CSS, JS & HTML
             </h1>
             <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
-              Inject custom CSS to control mobile and desktop design, add Google Search Console verification meta tags, Google Tag Manager, Facebook Pixel, and third-party API activation scripts across your entire website.
+              Inject custom CSS scoped by <strong>Page & Section</strong> to customize mobile/desktop views without breaking other sections. Add Google Search Console verification meta tags, Google Tag Manager, Facebook Pixel, and tracking scripts across your website.
             </p>
           </div>
 
@@ -293,7 +418,7 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search snippets..."
+            placeholder="Search title, section, or code..."
             className="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
           />
           {searchQuery && (
@@ -350,10 +475,11 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
                   <th className="py-3.5 px-4 w-12 text-center">★</th>
                   <th className="py-3.5 px-4 w-20">Type</th>
                   <th className="py-3.5 px-4">Title & Details</th>
-                  <th className="py-3.5 px-4 w-32">Device</th>
-                  <th className="py-3.5 px-4 w-32">Placement</th>
+                  <th className="py-3.5 px-4 w-36">Page Scope</th>
+                  <th className="py-3.5 px-4 w-32">Target Section</th>
+                  <th className="py-3.5 px-4 w-28">Device</th>
                   <th className="py-3.5 px-4 w-28 text-center">Status</th>
-                  <th className="py-3.5 px-4 w-28 text-right">Actions</th>
+                  <th className="py-3.5 px-4 w-24 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
@@ -398,38 +524,60 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
                       <div className="font-bold text-slate-800 group-hover:text-blue-600 transition-colors flex items-center gap-2">
                         <span>{snip.title}</span>
                       </div>
-                      <p className="text-[11px] font-mono text-slate-400 truncate max-w-md mt-1">
+                      <p className="text-[11px] font-mono text-slate-400 truncate max-w-xs sm:max-w-md mt-1">
                         {snip.code.trim().split('\n')[0] || '// Empty code snippet'}
                       </p>
                     </td>
 
+                    {/* PAGE SCOPE */}
+                    <td className="py-4 px-4">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-semibold text-[11px]">
+                        {snip.targetPage === '/' ? (
+                          <><span>🏠</span> Homepage</>
+                        ) : snip.targetPage === '/products/*' ? (
+                          <><span>👕</span> Product Pages</>
+                        ) : snip.targetPage === '/about-us' ? (
+                          <><span>📄</span> About Us</>
+                        ) : snip.targetPage === '/contact-us' ? (
+                          <><span>📞</span> Contact Us</>
+                        ) : (
+                          <><span>🌐</span> All Pages (Global)</>
+                        )}
+                      </span>
+                    </td>
+
+                    {/* TARGET SECTION */}
+                    <td className="py-4 px-4">
+                      {snip.targetSection ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-mono text-[10px] font-bold border border-blue-200">
+                          <Hash className="w-3 h-3" />
+                          <span>{snip.targetSection.replace(/^#/, '')}</span>
+                        </span>
+                      ) : (
+                        <span className="text-[11px] text-slate-400 italic">Entire Section/Page</span>
+                      )}
+                    </td>
+
                     {/* DEVICE TARGET */}
                     <td className="py-4 px-4">
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 font-semibold text-[11px]">
+                      <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600 font-medium text-[11px]">
                         {snip.targetDevice === 'mobile' ? (
                           <>
                             <Smartphone className="w-3.5 h-3.5 text-orange-500" />
-                            <span>Mobile Only</span>
+                            <span>Mobile</span>
                           </>
                         ) : snip.targetDevice === 'desktop' ? (
                           <>
                             <Monitor className="w-3.5 h-3.5 text-blue-500" />
-                            <span>Desktop Only</span>
+                            <span>Desktop</span>
                           </>
                         ) : (
                           <>
                             <Globe className="w-3.5 h-3.5 text-emerald-500" />
-                            <span>All Devices</span>
+                            <span>All</span>
                           </>
                         )}
                       </div>
-                    </td>
-
-                    {/* PLACEMENT */}
-                    <td className="py-4 px-4">
-                      <span className="text-[11px] font-medium text-slate-600">
-                        {snip.placement === 'footer' ? 'Footer (</body>)' : snip.placement === 'body_start' ? 'Body Start' : 'Header (<head>)'}
-                      </span>
                     </td>
 
                     {/* STATUS TOGGLE */}
@@ -487,7 +635,7 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
       <div className="bg-slate-900 text-white rounded-2xl p-6 border border-slate-800 shadow-xl space-y-4">
         <div className="flex items-center gap-3 text-amber-400 font-bold text-sm">
           <Sparkles className="w-4 h-4" />
-          <span>Quick Code Presets & Examples</span>
+          <span>Quick Code Presets & Recipes</span>
         </div>
         <p className="text-xs text-slate-300">
           Click any preset below to quickly create a Google verification snippet or a mobile responsive CSS block:
@@ -513,18 +661,19 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
           <div
             onClick={() => {
               handleOpenAdd('css')
-              setFormTitle('Mobile Responsive Styling Tweaks')
-              setFormTargetDevice('mobile')
-              setFormCode(CODE_TEMPLATES.responsive_css)
+              setFormTitle('Uniform Solutions Mobile Spacing')
+              setFormTargetPage('/')
+              setFormTargetSection('#uniforms')
+              setFormCode(`/* Scoped to Uniform Solutions on Mobile */\n@media (max-width: 768px) {\n  #uniforms {\n    padding: 24px 16px !important;\n  }\n}`)
             }}
             className="p-4 rounded-xl bg-slate-800/60 border border-slate-700/80 hover:border-blue-500/50 hover:bg-slate-800 transition-all cursor-pointer group"
           >
             <div className="flex items-center gap-2 text-xs font-bold text-blue-400 mb-1">
               <span className="px-1.5 py-0.5 rounded bg-blue-500/20 text-[10px] font-mono">CSS</span>
-              <span>Mobile-Only Scoped CSS</span>
+              <span>Section Mobile Tweaks (#uniforms)</span>
             </div>
             <p className="text-[11px] text-slate-400">
-              Target screens under 768px for fixing mobile font sizes, padding, and alignments.
+              Target screens under 768px on the Homepage for Uniforms spacing and padding.
             </p>
           </div>
 
@@ -547,10 +696,10 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
         </div>
       </div>
 
-      {/* EDITOR MODAL */}
+      {/* EDITOR MODAL WITH INTERACTIVE PAGE & SECTION PICKER */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-5xl max-h-[92vh] flex flex-col overflow-hidden">
             
             {/* MODAL HEADER */}
             <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 shrink-0">
@@ -608,8 +757,34 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
                 </div>
               </div>
 
-              {/* TARGET DEVICE & PLACEMENT */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+              {/* TARGET PAGE, DEVICE & PLACEMENT */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                
+                {/* 1. TARGET PAGE */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                    Target Page Scope
+                  </label>
+                  <select
+                    value={formTargetPage}
+                    onChange={(e) => {
+                      setFormTargetPage(e.target.value)
+                      setHelperSelectedSection(null)
+                    }}
+                    className="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-semibold"
+                  >
+                    <option value="all">🌐 All Pages (Global)</option>
+                    <option value="/">🏠 Homepage (/)</option>
+                    <option value="/products/*">👕 Product Pages (/products/*)</option>
+                    <option value="/about-us">📄 About Us (/about-us)</option>
+                    <option value="/contact-us">📞 Contact Us (/contact-us)</option>
+                  </select>
+                  <p className="text-[10px] text-slate-500 mt-1">
+                    Isolate styles to only one page.
+                  </p>
+                </div>
+
+                {/* 2. TARGET DEVICE */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                     Target Device
@@ -624,30 +799,30 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
                     <option value="desktop">Desktop Only (&gt; 768px)</option>
                   </select>
                   <p className="text-[10px] text-slate-500 mt-1">
-                    {formCodeType === 'css' && formTargetDevice === 'mobile'
-                      ? 'Automatically scoped with @media (max-width: 768px).'
-                      : 'Choose screen size where this applies.'}
+                    Auto-scoping with media queries.
                   </p>
                 </div>
 
+                {/* 3. PLACEMENT */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                    Injection Location
+                    Placement
                   </label>
                   <select
                     value={formPlacement}
                     onChange={(e) => setFormPlacement(e.target.value as any)}
                     className="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-semibold"
                   >
-                    <option value="head">Header (&lt;head&gt;) — Recommended</option>
-                    <option value="body_start">Body Start (Top)</option>
-                    <option value="footer">Footer (&lt;/body&gt;) — Scripts/Chat</option>
+                    <option value="head">Header (&lt;head&gt;)</option>
+                    <option value="body_start">Body Start</option>
+                    <option value="footer">Footer (&lt;/body&gt;)</option>
                   </select>
                   <p className="text-[10px] text-slate-500 mt-1">
-                    Google verification & CSS must be in &lt;head&gt;.
+                    &lt;head&gt; for verification & CSS.
                   </p>
                 </div>
 
+                {/* 4. ACTIVE STATUS */}
                 <div className="flex flex-col justify-center">
                   <span className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                     Status
@@ -661,11 +836,99 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
                     />
                     <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 relative"></div>
                     <span className="text-xs font-bold text-slate-700">
-                      {formIsActive ? 'Active (Live)' : 'Inactive'}
+                      {formIsActive ? 'Active' : 'Inactive'}
                     </span>
                   </label>
                 </div>
               </div>
+
+              {/* SECTION HELPER TOOLBAR (FOR CSS) */}
+              {formCodeType === 'css' && (
+                <div className="bg-slate-900 rounded-2xl p-5 text-white border border-slate-800 shadow-md space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <MousePointerClick className="w-4 h-4 text-blue-400" />
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">
+                        Section Selector & 1-Click Recipe Helper
+                      </h4>
+                      <span className="text-[11px] text-slate-400">
+                        (Showing sections for: <strong className="text-amber-400">{formTargetPage === 'all' || formTargetPage === '/' ? 'Homepage' : formTargetPage}</strong>)
+                      </span>
+                    </div>
+                    {formTargetSection && (
+                      <span className="text-[11px] px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-400/30 font-mono">
+                        Active Scope: {formTargetSection}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* SECTION CHIPS */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {currentSectionsList.map((sec) => (
+                      <button
+                        key={sec.id}
+                        type="button"
+                        onClick={() => {
+                          setHelperSelectedSection(helperSelectedSection === sec.id ? null : sec.id)
+                          setFormTargetSection(sec.tag)
+                        }}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 border ${
+                          helperSelectedSection === sec.id || formTargetSection === sec.tag
+                            ? 'bg-blue-600 text-white border-blue-500 shadow-md shadow-blue-600/30'
+                            : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-800 hover:text-white'
+                        }`}
+                      >
+                        <span className="font-mono text-[10px] text-blue-300">{sec.tag}</span>
+                        <span>{sec.name}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* 1-CLICK ACTION RECIPES FOR SELECTED SECTION */}
+                  {helperSelectedSection && (
+                    <div className="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/80 flex flex-wrap items-center gap-2 text-xs">
+                      <span className="text-slate-400 text-[11px] font-semibold mr-1">
+                        Insert 1-Click Recipe for <strong className="text-white font-mono">{formTargetSection}</strong>:
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => insertRecipe(formTargetSection, 'blank')}
+                        className="px-2.5 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold text-[11px] transition-colors"
+                      >
+                        + Insert Selector
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => insertRecipe(formTargetSection, 'hide_mobile')}
+                        className="px-2.5 py-1 rounded-lg bg-orange-600/80 hover:bg-orange-600 text-white font-semibold text-[11px] transition-colors"
+                      >
+                        + Hide on Mobile
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => insertRecipe(formTargetSection, 'padding_mobile')}
+                        className="px-2.5 py-1 rounded-lg bg-blue-600/80 hover:bg-blue-600 text-white font-semibold text-[11px] transition-colors"
+                      >
+                        + Mobile Spacing
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => insertRecipe(formTargetSection, 'heading_size')}
+                        className="px-2.5 py-1 rounded-lg bg-emerald-600/80 hover:bg-emerald-600 text-white font-semibold text-[11px] transition-colors"
+                      >
+                        + Heading Font Size
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => insertRecipe(formTargetSection, 'bg_color')}
+                        className="px-2.5 py-1 rounded-lg bg-purple-600/80 hover:bg-purple-600 text-white font-semibold text-[11px] transition-colors"
+                      >
+                        + Background Color
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* CODE EDITOR */}
               <div>
@@ -682,15 +945,6 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
                         className="text-[11px] text-orange-600 hover:text-orange-700 font-bold px-2 py-1 rounded bg-orange-50 hover:bg-orange-100 transition-colors"
                       >
                         + Insert Google Verification Tag
-                      </button>
-                    )}
-                    {formCodeType === 'css' && (
-                      <button
-                        type="button"
-                        onClick={() => setFormCode(CODE_TEMPLATES.responsive_css)}
-                        className="text-[11px] text-blue-600 hover:text-blue-700 font-bold px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 transition-colors"
-                      >
-                        + Insert Mobile CSS Template
                       </button>
                     )}
                   </div>
@@ -715,7 +969,7 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
                     onChange={(e) => setFormCode(e.target.value)}
                     placeholder={
                       formCodeType === 'css'
-                        ? '/* Add CSS styles here */\n.btn { color: #fff; }'
+                        ? '/* Add CSS styles here */\n#uniforms {\n  background-color: #faf9f6;\n}'
                         : formCodeType === 'html'
                         ? '<meta name="google-site-verification" content="..." />'
                         : '// Add JS scripts here\nconsole.log("Hello World");'

@@ -86,6 +86,30 @@ const getSectionLabel = (type: string) => {
   }
 }
 
+const getSectionCssId = (type: string) => {
+  switch (type) {
+    case 'HERO': return 'hero'
+    case 'BRAND_STORY': return 'heritage'
+    case 'CATEGORY_SHOWCASE': return 'services'
+    case 'UNIFORM_SOLUTIONS': return 'uniforms'
+    case 'OUR_WORK': return 'work'
+    case 'WHY_SILKY': return 'why-silky'
+    case 'PROCESS': return 'process'
+    case 'TESTIMONIALS': return 'testimonials'
+    case 'CONTACT_BAND': return 'contact'
+    case 'SPECS_MATRIX': return 'specs-matrix'
+    case 'CUSTOMIZATION': return 'customization'
+    case 'SECTORS': return 'sectors'
+    case 'FABRIC_SWATCHES': return 'fabric-swatches'
+    case 'QUALITY_CONTROL': return 'quality-control'
+    case 'BULK_PRICING': return 'bulk-pricing'
+    case 'LOGISTICS': return 'logistics'
+    case 'FAQ': return 'faq'
+    case 'QUOTE_BAND': return 'quote-band'
+    default: return type.toLowerCase().replace(/_/g, '-')
+  }
+}
+
 const getSectionIcon = (type: string) => {
   switch (type) {
     case 'HERO': return <ImageIcon className="w-4 h-4" />
@@ -1710,9 +1734,17 @@ export function ClientDashboard({
           {activeTab !== 'user-manager' && activeTab !== 'general-pages' && activeTab !== 'menu-manager' && activeTab !== 'footer' && activeTab !== 'custom-code' && !(activeTab === 'product-pages' && productPageViewMode === 'list') && (
             <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
               <div>
-                <h1 className="text-[28px] font-bold text-[#1E293B] tracking-tight">
-                  {activeTab === 'header' ? 'Theme & Settings' : activeTab === 'menu-manager' ? 'Menu Manager' : (activeSection ? `${getSectionLabel(activeSection.type)} Editor` : 'Page Builder')}
-                </h1>
+                <div className="flex flex-wrap items-center gap-3">
+                  <h1 className="text-[28px] font-bold text-[#1E293B] tracking-tight">
+                    {activeTab === 'header' ? 'Theme & Settings' : activeTab === 'menu-manager' ? 'Menu Manager' : (activeSection ? `${getSectionLabel(activeSection.type)} Editor` : 'Page Builder')}
+                  </h1>
+                  {activeSection && activeTab !== 'header' && (
+                    <span className="px-2.5 py-1 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 font-mono text-xs font-bold flex items-center gap-1 shadow-sm" title="Use this ID in Custom CSS to style only this section">
+                      <span>CSS ID:</span>
+                      <strong className="text-blue-900">#{getSectionCssId(activeSection.type)}</strong>
+                    </span>
+                  )}
+                </div>
                 <p className="text-gray-500 mt-1 text-sm">
                   {activeTab === 'header' ? 'Manage your global site configuration.' : activeTab === 'menu-manager' ? 'Manage navigation tabs, sub-columns, links & spotlight image cards.' : 'Modify content, layout, and position of this section.'}
                 </p>

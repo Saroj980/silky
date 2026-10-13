@@ -37,11 +37,12 @@ export function HomePageClient({ heroSlides, config, sections = [] }: { heroSlid
 
   // Live client-side auto-sync to ensure changes saved in Admin reflect immediately without rebuild
   useEffect(() => {
+    let isMounted = true
     // 1. Fetch live hero slides
     fetch('/api/hero-slides', { cache: 'no-store' })
       .then(res => res.ok ? res.json() : null)
       .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
+        if (isMounted && Array.isArray(data) && data.length > 0) {
           const parsed = data.map((s: any) => ({
             ...s,
             trustBadges: typeof s.trustBadges === 'string' ? JSON.parse(s.trustBadges || '[]') : s.trustBadges,
@@ -55,7 +56,7 @@ export function HomePageClient({ heroSlides, config, sections = [] }: { heroSlid
     fetch('/api/site-config', { cache: 'no-store' })
       .then(res => res.ok ? res.json() : null)
       .then(data => {
-        if (data && typeof data === 'object') {
+        if (isMounted && data && typeof data === 'object') {
           setSiteConfig(data)
         }
       })
@@ -65,7 +66,7 @@ export function HomePageClient({ heroSlides, config, sections = [] }: { heroSlid
     fetch('/api/page-sections', { cache: 'no-store' })
       .then(res => res.ok ? res.json() : null)
       .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
+        if (isMounted && Array.isArray(data) && data.length > 0) {
           const active = data.filter((s: any) => s.isActive)
           if (active.length > 0) {
             setActiveSections(active)
@@ -73,6 +74,10 @@ export function HomePageClient({ heroSlides, config, sections = [] }: { heroSlid
         }
       })
       .catch(() => {})
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   // Track rendered section types to guarantee ZERO duplicates on homepage

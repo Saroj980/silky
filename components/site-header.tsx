@@ -29,20 +29,27 @@ function parseNavItems(raw: any): NavItem[] {
     }
   }
   if (Array.isArray(parsed) && parsed.length > 0) {
-    return parsed.map((item: any, idx: number) => ({
-      id: String(item.id || `nav-${idx}-${item.title}`),
-      title: String(item.title || ''),
-      url: String(item.url || '#'),
-      badge: item.badge ? String(item.badge) : undefined,
-      children: Array.isArray(item.children)
-        ? item.children.map((child: any, cIdx: number) => ({
-            id: String(child.id || `sub-${cIdx}-${child.title}`),
-            title: String(child.title || ''),
-            url: String(child.url || '#'),
-            badge: child.badge ? String(child.badge) : undefined,
-          }))
-        : [],
-    }))
+    return parsed.map((item: any, idx: number) => {
+      let url = String(item.url || '#')
+      // Safeguard: Ensure HOME always directs to root / if mistakenly pointed to test/other pages
+      if ((item.id === 'm-home' || String(item.title || '').trim().toUpperCase() === 'HOME') && url.includes('test')) {
+        url = '/'
+      }
+      return {
+        id: String(item.id || `nav-${idx}-${item.title}`),
+        title: String(item.title || ''),
+        url,
+        badge: item.badge ? String(item.badge) : undefined,
+        children: Array.isArray(item.children)
+          ? item.children.map((child: any, cIdx: number) => ({
+              id: String(child.id || `sub-${cIdx}-${child.title}`),
+              title: String(child.title || ''),
+              url: String(child.url || '#'),
+              badge: child.badge ? String(child.badge) : undefined,
+            }))
+          : [],
+      }
+    })
   }
   return []
 }
@@ -79,9 +86,11 @@ export function SiteHeader({ onOpenQuoteModal, config: initialConfig }: SiteHead
 
   // Client-side auto-sync to ensure changes saved in Admin reflect in real-time
   useEffect(() => {
+    let isMounted = true
     fetch('/api/site-config', { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
+        if (!isMounted) return
         if (data) {
           setConfig(data)
           if (data.navLinks) {
@@ -93,6 +102,10 @@ export function SiteHeader({ onOpenQuoteModal, config: initialConfig }: SiteHead
         }
       })
       .catch(() => {})
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   const logoUrl = config?.logoUrl || '/silky-logo.png'
@@ -116,18 +129,18 @@ export function SiteHeader({ onOpenQuoteModal, config: initialConfig }: SiteHead
       onMouseLeave={() => setHoveredMenuId(null)}
     >
       {/* Executive Top Announcement & Credentials Bar (#141414) */}
-      <div className="bg-[#141414] text-gray-300 text-xs py-2 px-4 sm:px-8 border-b border-[#262626]">
-        <div className="max-w-[1400px] mx-auto flex items-center justify-between gap-4">
+      <div className="bg-[#141414] text-gray-300 text-xs py-1.5 sm:py-2 px-3 sm:px-6 lg:px-8 border-b border-[#262626]">
+        <div className="max-w-[1400px] mx-auto flex items-center justify-between gap-2 sm:gap-4">
           {/* Left Trust Statement */}
-          <div className="flex items-center space-x-2 text-gray-300 font-medium overflow-hidden">
-            <span className="w-2 h-2 rounded-full bg-[#1C7A4C] animate-pulse shrink-0" />
+          <div className="flex items-center space-x-1.5 sm:space-x-2 text-gray-300 font-medium overflow-hidden min-w-0">
+            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#1C7A4C] animate-pulse shrink-0" />
             <span className="text-[10px] sm:text-xs truncate">
               {config?.topBarText || 'Dubai Master Atelier (Est. 1963) • ISO 9001:2015 Certified'}
             </span>
           </div>
 
           {/* Right Direct Contacts & WhatsApp Pill */}
-          <div className="flex items-center space-x-3 sm:space-x-5 shrink-0">
+          <div className="flex items-center space-x-2 sm:space-x-5 shrink-0">
             <a
               href={`tel:${phone.replace(/\s+/g, '')}`}
               className="hidden md:flex items-center space-x-1.5 text-xs text-gray-300 hover:text-[#D97A42] transition-colors font-medium"
@@ -140,34 +153,34 @@ export function SiteHeader({ onOpenQuoteModal, config: initialConfig }: SiteHead
               href={`https://wa.me/${whatsapp}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 bg-[#25D366]/10 border border-[#25D366]/40 text-[#25D366] hover:bg-[#25D366] hover:text-white px-2.5 sm:px-3 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold transition-all shadow-xs"
+              className="inline-flex items-center gap-1 sm:gap-1.5 bg-[#25D366]/10 border border-[#25D366]/40 text-[#25D366] hover:bg-[#25D366] hover:text-white px-2 py-0.5 sm:px-3 sm:py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold transition-all shadow-xs shrink-0"
             >
-              <FaWhatsapp className="w-3.5 h-3.5" />
-              <span>WhatsApp Direct</span>
+              <FaWhatsapp className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              <span>WhatsApp<span className="hidden sm:inline"> Direct</span></span>
             </a>
           </div>
         </div>
       </div>
 
       {/* Main Glassmorphic Navigation Bar (#1A1A1A) */}
-      <div className="bg-[#1A1A1A]/95 backdrop-blur-xl text-white border-b border-[#292929] py-3.5 px-4 sm:px-8 shadow-2xl relative">
-        <div className="max-w-[1400px] mx-auto flex items-center justify-between gap-6">
+      <div className="bg-[#1A1A1A]/95 backdrop-blur-xl text-white border-b border-[#292929] py-2.5 sm:py-3.5 px-3 sm:px-6 lg:px-8 shadow-2xl relative">
+        <div className="max-w-[1400px] mx-auto flex items-center justify-between gap-3 sm:gap-6">
           {/* Mobile Menu Toggle & Logo */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-1.5 text-gray-300 hover:text-[#D97A42] focus:outline-none cursor-pointer"
+              className="lg:hidden p-1.5 -ml-1 text-gray-300 hover:text-[#D97A42] focus:outline-none cursor-pointer shrink-0"
               aria-label="Toggle Navigation"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
             </button>
 
             {/* Pure Logo Image Only */}
-            <a href="/" className="flex items-center group">
+            <a href="/" className="flex items-center group shrink-0">
               <img
                 src={logoUrl}
                 alt={config?.logoAlt || 'Silky Logo'}
-                className="h-10 sm:h-14 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                className="h-8 xs:h-9 sm:h-12 md:h-14 max-h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
               />
             </a>
           </div>
@@ -216,15 +229,15 @@ export function SiteHeader({ onOpenQuoteModal, config: initialConfig }: SiteHead
           </nav>
 
           {/* Right Action: Request Quote Button */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.96 }}
               onClick={onOpenQuoteModal}
-              className="bg-[#D97A42] hover:bg-[#c46833] text-white font-bold text-xs uppercase tracking-widest px-6 sm:px-7 py-3 rounded-full shadow-lg shadow-[#D97A42]/20 transition-all duration-300 flex items-center gap-2 cursor-pointer"
+              className="bg-[#D97A42] hover:bg-[#c46833] text-white font-bold text-[11px] sm:text-xs uppercase tracking-wider sm:tracking-widest px-3.5 py-2 sm:px-6 sm:py-2.5 md:px-7 md:py-3 rounded-full shadow-lg shadow-[#D97A42]/20 transition-all duration-300 flex items-center gap-1.5 sm:gap-2 cursor-pointer"
             >
               <span>Get Quote</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </motion.button>
           </div>
         </div>
@@ -349,16 +362,17 @@ export function SiteHeader({ onOpenQuoteModal, config: initialConfig }: SiteHead
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-[#141414] border-b border-[#292929] text-white px-6 py-6 space-y-4"
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:hidden bg-[#141414] border-b border-[#292929] text-white px-5 sm:px-6 py-5 space-y-5 max-h-[82vh] overflow-y-auto"
           >
-            <div className="space-y-2">
+            <div className="space-y-1.5 divide-y divide-[#262626]/80">
               {navItems.map((item) => {
                 const hasChildren = Boolean(item.children && item.children.length > 0)
                 const isExpanded = mobileExpandedId === item.id
 
                 return (
-                  <div key={item.id} className="border-b border-[#262626] pb-2">
-                    <div className="flex items-center justify-between">
+                  <div key={item.id} className="pt-2 first:pt-0">
+                    <div className="flex items-center justify-between py-1">
                       <a
                         href={hasChildren && item.url === '#' ? '#' : item.url}
                         onClick={(e) => {
@@ -369,7 +383,7 @@ export function SiteHeader({ onOpenQuoteModal, config: initialConfig }: SiteHead
                             setMobileMenuOpen(false)
                           }
                         }}
-                        className="text-sm font-bold text-gray-200 hover:text-[#D97A42] flex-1 py-1"
+                        className="text-sm font-bold text-gray-200 hover:text-[#D97A42] flex-1 py-1.5 transition-colors"
                       >
                         {item.title}
                       </a>
@@ -377,7 +391,7 @@ export function SiteHeader({ onOpenQuoteModal, config: initialConfig }: SiteHead
                         <button
                           type="button"
                           onClick={() => setMobileExpandedId(isExpanded ? null : item.id)}
-                          className="p-1.5 text-gray-400 hover:text-[#D97A42] cursor-pointer"
+                          className="p-2 text-gray-400 hover:text-[#D97A42] cursor-pointer"
                           aria-label={`Toggle ${item.title}`}
                         >
                           <ChevronDown
@@ -396,14 +410,14 @@ export function SiteHeader({ onOpenQuoteModal, config: initialConfig }: SiteHead
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: 'auto' }}
                           exit={{ opacity: 0, height: 0 }}
-                          className="mt-2 pl-3 space-y-1.5 border-l-2 border-[#D97A42]/50"
+                          className="mt-1 pl-3.5 space-y-1 border-l-2 border-[#D97A42]/60 mb-2"
                         >
                           {item.children!.map((child) => (
                             <a
                               key={child.id}
                               href={child.url}
                               onClick={() => setMobileMenuOpen(false)}
-                              className="block text-xs font-semibold text-gray-300 hover:text-[#D97A42] py-1.5 transition-colors"
+                              className="block text-xs font-semibold text-gray-300 hover:text-[#D97A42] py-2 transition-colors"
                             >
                               {child.title}
                             </a>
@@ -414,6 +428,27 @@ export function SiteHeader({ onOpenQuoteModal, config: initialConfig }: SiteHead
                   </div>
                 )
               })}
+            </div>
+
+            {/* Direct Contact Action Strip in Drawer */}
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#262626]">
+              <a
+                href={`tel:${phone.replace(/\s+/g, '')}`}
+                className="flex items-center justify-center gap-2 p-2.5 rounded-xl bg-[#1F1F1F] hover:bg-[#2A2A2A] text-gray-200 border border-[#2D2D2D] text-xs font-bold transition-all"
+              >
+                <Phone className="w-3.5 h-3.5 text-[#D97A42]" />
+                <span>Call Us</span>
+              </a>
+
+              <a
+                href={`https://wa.me/${whatsapp}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 p-2.5 rounded-xl bg-[#25D366]/15 hover:bg-[#25D366]/25 text-[#25D366] border border-[#25D366]/30 text-xs font-bold transition-all"
+              >
+                <FaWhatsapp className="w-3.5 h-3.5" />
+                <span>WhatsApp</span>
+              </a>
             </div>
 
             <button

@@ -63,6 +63,8 @@ class CustomCodeController extends Controller
             'code' => $request->input('code', ''),
             'placement' => $request->input('placement', 'head'), // 'head' | 'body_start' | 'footer'
             'targetDevice' => $request->input('targetDevice', 'all'), // 'all' | 'desktop' | 'mobile'
+            'targetPage' => $request->input('targetPage', 'all'), // 'all' | '/' | '/products/*' | slug
+            'targetSection' => $request->input('targetSection', ''), // '#uniforms', '#hero', etc.
             'isActive' => $request->boolean('isActive', true),
             'isFavorite' => $request->boolean('isFavorite', false),
             'createdAt' => now()->toIso8601String(),
@@ -101,6 +103,8 @@ class CustomCodeController extends Controller
                 $snippet['code'] = $request->input('code', $snippet['code']);
                 $snippet['placement'] = $request->input('placement', $snippet['placement']);
                 $snippet['targetDevice'] = $request->input('targetDevice', $snippet['targetDevice']);
+                $snippet['targetPage'] = $request->input('targetPage', $snippet['targetPage'] ?? 'all');
+                $snippet['targetSection'] = $request->input('targetSection', $snippet['targetSection'] ?? '');
                 if ($request->has('isActive')) {
                     $snippet['isActive'] = $request->boolean('isActive');
                 }

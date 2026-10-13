@@ -54,11 +54,12 @@ export function SiteFooter({ config: initialConfig }: { config?: any } = {}) {
   }, [initialConfig])
 
   useEffect(() => {
+    let isMounted = true
     // 1. Fetch live footer config
     fetch('/api/footer-config', { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (data) setFooterData(data)
+        if (isMounted && data) setFooterData(data)
       })
       .catch(() => {})
 
@@ -66,9 +67,13 @@ export function SiteFooter({ config: initialConfig }: { config?: any } = {}) {
     fetch('/api/site-config', { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (data) setConfig(data)
+        if (isMounted && data) setConfig(data)
       })
       .catch(() => {})
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   const logoUrl = footerData?.logoUrl || config?.logoUrl || '/silky-logo.png'

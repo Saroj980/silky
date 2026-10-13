@@ -1968,13 +1968,14 @@ export function ProductPageClient({ page: initialPage, config: initialConfig }: 
 
   // Live client-side auto-sync to ensure changes saved in Admin reflect immediately without rebuild
   useEffect(() => {
+    let isMounted = true
     const slug = initialPage?.slug
     if (!slug) return
 
     fetch(`/api/product-pages/slug/${slug}`, { cache: 'no-store' })
       .then(res => res.ok ? res.json() : null)
       .then(data => {
-        if (data && data.slug) {
+        if (isMounted && data && data.slug) {
           setCurrentPage(data)
         }
       })
@@ -1983,11 +1984,15 @@ export function ProductPageClient({ page: initialPage, config: initialConfig }: 
     fetch('/api/site-config', { cache: 'no-store' })
       .then(res => res.ok ? res.json() : null)
       .then(data => {
-        if (data && typeof data === 'object') {
+        if (isMounted && data && typeof data === 'object') {
           setCurrentConfig(data)
         }
       })
       .catch(() => {})
+
+    return () => {
+      isMounted = false
+    }
   }, [initialPage?.slug])
 
   const sections = currentPage?.sections || []
@@ -2148,43 +2153,67 @@ export function ProductSectionLiveRenderer({ sectionType, data }: { sectionType:
     } catch (e) {}
   }
 
-  switch (sectionType) {
-    case 'HERO':
-      return <ProductHeroSection data={parsedData} onOpenQuote={() => {}} />
-    case 'SPECS_MATRIX':
-      return <SpecsMatrixSection data={parsedData} />
-    case 'CUSTOMIZATION':
-      return <CustomizationShowcaseSection data={parsedData} />
-    case 'SECTORS':
-    case 'UNIFORM_SOLUTIONS':
-      return <SectorsSection data={parsedData} onOpenQuote={() => {}} />
-    case 'FABRIC_SWATCHES':
-      return <FabricSwatchesSection data={parsedData} onOpenQuote={() => {}} />
-    case 'QUALITY_CONTROL':
-      return <QualityCraftsmanshipSection data={parsedData} />
-    case 'BULK_PRICING':
-      return <BulkPricingTiersSection data={parsedData} onOpenQuote={() => {}} />
-    case 'LOGISTICS':
-      return <LogisticsCoverageSection data={parsedData} />
-    case 'TESTIMONIALS':
-      return <ClientTestimonialsSection data={parsedData} />
-    case 'FAQ':
-      return (
-        <ProductFaqSection
-          data={parsedData}
-          openIndex={openFaqIndex}
-          onToggle={(idx) => setOpenFaqIndex(openFaqIndex === idx ? null : idx)}
-        />
-      )
-    case 'QUOTE_BAND':
-      return <QuoteBandSection data={parsedData} onOpenQuote={() => {}} />
-    default:
-      return (
-        <div className="p-8 text-center text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-          No live preview available for section type: {sectionType}
-        </div>
-      )
+  const sectionIdMap: Record<string, string> = {
+    HERO: 'product-hero',
+    SPECS_MATRIX: 'specs-matrix',
+    CUSTOMIZATION: 'customization',
+    SECTORS: 'sectors',
+    UNIFORM_SOLUTIONS: 'sectors',
+    FABRIC_SWATCHES: 'fabric-swatches',
+    QUALITY_CONTROL: 'quality-control',
+    BULK_PRICING: 'bulk-pricing',
+    LOGISTICS: 'logistics',
+    TESTIMONIALS: 'testimonials',
+    FAQ: 'faq',
+    QUOTE_BAND: 'quote-band',
   }
+
+  const renderContent = () => {
+    switch (sectionType) {
+      case 'HERO':
+        return <ProductHeroSection data={parsedData} onOpenQuote={() => {}} />
+      case 'SPECS_MATRIX':
+        return <SpecsMatrixSection data={parsedData} />
+      case 'CUSTOMIZATION':
+        return <CustomizationShowcaseSection data={parsedData} />
+      case 'SECTORS':
+      case 'UNIFORM_SOLUTIONS':
+        return <SectorsSection data={parsedData} onOpenQuote={() => {}} />
+      case 'FABRIC_SWATCHES':
+        return <FabricSwatchesSection data={parsedData} onOpenQuote={() => {}} />
+      case 'QUALITY_CONTROL':
+        return <QualityCraftsmanshipSection data={parsedData} />
+      case 'BULK_PRICING':
+        return <BulkPricingTiersSection data={parsedData} onOpenQuote={() => {}} />
+      case 'LOGISTICS':
+        return <LogisticsCoverageSection data={parsedData} />
+      case 'TESTIMONIALS':
+        return <ClientTestimonialsSection data={parsedData} />
+      case 'FAQ':
+        return (
+          <ProductFaqSection
+            data={parsedData}
+            openIndex={openFaqIndex}
+            onToggle={(idx) => setOpenFaqIndex(openFaqIndex === idx ? null : idx)}
+          />
+        )
+      case 'QUOTE_BAND':
+        return <QuoteBandSection data={parsedData} onOpenQuote={() => {}} />
+      default:
+        return (
+          <div className="p-8 text-center text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+            No live preview available for section type: {sectionType}
+          </div>
+        )
+    }
+  }
+
+  const secId = sectionIdMap[sectionType] || sectionType.toLowerCase().replace(/_/g, '-')
+  return (
+    <div id={secId} data-section-type={sectionType}>
+      {renderContent()}
+    </div>
+  )
 }
 
 

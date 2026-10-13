@@ -146,9 +146,9 @@ export function HeroSection({
 
   return (
     <section
-      id="home"
+      id="hero"
       aria-label="Silky Textiles Hero Slider"
-      className="relative w-full min-h-[90vh] md:min-h-[86vh] overflow-hidden bg-[#181818] select-none flex items-center"
+      className="relative w-full min-h-[380px] sm:min-h-[460px] md:min-h-[78vh] lg:min-h-[84vh] max-h-[420px] sm:max-h-[500px] md:max-h-none overflow-hidden bg-[#181818] select-none flex items-center"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -189,26 +189,26 @@ export function HeroSection({
         }}
       />
 
-      {/* Large Outer Circular Navigation Button (<) */}
+      {/* Outer Circular Navigation Button (<) */}
       <button
         onClick={prev}
         aria-label="Previous Slide"
-        className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 sm:w-14 sm:h-14 bg-[#D97A42] hover:bg-[#c46833] text-white rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 focus:outline-none"
+        className="absolute left-1.5 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-7 h-7 sm:w-12 sm:h-12 bg-[#D97A42]/90 hover:bg-[#c46833] text-white rounded-full flex items-center justify-center shadow-xl transition-all duration-300 hover:scale-110 active:scale-95 focus:outline-none"
       >
-        <ChevronLeft className="w-8 h-8 stroke-[3]" />
+        <ChevronLeft className="w-4 h-4 sm:w-7 sm:h-7 stroke-[2.5]" />
       </button>
 
-      {/* Large Outer Circular Navigation Button (>) */}
+      {/* Outer Circular Navigation Button (>) */}
       <button
         onClick={next}
         aria-label="Next Slide"
-        className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 sm:w-14 sm:h-14 bg-[#D97A42] hover:bg-[#c46833] text-white rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 focus:outline-none"
+        className="absolute right-1.5 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-7 h-7 sm:w-12 sm:h-12 bg-[#D97A42]/90 hover:bg-[#c46833] text-white rounded-full flex items-center justify-center shadow-xl transition-all duration-300 hover:scale-110 active:scale-95 focus:outline-none"
       >
-        <ChevronRight className="w-8 h-8 stroke-[3]" />
+        <ChevronRight className="w-4 h-4 sm:w-7 sm:h-7 stroke-[2.5]" />
       </button>
 
       {/* Minimal, Spacious Editorial Content Overlay */}
-      <div className="relative z-20 max-w-[1380px] mx-auto px-6 sm:px-10 w-full py-16 sm:py-24 lg:py-28">
+      <div className="relative z-20 max-w-[1380px] mx-auto px-9 sm:px-14 lg:px-16 w-full py-6 sm:py-20 lg:py-24">
         <AnimatePresence mode="wait">
           <motion.div
             key={index}
@@ -218,8 +218,8 @@ export function HeroSection({
             className="max-w-2xl text-left"
           >
             {/* Eyebrow Tagline */}
-            <motion.div variants={childItem} className="mb-4">
-              <span className="text-xs font-extrabold uppercase tracking-[0.25em] text-[#D97A42] font-sans">
+            <motion.div variants={childItem} className="mb-1.5 sm:mb-4">
+              <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-[0.16em] sm:tracking-[0.25em] text-[#D97A42] font-sans">
                 {currentSlide.tagline}
               </span>
             </motion.div>
@@ -227,10 +227,10 @@ export function HeroSection({
             {/* Breathtaking Headline */}
             <motion.h1
               variants={childItem}
-              className="text-3xl sm:text-5xl lg:text-[62px] font-black leading-[1.06] tracking-tight text-white font-sans"
+              className="text-xl sm:text-4xl md:text-5xl lg:text-[62px] font-black leading-[1.12] sm:leading-[1.06] tracking-tight text-white font-sans"
             >
               {currentSlide.titleLine1}
-              <span className="block text-[#D97A42] text-3xl sm:text-5xl lg:text-[62px] font-black mt-1 drop-shadow-md">
+              <span className="block text-[#D97A42] text-xl sm:text-4xl md:text-5xl lg:text-[62px] font-black mt-0.5 sm:mt-1 drop-shadow-md">
                 {currentSlide.highlightText}
               </span>
             </motion.h1>
@@ -238,34 +238,34 @@ export function HeroSection({
             {/* Description (2 lines, clean & readable) */}
             <motion.p
               variants={childItem}
-              className="mt-5 text-sm sm:text-base font-medium leading-relaxed text-gray-200/90 max-w-xl font-sans"
+              className="mt-2 sm:mt-5 text-[11px] sm:text-base font-medium leading-snug sm:leading-relaxed text-gray-200/90 max-w-xl font-sans line-clamp-2 sm:line-clamp-none"
             >
               {currentSlide.description}
             </motion.p>
 
-            {/* CTAs */}
-            <motion.div variants={childItem} className="mt-9 flex items-center gap-4 flex-wrap">
+            {/* CTAs - Single row side-by-side on mobile */}
+            <motion.div variants={childItem} className="mt-3.5 sm:mt-9 flex items-center gap-2 sm:gap-4 flex-nowrap">
               {currentSlide.primaryBtnHref && currentSlide.primaryBtnHref !== '#modal' && currentSlide.primaryBtnHref !== '#quote' ? (
                 <a
                   href={currentSlide.primaryBtnHref}
-                  className="group inline-flex items-center gap-2.5 bg-[#D97A42] hover:bg-[#c46833] px-8 py-4 font-sans text-xs font-bold uppercase tracking-widest text-white shadow-xl transition-all duration-300 hover:scale-105"
+                  className="group inline-flex items-center justify-center gap-1.5 bg-[#D97A42] hover:bg-[#c46833] px-3.5 py-2 sm:px-8 sm:py-4 font-sans text-[11px] sm:text-xs font-bold uppercase tracking-wider sm:tracking-widest text-white shadow-xl transition-all duration-300 hover:scale-105 whitespace-nowrap shrink-0"
                 >
                   <span>{currentSlide.primaryBtnText}</span>
-                  <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                  <ArrowUpRight className="w-3 h-3 sm:w-4 sm:h-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                 </a>
               ) : (
                 <button
                   onClick={onOpenQuoteModal}
-                  className="group inline-flex items-center gap-2.5 bg-[#D97A42] hover:bg-[#c46833] px-8 py-4 font-sans text-xs font-bold uppercase tracking-widest text-white shadow-xl transition-all duration-300 hover:scale-105"
+                  className="group inline-flex items-center justify-center gap-1.5 bg-[#D97A42] hover:bg-[#c46833] px-3.5 py-2 sm:px-8 sm:py-4 font-sans text-[11px] sm:text-xs font-bold uppercase tracking-wider sm:tracking-widest text-white shadow-xl transition-all duration-300 hover:scale-105 whitespace-nowrap shrink-0"
                 >
                   <span>{currentSlide.primaryBtnText}</span>
-                  <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                  <ArrowUpRight className="w-3 h-3 sm:w-4 sm:h-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                 </button>
               )}
 
               <a
                 href={currentSlide.secondaryBtnHref || '#services'}
-                className="group inline-flex items-center gap-2 border border-white/40 hover:border-[#D97A42] hover:bg-[#D97A42] px-7 py-4 font-sans text-xs font-bold uppercase tracking-widest text-white backdrop-blur-sm transition-all"
+                className="group inline-flex items-center justify-center gap-1 border border-white/40 hover:border-[#D97A42] hover:bg-[#D97A42] px-3 py-2 sm:px-7 sm:py-4 font-sans text-[11px] sm:text-xs font-bold uppercase tracking-wider sm:tracking-widest text-white backdrop-blur-sm transition-all whitespace-nowrap shrink-0"
               >
                 <span>{currentSlide.secondaryBtnText}</span>
               </a>
@@ -277,15 +277,15 @@ export function HeroSection({
 
       {/* Slide Navigation Dots & Auto-Play Progress Bar (Bottom Left Gutter) */}
       {total > 1 && (
-        <div className="absolute bottom-8 left-6 sm:left-12 lg:left-16 z-30 flex items-center gap-6">
-          <div className="flex items-center gap-2.5">
+        <div className="absolute bottom-2.5 sm:bottom-8 left-9 sm:left-12 lg:left-16 z-30 flex items-center gap-3 sm:gap-6">
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
             {activeSlides.map((_, i) => (
               <button
                 key={i}
                 onClick={() => goTo(i)}
                 aria-label={`Go to slide ${i + 1}`}
-                className="group relative h-2.5 overflow-hidden rounded-full transition-all duration-300"
-                style={{ width: i === index ? 44 : 12 }}
+                className="group relative h-1.5 sm:h-2.5 overflow-hidden rounded-full transition-all duration-300"
+                style={{ width: i === index ? 24 : 6 }}
               >
                 <span className="absolute inset-0 rounded-full bg-white/30" />
                 {i === index && (
@@ -304,7 +304,7 @@ export function HeroSection({
             ))}
           </div>
 
-          <span className="text-xs font-bold tracking-widest text-gray-400 font-sans hidden sm:inline">
+          <span className="text-[10px] sm:text-xs font-bold tracking-widest text-gray-400 font-sans hidden sm:inline">
             0{index + 1} / 0{total}
           </span>
         </div>

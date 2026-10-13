@@ -6,6 +6,10 @@
 function getPhpApiUrl(): string {
   // Client-side: use the URL embedded at build time (injected via layout.tsx)
   if (typeof window !== 'undefined') {
+    // If testing on localhost, ALWAYS use local '/api'
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return '/api'
+    }
     const envUrl = (window as any).__NEXT_PUBLIC_LARAVEL_API_URL__
     if (envUrl && typeof envUrl === 'string' && envUrl.startsWith('http')) {
       try {
@@ -362,6 +366,8 @@ export interface CustomCodeSnippet {
   code: string
   placement: 'head' | 'body_start' | 'footer'
   targetDevice: 'all' | 'desktop' | 'mobile'
+  targetPage?: string
+  targetSection?: string
   isActive: boolean
   isFavorite?: boolean
   createdAt?: string
@@ -370,8 +376,12 @@ export interface CustomCodeSnippet {
 
 export async function getCustomCodeSnippets(activeOnly: boolean = false): Promise<CustomCodeSnippet[]> {
   try {
-    const url = `${getPhpApiUrl()}/custom-code${activeOnly ? '?active_only=1' : ''}`
-    const res = await fetch(url, getFetchOptions())
+    const query = activeOnly ? '?active_only=1' : ''
+    const primaryUrl = `${getPhpApiUrl()}/custom-code${query}`
+    let res = await fetch(primaryUrl, getFetchOptions())
+    if (res.status === 404 && primaryUrl !== `/api/custom-code${query}`) {
+      res = await fetch(`/api/custom-code${query}`, getFetchOptions())
+    }
     const json = await safeJson(res)
     if (json && Array.isArray(json)) return json
   } catch (err) {
@@ -381,40 +391,68 @@ export async function getCustomCodeSnippets(activeOnly: boolean = false): Promis
 }
 
 export async function createCustomCodeSnippet(snippet: Partial<CustomCodeSnippet>) {
-  const res = await fetch(`${getPhpApiUrl()}/custom-code`, {
+  const primaryUrl = `${getPhpApiUrl()}/custom-code`
+  let res = await fetch(primaryUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(snippet),
   })
+  if (res.status === 404 && primaryUrl !== '/api/custom-code') {
+    res = await fetch('/api/custom-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(snippet),
+    })
+  }
   const json = await safeJson(res)
   if (!json) throw new Error(`createCustomCodeSnippet HTTP ${res.status}`)
   return json
 }
 
 export async function updateCustomCodeSnippet(id: string, snippet: Partial<CustomCodeSnippet>) {
-  const res = await fetch(`${getPhpApiUrl()}/custom-code/${id}`, {
+  const primaryUrl = `${getPhpApiUrl()}/custom-code/${id}`
+  let res = await fetch(primaryUrl, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(snippet),
   })
+  if (res.status === 404 && primaryUrl !== `/api/custom-code/${id}`) {
+    res = await fetch(`/api/custom-code/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(snippet),
+    })
+  }
   const json = await safeJson(res)
   if (!json) throw new Error(`updateCustomCodeSnippet HTTP ${res.status}`)
   return json
 }
 
 export async function toggleCustomCodeSnippet(id: string) {
-  const res = await fetch(`${getPhpApiUrl()}/custom-code/${id}/toggle`, {
+  const primaryUrl = `${getPhpApiUrl()}/custom-code/${id}/toggle`
+  let res = await fetch(primaryUrl, {
     method: 'PATCH',
   })
+  if (res.status === 404 && primaryUrl !== `/api/custom-code/${id}/toggle`) {
+    res = await fetch(`/api/custom-code/${id}/toggle`, {
+      method: 'PATCH',
+    })
+  }
   const json = await safeJson(res)
   if (!json) throw new Error(`toggleCustomCodeSnippet HTTP ${res.status}`)
   return json
 }
 
 export async function deleteCustomCodeSnippet(id: string) {
-  const res = await fetch(`${getPhpApiUrl()}/custom-code/${id}`, {
+  const primaryUrl = `${getPhpApiUrl()}/custom-code/${id}`
+  let res = await fetch(primaryUrl, {
     method: 'DELETE',
   })
+  if (res.status === 404 && primaryUrl !== `/api/custom-code/${id}`) {
+    res = await fetch(`/api/custom-code/${id}`, {
+      method: 'DELETE',
+    })
+  }
   const json = await safeJson(res)
   if (!json) throw new Error(`deleteCustomCodeSnippet HTTP ${res.status}`)
   return json

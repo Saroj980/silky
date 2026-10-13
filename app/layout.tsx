@@ -44,6 +44,7 @@ export const viewport: Viewport = {
   themeColor: '#2B241E',
 }
 
+import Script from 'next/script'
 import { CustomCodeInjector } from '@/components/custom-code-injector'
 
 export default function RootLayout({
@@ -56,16 +57,19 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${poppins.variable} ${montserrat.variable} bg-[#FBF7F2] text-[#2B241E] scroll-smooth`}
+      suppressHydrationWarning
     >
       <head>
         {/* Embed the Laravel API URL so client-side JS can reach PHP backend from static export */}
-        <script
+        <Script
+          id="laravel-api-url"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `window.__NEXT_PUBLIC_LARAVEL_API_URL__ = ${JSON.stringify(laravelApiUrl)};`,
           }}
         />
       </head>
-      <body className="antialiased selection:bg-[#D97A42] selection:text-white font-sans">
+      <body className="antialiased selection:bg-[#D97A42] selection:text-white font-sans" suppressHydrationWarning>
         <CustomCodeInjector />
         {children}
       </body>

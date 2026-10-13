@@ -1,10 +1,25 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { CustomCodeSnippet, getCustomCodeSnippets } from '@/lib/laravel-api'
+
+function matchesPage(targetPage: string | undefined, currentPath: string): boolean {
+  if (!targetPage || targetPage === 'all') return true
+  const cleanCurrent = (currentPath || '/').trim()
+  if (targetPage === '/' && (cleanCurrent === '/' || cleanCurrent === '')) return true
+  if (targetPage === '/products/*' && cleanCurrent.startsWith('/products')) return true
+
+  // Normalize leading slash for comparison
+  const normTarget = targetPage.startsWith('/') ? targetPage : `/${targetPage}`
+  const normCurrent = cleanCurrent.startsWith('/') ? cleanCurrent : `/${cleanCurrent}`
+
+  return normTarget === normCurrent
+}
 
 export function CustomCodeInjector() {
   const [snippets, setSnippets] = useState<CustomCodeSnippet[]>([])
+  const pathname = usePathname() || '/'
 
   useEffect(() => {
     // Fetch live active snippets on mount
@@ -22,13 +37,19 @@ export function CustomCodeInjector() {
   useEffect(() => {
     if (typeof document === 'undefined' || !snippets.length) return
 
-    const appliedIds = new Set<string>()
-
     snippets.forEach((snip) => {
-      if (!snip.isActive || !snip.code?.trim()) return
-
       const elementId = `custom-code-${snip.id}`
-      appliedIds.add(elementId)
+      const isTargetPage = matchesPage(snip.targetPage, pathname)
+
+      // If snippet is inactive or does not match current page, clean it up if present
+      if (!snip.isActive || !snip.code?.trim() || !isTargetPage) {
+        const existing = document.getElementById(elementId)
+        if (existing) existing.remove()
+
+        // Also clean up multi-node html tags if any
+        document.querySelectorAll(`[id^="${elementId}-"]`).forEach((el) => el.remove())
+        return
+      }
 
       // ─── 1. CSS ─────────────────────────────────────────────────────────────
       if (snip.codeType === 'css') {
@@ -109,12 +130,7 @@ export function CustomCodeInjector() {
         }
       }
     })
-
-    // Cleanup: remove any previously applied elements that are now inactive or deleted
-    return () => {
-      // (Styles update in-place; elements tagged with custom-code can be cleaned up on unmount)
-    }
-  }, [snippets])
+  }, [snippets, pathname])
 
   return null
 }
