@@ -64,15 +64,13 @@ export async function createPageSection(type: string, data: any) {
   }
 }
 
-export async function updatePageSection(id: number, dataStr: string, isActive: boolean) {
+export async function updatePageSection(id: number, type: string, dataStr: string, isActive: boolean) {
   try {
-    const updatedSection = await laravelApi.updatePageSection(id, dataStr, isActive)
-    safeRevalidate('/')
-    safeRevalidate('/admin')
+    const updatedSection = await laravelApi.updatePageSection(id, type, dataStr, isActive)
     return updatedSection
   } catch (err) {
     console.error('Error updating page section:', err)
-    return { id, data: dataStr, isActive }
+    return { id, type, data: dataStr, isActive }
   }
 }
 

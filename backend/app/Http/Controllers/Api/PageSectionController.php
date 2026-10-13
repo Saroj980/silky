@@ -26,22 +26,48 @@ class PageSectionController extends Controller
         $newOrder = $lastSection ? $lastSection->order + 1 : 1;
 
         $section = PageSection::create([
-            'type' => $type,
-            'order' => $newOrder,
-            'data' => $data ?? '{}',
+            'type'     => $type,
+            'order'    => $newOrder,
+            'data'     => $data ?? '{}',
             'isActive' => true,
         ]);
 
         return response()->json($section, 201);
     }
 
+    /**
+     * Update a page section.
+     * Strategy (robust upsert):
+     *  1. Try to find by the given $id.
+     *  2. If not found by ID, look up by 'type' sent in the request body.
+     *  3. If still not found, CREATE a new record (so first publish always works).
+     */
     public function update(Request $request, $id)
     {
-        $section = PageSection::findOrFail($id);
+        // 1. Try find by primary key
+        $section = PageSection::find($id);
+
+        // 2. Fallback: find by type
+        if (!$section && $request->has('type')) {
+            $section = PageSection::where('type', $request->input('type'))->first();
+        }
+
+        // 3. Still nothing — create it fresh
+        if (!$section) {
+            $type = $request->input('type', 'CUSTOM');
+            $lastSection = PageSection::orderBy('order', 'desc')->first();
+            $newOrder    = $lastSection ? $lastSection->order + 1 : 1;
+
+            $section = new PageSection();
+            $section->type     = $type;
+            $section->order    = $newOrder;
+            $section->isActive = true;
+            $section->data     = '{}';
+        }
 
         if ($request->has('data')) {
-            $data = $request->input('data');
-            $section->data = is_array($data) ? json_encode($data) : $data;
+            $data           = $request->input('data');
+            $section->data  = is_array($data) ? json_encode($data) : $data;
         }
 
         if ($request->has('isActive')) {
@@ -69,8 +95,10 @@ class PageSectionController extends Controller
 
     public function destroy($id)
     {
-        $section = PageSection::findOrFail($id);
-        $section->delete();
+        $section = PageSection::find($id);
+        if ($section) {
+            $section->delete();
+        }
         return response()->json(['success' => true]);
     }
 }

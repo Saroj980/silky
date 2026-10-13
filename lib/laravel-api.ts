@@ -121,12 +121,13 @@ export async function createPageSection(type: string, data: any) {
   return json
 }
 
-export async function updatePageSection(id: number, dataStr: string, isActive: boolean) {
+export async function updatePageSection(id: number, type: string, dataStr: string, isActive: boolean) {
   // PHP route: PUT /api/page-sections/{id}
+  // Also sends 'type' so PHP can upsert by type if ID doesn't exist in MySQL yet
   const res = await fetch(`${getPhpApiUrl()}/page-sections/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ data: dataStr, isActive }),
+    body: JSON.stringify({ type, data: dataStr, isActive }),
   })
   const json = await safeJson(res)
   if (!json) throw new Error(`updatePageSection HTTP ${res.status}`)

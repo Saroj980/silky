@@ -312,9 +312,11 @@ function ensureAllHomepageSections(existingSections: any[]) {
         mergedData.testimonials = parsedDefData.testimonials
       }
 
-      return { ...def, ...ex, data: JSON.stringify(mergedData) }
+      // IMPORTANT: preserve the real DB id (ex.id), not the hardcoded default id (def.id)
+      return { ...def, ...ex, id: ex.id, data: JSON.stringify(mergedData) }
     }
-    return { ...def }
+    // No DB record for this type yet — return default but with no id so PHP creates it fresh
+    return { ...def, id: def.id }
   })
 }
 
@@ -434,11 +436,12 @@ export function ClientDashboard({
     startingProductPages[0]?.slug || 'pure-cotton-shirts-supplier-in-uae'
   )
 
-  // Fetch live product pages from Laravel API / MySQL on client mount
+  // Fetch live product pages from PHP Laravel API on client mount
   useEffect(() => {
     async function fetchLiveProductPages() {
       try {
-        const res = await fetch('/api/product-pages')
+        const laravelUrl = (window as any).__NEXT_PUBLIC_LARAVEL_API_URL__ || `${window.location.origin}/api`
+        const res = await fetch(`${laravelUrl}/product-pages`)
         if (res.ok) {
           const data = await res.json()
           if (Array.isArray(data) && data.length > 0) {
@@ -451,10 +454,50 @@ export function ClientDashboard({
           }
         }
       } catch (err) {
-        console.warn('API /api/product-pages fetch error:', err)
+        console.warn('PHP API product-pages fetch error:', err)
       }
     }
     fetchLiveProductPages()
+  }, [])
+
+  // Fetch live slides + homepage sections from PHP Laravel API on client mount
+  // This ensures we always have the real DB IDs — not the build-time Prisma IDs
+  useEffect(() => {
+    async function fetchLiveHomepageData() {
+      try {
+        const laravelUrl = (window as any).__NEXT_PUBLIC_LARAVEL_API_URL__ || `${window.location.origin}/api`
+
+        // Fetch hero slides
+        const slidesRes = await fetch(`${laravelUrl}/hero-slides`)
+        if (slidesRes.ok) {
+          const slidesData = await slidesRes.json()
+          if (Array.isArray(slidesData) && slidesData.length > 0) {
+            setSlides(slidesData.map(parseSlideData))
+          }
+        }
+
+        // Fetch homepage page sections
+        const sectionsRes = await fetch(`${laravelUrl}/page-sections`)
+        if (sectionsRes.ok) {
+          const sectionsData = await sectionsRes.json()
+          if (Array.isArray(sectionsData) && sectionsData.length > 0) {
+            setHomepageSections(ensureAllHomepageSections(sectionsData))
+          }
+        }
+
+        // Fetch site config
+        const configRes = await fetch(`${laravelUrl}/site-config`)
+        if (configRes.ok) {
+          const configData = await configRes.json()
+          if (configData && configData.id) {
+            setConfig(configData)
+          }
+        }
+      } catch (err) {
+        console.warn('PHP API homepage data fetch error:', err)
+      }
+    }
+    fetchLiveHomepageData()
   }, [])
 
   const [productPageViewMode, setProductPageViewMode] = useState<'list' | 'editor'>('list')
@@ -938,7 +981,7 @@ export function ClientDashboard({
 
         // 2. Save all homepage sections
         for (const sec of homepageSections) {
-          await updatePageSection(sec.id, sec.data || '{}', sec.isActive ?? true)
+          await updatePageSection(sec.id, sec.type, sec.data || '{}', sec.isActive ?? true)
         }
 
         // 3. Save global config
