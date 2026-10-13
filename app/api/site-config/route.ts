@@ -37,6 +37,8 @@ export async function PUT(req: Request) {
         ...(body.textColor && { textColor: body.textColor }),
         ...(body.headingFont && { headingFont: body.headingFont }),
         ...(body.bodyFont && { bodyFont: body.bodyFont }),
+        customFontUrl: body.customFontUrl !== undefined ? body.customFontUrl : null,
+        customFontFamily: body.customFontFamily !== undefined ? body.customFontFamily : null,
       },
       create: {
         id: targetId,
@@ -55,6 +57,8 @@ export async function PUT(req: Request) {
         textColor: body.textColor || '#1F2A37',
         headingFont: body.headingFont || 'inter',
         bodyFont: body.bodyFont || 'inter',
+        customFontUrl: body.customFontUrl || null,
+        customFontFamily: body.customFontFamily || null,
       },
     })
     return NextResponse.json(updated)

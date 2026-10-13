@@ -13,7 +13,7 @@ import { ContactBand } from '@/components/contact-band'
 import { SiteHeader } from '@/components/site-header'
 import { updateSlide, createSlide, deleteSlide, updateSiteConfig, updatePageSection, updateSectionOrder, saveProductPageSectionsAction, createProductPageAction, deleteProductPageAction } from './actions'
 import { getProductPageBySlug } from '@/lib/laravel-api'
-import { Plus, Trash2, Save, Layout, Settings, Image as ImageIcon, UploadCloud, Monitor, Menu, Search, Bell, HelpCircle, FileText, ShoppingBag, FolderTree, BookOpen, Briefcase, Activity, FolderOpen, Users as UsersIcon, ExternalLink, ChevronDown, ChevronLeft, ChevronRight, Check, ArrowUp, ArrowDown, Layers, Move, Sliders, LogOut, Lock, ShieldCheck, Eye, EyeOff, UserCheck, ArrowRight, ArrowLeft, Edit3, Filter, Copy, CopyCheck, Tag, Shirt, Columns, Smartphone, ZoomIn, ZoomOut, Maximize2, RotateCcw, GripVertical, PanelBottom, Code } from 'lucide-react'
+import { Plus, Trash2, Save, Layout, Settings, Image as ImageIcon, UploadCloud, Monitor, Menu, Search, Bell, HelpCircle, FileText, ShoppingBag, FolderTree, BookOpen, Briefcase, Activity, FolderOpen, Users as UsersIcon, ExternalLink, ChevronDown, ChevronLeft, ChevronRight, Check, ArrowUp, ArrowDown, Layers, Move, Sliders, LogOut, Lock, ShieldCheck, Eye, EyeOff, UserCheck, ArrowRight, ArrowLeft, Edit3, Filter, Copy, CopyCheck, Tag, Shirt, Columns, Smartphone, ZoomIn, ZoomOut, Maximize2, RotateCcw, GripVertical, PanelBottom, Code, Type, Link2, Terminal, Globe, Palette } from 'lucide-react'
 import { CategoryShowcaseEditor, UniformSolutionsEditor, OurWorkEditor, WhySilkyEditor, ProcessEditor, TestimonialsEditor, ContactBandEditor, SpecsMatrixEditor, FaqEditor, FabricSwatchesEditor, QualityControlEditor, BulkPricingEditor, LogisticsEditor, ProductHeroEditor, CustomizationEditor } from './section-editors'
 import { WordPressMenuManager } from './menu-manager'
 import { UserManager, getUserList, UserItem } from './user-manager'
@@ -439,6 +439,28 @@ export function ClientDashboard({
     initialSlides.map(parseSlideData)
   )
   const [config, setConfig] = useState(initialConfig || {})
+  const [fontTab, setFontTab] = useState<'preset' | 'custom'>(() => {
+    return (initialConfig?.headingFont === 'custom' || initialConfig?.bodyFont === 'custom' || Boolean(initialConfig?.customFontUrl)) ? 'custom' : 'preset'
+  })
+
+  // Live preview injection for custom Google Font in admin dashboard
+  useEffect(() => {
+    if (typeof document === 'undefined' || !config.customFontUrl) return
+    let cleanUrl = String(config.customFontUrl).trim()
+    const match = cleanUrl.match(/https?:\/\/[^\s"'\)]+/)
+    if (match) cleanUrl = match[0]
+    if (!cleanUrl) return
+
+    const previewLinkId = 'admin-live-font-preview-link'
+    let link = document.getElementById(previewLinkId) as HTMLLinkElement | null
+    if (!link) {
+      link = document.createElement('link')
+      link.id = previewLinkId
+      link.rel = 'stylesheet'
+      document.head.appendChild(link)
+    }
+    link.href = cleanUrl
+  }, [config.customFontUrl])
   
   const [homepageSections, setHomepageSections] = useState<any[]>(
     ensureAllHomepageSections(initialSections)
@@ -963,6 +985,29 @@ export function ClientDashboard({
 
   const handleConfigChange = (field: string, value: string) => {
     setConfig((prev: any) => ({ ...prev, [field]: value }))
+  }
+
+  const handleParseCustomFont = (rawInput: string) => {
+    const raw = rawInput.trim()
+    let url = raw
+    const urlMatch = raw.match(/https?:\/\/[^\s"'\)]+/)
+    if (urlMatch) {
+      url = urlMatch[0]
+    }
+
+    let family = config.customFontFamily || ''
+    const familyMatch = url.match(/family=([^:&]+)/)
+    if (familyMatch && familyMatch[1]) {
+      const decoded = decodeURIComponent(familyMatch[1]).replace(/\+/g, ' ')
+      family = `'${decoded}', sans-serif`
+    }
+
+    setConfig((prev: any) => ({
+      ...prev,
+      customFontUrl: url,
+      ...(family && { customFontFamily: family }),
+      ...(prev.headingFont !== 'custom' && prev.bodyFont !== 'custom' ? { headingFont: 'custom' } : {}),
+    }))
   }
 
   // Save Handlers
@@ -2927,6 +2972,309 @@ export function ClientDashboard({
                           <input type="text" value={config.textColor || '#1F2A37'} onChange={(e) => handleConfigChange('textColor', e.target.value)} className="w-full bg-transparent text-sm font-bold text-white border-0 focus:ring-0 uppercase font-mono" />
                         </div>
                       </div>
+
+                      {/* GLOBAL SITE TYPOGRAPHY & FONT SELECTION */}
+                      <div className="pt-6 border-t border-slate-700/80 space-y-4">
+                        
+                        {/* SECTION HEADER */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-[#DE7B3D]">
+                              <Type className="w-3.5 h-3.5" />
+                            </div>
+                            <div>
+                              <h4 className="text-xs font-black text-white uppercase tracking-wider">Site Typography</h4>
+                              <p className="text-[10px] text-slate-400">Heading &amp; body font styling</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* FULL-WIDTH SEGMENTED TABS */}
+                        <div className="grid grid-cols-2 p-1 bg-slate-900/90 rounded-xl border border-slate-700/80 gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setFontTab('preset')}
+                            className={`py-2 px-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                              fontTab === 'preset'
+                                ? 'bg-[#DE7B3D] text-white shadow-md font-extrabold'
+                                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                            }`}
+                          >
+                            <span>Presets</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setFontTab('custom')}
+                            className={`py-2 px-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                              fontTab === 'custom'
+                                ? 'bg-[#DE7B3D] text-white shadow-md font-extrabold'
+                                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                            }`}
+                          >
+                            <Code className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                            <span>Custom Font</span>
+                          </button>
+                        </div>
+
+                        {fontTab === 'preset' ? (
+                          <div className="space-y-4 pt-1">
+                            <div>
+                              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+                                <span>Heading Font</span>
+                                <span className="px-2 py-0.5 rounded bg-slate-800 text-[10px] font-mono text-[#DE7B3D] border border-slate-700 lowercase">{config.headingFont || 'inter'}</span>
+                              </label>
+                              <select
+                                value={config.headingFont || 'inter'}
+                                onChange={(e) => handleConfigChange('headingFont', e.target.value)}
+                                className="w-full bg-slate-800 text-xs font-semibold text-white px-3.5 py-2.5 rounded-xl border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-[#DE7B3D] transition-all cursor-pointer"
+                              >
+                                <option value="montserrat">Montserrat (Clean Luxury Modern)</option>
+                                <option value="poppins">Poppins (Bold Geometric Editorial)</option>
+                                <option value="playfair">Playfair Display (Master Atelier Serif)</option>
+                                <option value="cinzel">Cinzel (Haute Couture Luxury)</option>
+                                <option value="cormorant">Cormorant Garamond (Italian Heritage)</option>
+                                <option value="inter">Inter (Contemporary Minimalist)</option>
+                                <option value="jakarta">Plus Jakarta Sans (Sharp Modern)</option>
+                                <option value="outfit">Outfit (Modern Avant-Garde)</option>
+                                {config.customFontFamily && (
+                                  <option value="custom">★ Custom Font ({config.customFontFamily})</option>
+                                )}
+                              </select>
+                            </div>
+
+                            <div>
+                              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+                                <span>Body Font</span>
+                                <span className="px-2 py-0.5 rounded bg-slate-800 text-[10px] font-mono text-emerald-400 border border-slate-700 lowercase">{config.bodyFont || 'inter'}</span>
+                              </label>
+                              <select
+                                value={config.bodyFont || 'inter'}
+                                onChange={(e) => handleConfigChange('bodyFont', e.target.value)}
+                                className="w-full bg-slate-800 text-xs font-semibold text-white px-3.5 py-2.5 rounded-xl border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-[#DE7B3D] transition-all cursor-pointer"
+                              >
+                                <option value="inter">Inter (Ultra-Clean Readable Sans)</option>
+                                <option value="poppins">Poppins (Friendly Geometric Sans)</option>
+                                <option value="montserrat">Montserrat (Sophisticated Clean Sans)</option>
+                                <option value="jakarta">Plus Jakarta Sans (Crisp Modern Sans)</option>
+                                <option value="roboto">Roboto (Neutral High Legibility)</option>
+                                <option value="open-sans">Open Sans (Warm Natural Sans)</option>
+                                {config.customFontFamily && (
+                                  <option value="custom">★ Custom Font ({config.customFontFamily})</option>
+                                )}
+                              </select>
+                            </div>
+                          </div>
+                        ) : (
+                          /* PROFESSIONAL CMS CUSTOM GOOGLE FONT MODE */
+                          <div className="space-y-4 pt-1 bg-slate-900/80 p-4 rounded-xl border border-slate-700/80 shadow-inner">
+                            {/* 1. GOOGLE FONT LINK */}
+                            <div className="space-y-1.5">
+                              <div className="flex items-center justify-between">
+                                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                                  <Link2 className="w-3.5 h-3.5 text-blue-400" />
+                                  <span>Google Font Link</span>
+                                </label>
+                                <a
+                                  href="https://fonts.google.com"
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="text-[11px] text-[#DE7B3D] hover:underline flex items-center gap-1 font-bold"
+                                >
+                                  <span>Browse Fonts</span>
+                                  <ExternalLink className="w-3 h-3" />
+                                </a>
+                              </div>
+                              <input
+                                type="text"
+                                value={config.customFontUrl || ''}
+                                onChange={(e) => handleParseCustomFont(e.target.value)}
+                                placeholder="Paste Google Font link or @import URL"
+                                className="w-full bg-slate-800 text-xs font-mono text-white px-3.5 py-2.5 rounded-xl border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-[#DE7B3D] transition-all placeholder:text-slate-500"
+                              />
+                              <p className="text-[10px] text-slate-400 leading-normal">
+                                Paste the URL from Google Fonts (or standard &lt;link&gt; tag). Font family is auto-detected.
+                              </p>
+                            </div>
+
+                            {/* 2. CSS FONT-FAMILY NAME */}
+                            <div className="space-y-1.5">
+                              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                                <span>CSS font-family Name</span>
+                              </label>
+                              <input
+                                type="text"
+                                value={config.customFontFamily || ''}
+                                onChange={(e) => handleConfigChange('customFontFamily', e.target.value)}
+                                placeholder="e.g. 'Cinzel Decorative', cursive"
+                                className="w-full bg-slate-800 text-xs font-mono text-white px-3.5 py-2.5 rounded-xl border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-2 focus:ring-[#DE7B3D] transition-all placeholder:text-slate-500"
+                              />
+                            </div>
+
+                            {/* 3. TARGET ELEMENTS */}
+                            <div className="space-y-1.5">
+                              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                <span>Apply Custom Font To:</span>
+                              </label>
+                              <div className="grid grid-cols-3 gap-2">
+                                {[
+                                  { id: 'headings', label: 'Headings', desc: 'H1–H6 only' },
+                                  { id: 'body', label: 'Body', desc: 'Body text' },
+                                  { id: 'all', label: 'All Text', desc: 'Entire site' },
+                                ].map((target) => {
+                                  const isActive =
+                                    target.id === 'headings'
+                                      ? config.headingFont === 'custom' && config.bodyFont !== 'custom'
+                                      : target.id === 'body'
+                                      ? config.bodyFont === 'custom' && config.headingFont !== 'custom'
+                                      : config.headingFont === 'custom' && config.bodyFont === 'custom'
+
+                                  return (
+                                    <button
+                                      key={target.id}
+                                      type="button"
+                                      onClick={() => {
+                                        if (target.id === 'headings') {
+                                          handleConfigChange('headingFont', 'custom')
+                                          if (config.bodyFont === 'custom') handleConfigChange('bodyFont', 'inter')
+                                        } else if (target.id === 'body') {
+                                          handleConfigChange('bodyFont', 'custom')
+                                          if (config.headingFont === 'custom') handleConfigChange('headingFont', 'inter')
+                                        } else {
+                                          handleConfigChange('headingFont', 'custom')
+                                          handleConfigChange('bodyFont', 'custom')
+                                        }
+                                      }}
+                                      className={`py-2 px-1 text-center rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                                        isActive
+                                          ? 'bg-[#DE7B3D] border-[#DE7B3D] text-white shadow-md'
+                                          : 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700/80'
+                                      }`}
+                                    >
+                                      <div>{target.label}</div>
+                                      <div className={`text-[9px] font-normal ${isActive ? 'text-white/80' : 'text-slate-500'}`}>{target.desc}</div>
+                                    </button>
+                                  )
+                                })}
+                              </div>
+                            </div>
+
+                            {/* 4. 1-CLICK POPULAR LUXURY GOOGLE FONTS */}
+                            <div className="pt-3 border-t border-slate-800/80 space-y-2">
+                              <div className="flex items-center justify-between">
+                                <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                                  <Palette className="w-3.5 h-3.5 text-[#DE7B3D]" />
+                                  <span>Curated Font Presets</span>
+                                </label>
+                                {(config.customFontUrl || config.customFontFamily) && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setConfig((prev: any) => ({
+                                        ...prev,
+                                        customFontUrl: '',
+                                        customFontFamily: '',
+                                        headingFont: 'inter',
+                                        bodyFont: 'inter',
+                                      }))
+                                    }}
+                                    className="text-[10px] text-red-400 hover:text-red-300 flex items-center gap-1 cursor-pointer font-bold"
+                                    title="Reset to default fonts"
+                                  >
+                                    <RotateCcw className="w-2.5 h-2.5" />
+                                    <span>Reset</span>
+                                  </button>
+                                )}
+                              </div>
+                              <div className="grid grid-cols-2 gap-1.5">
+                                {[
+                                  { name: 'Cinzel Decorative', style: 'Haute Couture', url: 'https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&display=swap', family: "'Cinzel Decorative', cursive" },
+                                  { name: 'Italiana', style: 'Italian Sartorial', url: 'https://fonts.googleapis.com/css2?family=Italiana&display=swap', family: "'Italiana', serif" },
+                                  { name: 'Marcellus', style: 'Roman Atelier', url: 'https://fonts.googleapis.com/css2?family=Marcellus&display=swap', family: "'Marcellus', serif" },
+                                  { name: 'Syne', style: 'Modern Luxury', url: 'https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap', family: "'Syne', sans-serif" },
+                                  { name: 'Alex Brush', style: 'Signature Script', url: 'https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap', family: "'Alex Brush', cursive" },
+                                  { name: 'Playfair Display', style: 'Classic Editorial', url: 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap', family: "'Playfair Display', serif" },
+                                ].map((p) => {
+                                  const isSelected = config.customFontFamily === p.family
+                                  return (
+                                    <button
+                                      key={p.name}
+                                      type="button"
+                                      onClick={() => {
+                                        setConfig((prev: any) => ({
+                                          ...prev,
+                                          customFontUrl: p.url,
+                                          customFontFamily: p.family,
+                                          headingFont: 'custom',
+                                        }))
+                                      }}
+                                      className={`p-2 rounded-xl text-left border transition-all cursor-pointer ${
+                                        isSelected
+                                          ? 'bg-[#DE7B3D]/20 border-[#DE7B3D] text-[#DE7B3D] shadow-sm'
+                                          : 'bg-slate-800/90 border-slate-700/80 hover:bg-slate-800 hover:border-slate-600 text-slate-300'
+                                      }`}
+                                    >
+                                      <div className="text-[11px] font-bold truncate flex items-center justify-between">
+                                        <span>{p.name}</span>
+                                        {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-[#DE7B3D]" />}
+                                      </div>
+                                      <div className="text-[9px] text-slate-400 truncate">{p.style}</div>
+                                    </button>
+                                  )
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* LIVE TYPOGRAPHY PREVIEW BOX */}
+                        <div className="bg-slate-900/90 p-3.5 rounded-xl border border-slate-800 space-y-2 shadow-inner">
+                          <div className="flex items-center justify-between pb-1 border-b border-slate-800/80">
+                            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                              <Eye className="w-3 h-3 text-[#DE7B3D]" /> Live Font Preview
+                            </span>
+                            <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono text-emerald-400">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                              {config.headingFont === 'custom' && config.customFontFamily
+                                ? config.customFontFamily.replace(/['",]/g, '').split(' ')[0]
+                                : (config.headingFont || 'inter')}
+                            </span>
+                          </div>
+                          <div
+                            className="text-base font-extrabold text-white leading-tight"
+                            style={{
+                              fontFamily:
+                                config.headingFont === 'custom' && config.customFontFamily
+                                  ? config.customFontFamily
+                                  : config.headingFont === 'montserrat' ? "'Montserrat', sans-serif" :
+                                  config.headingFont === 'poppins' ? "'Poppins', sans-serif" :
+                                  config.headingFont === 'playfair' ? "'Playfair Display', serif" :
+                                  config.headingFont === 'cinzel' ? "'Cinzel', serif" :
+                                  config.headingFont === 'cormorant' ? "'Cormorant Garamond', serif" :
+                                  config.headingFont === 'jakarta' ? "'Plus Jakarta Sans', sans-serif" :
+                                  config.headingFont === 'outfit' ? "'Outfit', sans-serif" :
+                                  "'Inter', sans-serif"
+                            }}
+                          >
+                            Silky Master Atelier Dubai
+                          </div>
+                          <div
+                            className="text-xs text-slate-300 leading-relaxed font-medium"
+                            style={{
+                              fontFamily:
+                                config.bodyFont === 'custom' && config.customFontFamily
+                                  ? config.customFontFamily
+                                  : config.bodyFont === 'poppins' ? "'Poppins', sans-serif" :
+                                  config.bodyFont === 'montserrat' ? "'Montserrat', sans-serif" :
+                                  config.bodyFont === 'jakarta' ? "'Plus Jakarta Sans', sans-serif" :
+                                  config.bodyFont === 'roboto' ? "'Roboto', sans-serif" :
+                                  config.bodyFont === 'open-sans' ? "'Open Sans', sans-serif" :
+                                  "'Inter', sans-serif"
+                            }}
+                          >
+                            Handcrafted bespoke tailoring &amp; fine wholesale fabrics since 1963.
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -2940,7 +3288,7 @@ export function ClientDashboard({
                         <div className="flex-1 space-y-4">
                           <input
                             type="text"
-                            value={config.logoUrl}
+                            value={config.logoUrl || ''}
                             onChange={(e) => handleConfigChange('logoUrl', e.target.value)}
                             className="w-full px-4 py-3 text-sm bg-slate-50 border border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-mono text-slate-600"
                             placeholder="https://..."

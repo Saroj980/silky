@@ -2,23 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const { execSync } = require('child_process')
 
-console.log('🚀 Starting Server Export Build...')
-
-// 1. Prisma generate
-console.log('📦 Generating Prisma Client...')
-try {
-  execSync('npx prisma generate', { stdio: 'inherit' })
-} catch (e) {
-  console.warn('Prisma generate warning:', e.message)
-}
-
-// 2. Safe seed
-console.log('🌱 Checking Database Seed...')
-try {
-  execSync('node prisma/seed.js', { stdio: 'inherit' })
-} catch (e) {
-  console.warn('Seed warning:', e.message)
-}
+console.log('🚀 Starting Server Export Build (Direct Laravel API)...')
 
 // 3. Static export build (temporarily moving app/api since static export only builds HTML pages)
 let apiMoved = false

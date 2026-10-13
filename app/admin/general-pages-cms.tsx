@@ -7,7 +7,7 @@ import {
   Bold, Italic, Underline, Highlighter, Code2,
   List, ListOrdered, Quote, Info, Minus, Table, Image as ImageIcon, Link as LinkIcon,
   ArrowLeft, Save, X, ToggleLeft, ToggleRight, Code, Eye as EyeIcon,
-  Smartphone, Monitor, Clock, Split, Globe, Wand2, Upload, RefreshCw
+  Smartphone, Monitor, Clock, Split, Globe, Upload, RefreshCw
 } from 'lucide-react'
 
 export interface GeneralPageItem {
@@ -1377,7 +1377,7 @@ export function GeneralPagesCMS() {
                   className="ml-auto px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-[11px] font-bold cursor-pointer flex items-center gap-1"
                   title="Clean HTML formatting"
                 >
-                  <Wand2 className="w-3 h-3 text-purple-600" /> Clean HTML
+                  <Code2 className="w-3 h-3 text-purple-600" /> Format HTML
                 </button>
               </div>
 

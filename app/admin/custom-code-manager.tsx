@@ -3,10 +3,11 @@
 import React, { useState, useEffect } from 'react'
 import {
   Code, Plus, Trash2, Edit3, Star, Check, X, Globe,
-  Smartphone, Monitor, ShieldAlert, Sparkles, Copy,
+  Smartphone, Monitor, ShieldAlert, Copy,
   CheckCircle2, ArrowUpDown, Filter, Search, Terminal,
   ExternalLink, FileCode, Layers, Info, ChevronRight,
-  Eye, MousePointerClick, Sliders, Hash
+  Eye, MousePointerClick, Sliders, Hash,
+  User, UserCheck, UserCog, Palette, Laptop
 } from 'lucide-react'
 import {
   CustomCodeSnippet,
@@ -344,14 +345,14 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
         <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-semibold">
-              <Terminal className="w-3.5 h-3.5" />
-              <span>WordPress-Style Code Snippets</span>
+              <UserCheck className="w-3.5 h-3.5 text-blue-400" />
+              <span>Human Visual Styling &amp; Custom Code Manager</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight flex items-center gap-3">
-              Custom CSS, JS & HTML
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight flex items-center gap-3 !text-white" style={{ color: '#ffffff' }}>
+              <span className="text-white">Custom CSS, JS &amp; HTML</span>
             </h1>
-            <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
-              Inject custom CSS scoped by <strong>Page & Section</strong> to customize mobile/desktop views without breaking other sections. Add Google Search Console verification meta tags, Google Tag Manager, Facebook Pixel, and tracking scripts across your website.
+            <p className="text-sm max-w-2xl leading-relaxed !text-slate-200" style={{ color: '#e2e8f0' }}>
+              Inject custom CSS scoped by <strong className="!text-white font-bold" style={{ color: '#ffffff' }}>Page &amp; Section</strong> to customize mobile/desktop views without breaking other sections. Add Google Search Console verification meta tags, Google Tag Manager, Facebook Pixel, and tracking scripts across your website.
             </p>
           </div>
 
@@ -359,21 +360,21 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
           <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={() => handleOpenAdd('css')}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg shadow-blue-600/30 transition-all cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 !text-white font-bold text-xs shadow-lg shadow-blue-600/30 transition-all cursor-pointer"
             >
-              <Plus className="w-4 h-4" /> Add Custom CSS
+              <Palette className="w-4 h-4" /> Add Custom CSS
             </button>
             <button
               onClick={() => handleOpenAdd('js')}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs shadow-lg shadow-amber-600/30 transition-all cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 !text-white font-bold text-xs shadow-lg shadow-amber-600/30 transition-all cursor-pointer"
             >
-              <Plus className="w-4 h-4" /> Add Custom JS
+              <Laptop className="w-4 h-4" /> Add Custom JS
             </button>
             <button
               onClick={() => handleOpenAdd('html')}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#E44D26] hover:bg-[#D03C15] text-white font-bold text-xs shadow-lg shadow-orange-600/30 transition-all cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#E44D26] hover:bg-[#D03C15] !text-white font-bold text-xs shadow-lg shadow-orange-600/30 transition-all cursor-pointer"
             >
-              <Plus className="w-4 h-4" /> Add Custom HTML
+              <UserCheck className="w-4 h-4" /> Add Custom HTML
             </button>
           </div>
         </div>
@@ -441,29 +442,34 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
           </div>
         ) : filteredSnippets.length === 0 ? (
           <div className="p-16 text-center space-y-4">
-            <div className="w-16 h-16 rounded-3xl bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
-              <Code className="w-8 h-8" />
+            <div className="relative w-20 h-20 mx-auto">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-[#DE7B3D]/20 via-blue-500/10 to-amber-500/20 flex items-center justify-center border border-[#DE7B3D]/30 shadow-inner">
+                <User className="w-10 h-10 text-[#DE7B3D]" />
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-slate-900 border-2 border-white flex items-center justify-center text-emerald-400 shadow-md">
+                <Palette className="w-3.5 h-3.5" />
+              </div>
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-800">No code snippets found</h3>
+              <h3 className="text-base font-bold text-slate-800">No Custom Code Snippets Yet</h3>
               <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
                 {searchQuery
                   ? 'No snippets matched your search query. Try clearing the filter.'
-                  : 'Get started by creating your first custom CSS style or Google HTML verification snippet.'}
+                  : 'Take total human control of your website. Craft custom CSS to tweak section styles, or embed Google Verification HTML.'}
               </p>
             </div>
             <div className="flex items-center justify-center gap-2 pt-2">
               <button
                 onClick={() => handleOpenAdd('html')}
-                className="px-4 py-2 rounded-xl bg-orange-50 text-[#E44D26] hover:bg-orange-100 font-bold text-xs transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-orange-50 text-[#E44D26] hover:bg-orange-100 font-bold text-xs transition-colors cursor-pointer"
               >
-                + Google Verification HTML
+                <UserCheck className="w-3.5 h-3.5" /> + Google Verification HTML
               </button>
               <button
                 onClick={() => handleOpenAdd('css')}
-                className="px-4 py-2 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold text-xs transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold text-xs transition-colors cursor-pointer"
               >
-                + Custom CSS Style
+                <Palette className="w-3.5 h-3.5" /> + Custom CSS Style
               </button>
             </div>
           </div>
@@ -606,9 +612,9 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
                             handleOpenEdit(snip)
                           }}
                           className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
-                          title="Edit Code"
+                          title="Human Visual Edit"
                         >
-                          <Edit3 className="w-4 h-4" />
+                          <UserCog className="w-4 h-4" />
                         </button>
                         <button
                           type="button"
@@ -633,9 +639,9 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
 
       {/* QUICK TEMPLATES GUIDE CARD */}
       <div className="bg-slate-900 text-white rounded-2xl p-6 border border-slate-800 shadow-xl space-y-4">
-        <div className="flex items-center gap-3 text-amber-400 font-bold text-sm">
-          <Sparkles className="w-4 h-4" />
-          <span>Quick Code Presets & Recipes</span>
+        <div className="flex items-center gap-3 text-emerald-400 font-bold text-sm">
+          <Terminal className="w-4 h-4" />
+          <span>Developer Presets & Snippet Templates</span>
         </div>
         <p className="text-xs text-slate-300">
           Click any preset below to quickly create a Google verification snippet or a mobile responsive CSS block:
@@ -704,14 +710,22 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
             {/* MODAL HEADER */}
             <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 shrink-0">
               <div className="flex items-center gap-3">
-                <span className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold uppercase text-white ${
-                  formCodeType === 'css' ? 'bg-blue-600' : formCodeType === 'js' ? 'bg-amber-500' : 'bg-[#E44D26]'
-                }`}>
-                  {formCodeType}
-                </span>
-                <h3 className="font-bold text-slate-800 text-base">
-                  {editingSnippetId ? 'Edit Code Snippet' : 'Add New Custom Code'}
-                </h3>
+                <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center text-[#DE7B3D] shadow-sm shrink-0">
+                  <UserCog className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase text-white ${
+                      formCodeType === 'css' ? 'bg-blue-600' : formCodeType === 'js' ? 'bg-amber-500' : 'bg-[#E44D26]'
+                    }`}>
+                      {formCodeType}
+                    </span>
+                    <h3 className="font-bold text-slate-800 text-sm">
+                      {editingSnippetId ? 'Edit Custom Code Snippet' : 'Human Custom Code Creator'}
+                    </h3>
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Visual code scoped directly to target pages &amp; sections</p>
+                </div>
               </div>
               <button
                 type="button"
@@ -1001,7 +1015,7 @@ export function CustomCodeManager({ onToast }: CustomCodeManagerProps) {
                     </>
                   ) : (
                     <>
-                      <Check className="w-4 h-4" />
+                      <UserCheck className="w-4 h-4" />
                       <span>{editingSnippetId ? 'Update Snippet' : 'Publish Snippet'}</span>
                     </>
                   )}

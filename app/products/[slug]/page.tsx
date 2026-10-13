@@ -1,7 +1,6 @@
 import React from 'react'
 import { notFound } from 'next/navigation'
-import { getProductPageBySlug, getSiteConfig } from '@/lib/laravel-api'
-import { prisma } from '@/lib/prisma'
+import { getProductPageBySlug, getProductPages, getSiteConfig } from '@/lib/laravel-api'
 import { ProductPageClient } from './product-page-client'
 
 export const dynamicParams = false
@@ -13,12 +12,12 @@ const KNOWN_PRODUCT_SLUGS = [
 export async function generateStaticParams() {
   const slugs = new Set(KNOWN_PRODUCT_SLUGS)
   try {
-    const dbPages = await prisma.productPage.findMany({
-      select: { slug: true },
-    })
-    dbPages.forEach((p) => {
-      if (p.slug) slugs.add(p.slug)
-    })
+    const apiPages = await getProductPages()
+    if (Array.isArray(apiPages)) {
+      apiPages.forEach((p: any) => {
+        if (p?.slug) slugs.add(p.slug)
+      })
+    }
   } catch (e) {
     console.error('generateStaticParams error:', e)
   }
@@ -26,24 +25,9 @@ export async function generateStaticParams() {
 }
 
 async function getProductPageData(slug: string) {
-  // 1. Primary Source of Truth: MySQL (Laravel API)
+  // Direct Laravel API
   const apiPage = await getProductPageBySlug(slug)
   if (apiPage) return apiPage
-
-  // 2. Fallback: Prisma MySQL
-  try {
-    const dbPage = await prisma.productPage.findUnique({
-      where: { slug },
-      include: {
-        sections: {
-          orderBy: { order: 'asc' },
-        },
-      },
-    })
-    if (dbPage) return dbPage
-  } catch (e) {
-    console.error('Error reading product page from Prisma:', e)
-  }
 
   const formattedTitle = slug
     .split('-')
