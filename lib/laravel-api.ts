@@ -111,6 +111,30 @@ export async function updateSiteConfig(data: any) {
   return json
 }
 
+// ─── Footer Config ───────────────────────────────────────────────────────────
+
+export async function getFooterConfig() {
+  try {
+    const res = await fetch(`${getPhpApiUrl()}/footer-config`, getFetchOptions())
+    return await safeJson(res)
+  } catch (err) {
+    console.error('getFooterConfig error:', err)
+    return null
+  }
+}
+
+export async function updateFooterConfig(data: any) {
+  // PHP route: PUT /api/footer-config
+  const res = await fetch(`${getPhpApiUrl()}/footer-config`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+  const json = await safeJson(res)
+  if (!json) throw new Error(`updateFooterConfig HTTP ${res.status}`)
+  return json
+}
+
 // ─── Page Sections (Homepage) ─────────────────────────────────────────────────
 
 export async function getPageSections() {
@@ -327,4 +351,82 @@ export async function deleteGeneralPage(idOrSlug: string | number) {
     console.error('deleteGeneralPage error:', err)
   }
   return null
+}
+
+// ─── Custom CSS, JS & HTML Code Snippets ──────────────────────────────────────
+
+export interface CustomCodeSnippet {
+  id: string
+  title: string
+  codeType: 'css' | 'js' | 'html'
+  code: string
+  placement: 'head' | 'body_start' | 'footer'
+  targetDevice: 'all' | 'desktop' | 'mobile'
+  isActive: boolean
+  isFavorite?: boolean
+  createdAt?: string
+  updatedAt?: string
+}
+
+export async function getCustomCodeSnippets(activeOnly: boolean = false): Promise<CustomCodeSnippet[]> {
+  try {
+    const url = `${getPhpApiUrl()}/custom-code${activeOnly ? '?active_only=1' : ''}`
+    const res = await fetch(url, getFetchOptions())
+    const json = await safeJson(res)
+    if (json && Array.isArray(json)) return json
+  } catch (err) {
+    console.error('getCustomCodeSnippets error:', err)
+  }
+  return []
+}
+
+export async function createCustomCodeSnippet(snippet: Partial<CustomCodeSnippet>) {
+  const res = await fetch(`${getPhpApiUrl()}/custom-code`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(snippet),
+  })
+  const json = await safeJson(res)
+  if (!json) throw new Error(`createCustomCodeSnippet HTTP ${res.status}`)
+  return json
+}
+
+export async function updateCustomCodeSnippet(id: string, snippet: Partial<CustomCodeSnippet>) {
+  const res = await fetch(`${getPhpApiUrl()}/custom-code/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(snippet),
+  })
+  const json = await safeJson(res)
+  if (!json) throw new Error(`updateCustomCodeSnippet HTTP ${res.status}`)
+  return json
+}
+
+export async function toggleCustomCodeSnippet(id: string) {
+  const res = await fetch(`${getPhpApiUrl()}/custom-code/${id}/toggle`, {
+    method: 'PATCH',
+  })
+  const json = await safeJson(res)
+  if (!json) throw new Error(`toggleCustomCodeSnippet HTTP ${res.status}`)
+  return json
+}
+
+export async function deleteCustomCodeSnippet(id: string) {
+  const res = await fetch(`${getPhpApiUrl()}/custom-code/${id}`, {
+    method: 'DELETE',
+  })
+  const json = await safeJson(res)
+  if (!json) throw new Error(`deleteCustomCodeSnippet HTTP ${res.status}`)
+  return json
+}
+
+export async function saveAllCustomCodeSnippets(snippets: CustomCodeSnippet[]) {
+  const res = await fetch(`${getPhpApiUrl()}/custom-code/save-all`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ snippets }),
+  })
+  const json = await safeJson(res)
+  if (!json) throw new Error(`saveAllCustomCodeSnippets HTTP ${res.status}`)
+  return json
 }

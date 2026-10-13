@@ -13,11 +13,13 @@ import { ContactBand } from '@/components/contact-band'
 import { SiteHeader } from '@/components/site-header'
 import { updateSlide, createSlide, deleteSlide, updateSiteConfig, updatePageSection, updateSectionOrder, saveProductPageSectionsAction, createProductPageAction, deleteProductPageAction } from './actions'
 import { getProductPageBySlug } from '@/lib/laravel-api'
-import { Plus, Trash2, Save, Layout, Settings, Image as ImageIcon, UploadCloud, Monitor, Menu, Search, Bell, HelpCircle, FileText, ShoppingBag, FolderTree, BookOpen, Briefcase, Activity, FolderOpen, Users as UsersIcon, ExternalLink, ChevronDown, ChevronLeft, ChevronRight, Check, ArrowUp, ArrowDown, Layers, Move, Sliders, LogOut, Lock, ShieldCheck, Eye, EyeOff, UserCheck, ArrowRight, ArrowLeft, Edit3, Filter, Copy, CopyCheck, Tag, Shirt, Columns, Smartphone, ZoomIn, ZoomOut, Maximize2, RotateCcw, GripVertical } from 'lucide-react'
+import { Plus, Trash2, Save, Layout, Settings, Image as ImageIcon, UploadCloud, Monitor, Menu, Search, Bell, HelpCircle, FileText, ShoppingBag, FolderTree, BookOpen, Briefcase, Activity, FolderOpen, Users as UsersIcon, ExternalLink, ChevronDown, ChevronLeft, ChevronRight, Check, ArrowUp, ArrowDown, Layers, Move, Sliders, LogOut, Lock, ShieldCheck, Eye, EyeOff, UserCheck, ArrowRight, ArrowLeft, Edit3, Filter, Copy, CopyCheck, Tag, Shirt, Columns, Smartphone, ZoomIn, ZoomOut, Maximize2, RotateCcw, GripVertical, PanelBottom, Code } from 'lucide-react'
 import { CategoryShowcaseEditor, UniformSolutionsEditor, OurWorkEditor, WhySilkyEditor, ProcessEditor, TestimonialsEditor, ContactBandEditor, SpecsMatrixEditor, FaqEditor, FabricSwatchesEditor, QualityControlEditor, BulkPricingEditor, LogisticsEditor, ProductHeroEditor, CustomizationEditor } from './section-editors'
 import { WordPressMenuManager } from './menu-manager'
 import { UserManager, getUserList, UserItem } from './user-manager'
 import { GeneralPagesCMS } from './general-pages-cms'
+import { FooterManager } from './footer-manager'
+import { CustomCodeManager } from './custom-code-manager'
 import { ProductSectionLiveRenderer } from '@/app/products/[slug]/product-page-client'
 
 function DynamicSectionLiveRenderer({
@@ -544,14 +546,14 @@ export function ClientDashboard({
   const currentZoomPercent = previewZoom === 'auto' ? autoScalePercent : previewZoom
 
 
-  type AdminTab = 'builder' | 'header' | 'product-pages' | 'general-pages' | 'menu-manager' | 'user-manager'
+  type AdminTab = 'builder' | 'header' | 'footer' | 'product-pages' | 'general-pages' | 'menu-manager' | 'user-manager' | 'custom-code'
 
   const [activeTab, setActiveTab] = useState<AdminTab>('product-pages')
 
   useEffect(() => {
     try {
       const savedTab = localStorage.getItem('silky_admin_active_tab') as AdminTab | null
-      if (savedTab && ['builder', 'header', 'product-pages', 'general-pages', 'menu-manager', 'user-manager'].includes(savedTab)) {
+      if (savedTab && ['builder', 'header', 'footer', 'product-pages', 'general-pages', 'menu-manager', 'user-manager'].includes(savedTab)) {
         setActiveTab(savedTab)
       }
     } catch (e) {
@@ -1272,6 +1274,17 @@ export function ClientDashboard({
           >
             <Monitor className={`w-4 h-4 ${activeTab === 'header' ? 'text-white' : 'text-slate-400'}`} /> Theme & Header
           </button>
+
+          <button 
+            onClick={() => switchTab('footer')}
+            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'footer' 
+                ? 'bg-[#DE7B3D] text-white shadow-lg shadow-[#DE7B3D]/30' 
+                : 'text-slate-300 hover:text-white hover:bg-white/10'
+            }`}
+          >
+            <PanelBottom className={`w-4 h-4 ${activeTab === 'footer' ? 'text-white' : 'text-slate-400'}`} /> Footer
+          </button>
           
           <button 
             onClick={() => switchTab('builder')}
@@ -1315,6 +1328,17 @@ export function ClientDashboard({
             }`}
           >
             <Sliders className={`w-4 h-4 ${activeTab === 'menu-manager' ? 'text-white' : 'text-slate-400'}`} /> Menu Manager
+          </button>
+
+          <button 
+            onClick={() => switchTab('custom-code')}
+            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'custom-code' 
+                ? 'bg-[#DE7B3D] text-white shadow-lg shadow-[#DE7B3D]/30' 
+                : 'text-slate-300 hover:text-white hover:bg-white/10'
+            }`}
+          >
+            <Code className={`w-4 h-4 ${activeTab === 'custom-code' ? 'text-white' : 'text-slate-400'}`} /> Custom CSS & JS
           </button>
         </div>
         
@@ -1407,6 +1431,10 @@ export function ClientDashboard({
                  ? 'Product Pages CMS'
                  : activeTab === 'header'
                  ? 'Theme & Header Settings'
+                 : activeTab === 'footer'
+                 ? 'Footer Settings & Menu CMS'
+                 : activeTab === 'custom-code'
+                 ? 'Custom CSS, JS & HTML Code Manager'
                  : activeTab === 'user-manager'
                  ? 'User Management'
                  : 'Homepage Page Builder'}
@@ -1679,7 +1707,7 @@ export function ClientDashboard({
 
         <div className="flex-1 overflow-y-auto w-full min-w-0 p-6 lg:p-8 pb-32">
           
-          {activeTab !== 'user-manager' && activeTab !== 'general-pages' && activeTab !== 'menu-manager' && !(activeTab === 'product-pages' && productPageViewMode === 'list') && (
+          {activeTab !== 'user-manager' && activeTab !== 'general-pages' && activeTab !== 'menu-manager' && activeTab !== 'footer' && activeTab !== 'custom-code' && !(activeTab === 'product-pages' && productPageViewMode === 'list') && (
             <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
               <div>
                 <h1 className="text-[28px] font-bold text-[#1E293B] tracking-tight">
@@ -2975,10 +3003,14 @@ export function ClientDashboard({
                   </div>
                </div>
             </div>
+          ) : activeTab === 'footer' ? (
+            <FooterManager onToast={showToast} />
+          ) : activeTab === 'custom-code' ? (
+            <CustomCodeManager onToast={showToast} />
           ) : null}
         </div>
 
-        {!(activeTab === 'product-pages' && productPageViewMode === 'list') && activeTab !== 'user-manager' && activeTab !== 'general-pages' && (
+        {!(activeTab === 'product-pages' && productPageViewMode === 'list') && activeTab !== 'user-manager' && activeTab !== 'general-pages' && activeTab !== 'footer' && activeTab !== 'custom-code' && (
           <button
             onClick={handleSave}
             disabled={isSaving}

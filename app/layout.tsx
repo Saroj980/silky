@@ -44,6 +44,8 @@ export const viewport: Viewport = {
   themeColor: '#2B241E',
 }
 
+import { CustomCodeInjector } from '@/components/custom-code-injector'
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -64,6 +66,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased selection:bg-[#D97A42] selection:text-white font-sans">
+        <CustomCodeInjector />
         {children}
       </body>
     </html>

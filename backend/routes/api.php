@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ProductPageController;
 use App\Http\Controllers\Api\GeneralPageController;
 use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\CustomCodeController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -38,6 +39,11 @@ Route::delete('/hero-slides', [HeroSlideController::class, 'destroy']);
 Route::get('/site-config', [SiteConfigController::class, 'show']);
 Route::put('/site-config', [SiteConfigController::class, 'update']);
 Route::post('/site-config', [SiteConfigController::class, 'update']);
+
+// Footer Config
+Route::get('/footer-config', [\App\Http\Controllers\Api\FooterConfigController::class, 'show']);
+Route::put('/footer-config', [\App\Http\Controllers\Api\FooterConfigController::class, 'update']);
+Route::post('/footer-config', [\App\Http\Controllers\Api\FooterConfigController::class, 'update']);
 
 // Page Sections
 Route::get('/page-sections', [PageSectionController::class, 'index']);
@@ -69,6 +75,15 @@ Route::delete('/general-pages', function (Request $request) {
     $id = $request->input('id') ?? $request->query('id');
     return app(GeneralPageController::class)->destroy($id);
 });
+
+// Custom CSS, JS & HTML Code Snippets
+Route::get('/custom-code', [CustomCodeController::class, 'index']);
+Route::post('/custom-code', [CustomCodeController::class, 'store']);
+Route::post('/custom-code/save-all', [CustomCodeController::class, 'saveAll']);
+Route::get('/custom-code/{id}', [CustomCodeController::class, 'show']);
+Route::put('/custom-code/{id}', [CustomCodeController::class, 'update']);
+Route::patch('/custom-code/{id}/toggle', [CustomCodeController::class, 'toggle']);
+Route::delete('/custom-code/{id}', [CustomCodeController::class, 'destroy']);
 
 // Upload
 Route::post('/upload', [UploadController::class, 'store']);
