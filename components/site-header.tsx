@@ -54,34 +54,41 @@ const DEFAULT_NAV: NavItem[] = [
   { id: 'm-contact', title: 'CONTACT US', url: '/contact-us' },
 ]
 
-export function SiteHeader({ onOpenQuoteModal, config }: SiteHeaderProps) {
+export function SiteHeader({ onOpenQuoteModal, config: initialConfig }: SiteHeaderProps) {
+  const [config, setConfig] = useState<any>(initialConfig)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileExpandedId, setMobileExpandedId] = useState<string | null>(null)
   const [hoveredMenuId, setHoveredMenuId] = useState<string | null>(null)
   const [navItems, setNavItems] = useState<NavItem[]>(() => {
-    const initial = parseNavItems(config?.navLinks)
+    const initial = parseNavItems(initialConfig?.navLinks)
     return initial.length > 0 ? initial : DEFAULT_NAV
   })
 
-  // Synchronize when config prop changes
+  // Synchronize when initialConfig prop changes
   useEffect(() => {
-    if (config?.navLinks) {
-      const parsed = parseNavItems(config.navLinks)
-      if (parsed.length > 0) {
-        setNavItems(parsed)
+    if (initialConfig) {
+      setConfig(initialConfig)
+      if (initialConfig.navLinks) {
+        const parsed = parseNavItems(initialConfig.navLinks)
+        if (parsed.length > 0) {
+          setNavItems(parsed)
+        }
       }
     }
-  }, [config?.navLinks])
+  }, [initialConfig])
 
   // Client-side auto-sync to ensure changes saved in Admin reflect in real-time
   useEffect(() => {
     fetch('/api/site-config', { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (data?.navLinks) {
-          const parsed = parseNavItems(data.navLinks)
-          if (parsed.length > 0) {
-            setNavItems(parsed)
+        if (data) {
+          setConfig(data)
+          if (data.navLinks) {
+            const parsed = parseNavItems(data.navLinks)
+            if (parsed.length > 0) {
+              setNavItems(parsed)
+            }
           }
         }
       })

@@ -277,25 +277,38 @@ export function GeneralPageClient({ slug }: { slug: string }) {
     const loadPage = async () => {
       // 1. Fetch live page data directly from MySQL database API
       try {
-        const res = await fetch(`/api/general-pages?slug=${encodeURIComponent(normSlug)}`, { cache: 'no-store' })
+        let res = await fetch(`/api/general-pages/slug/${encodeURIComponent(normSlug)}`, { cache: 'no-store' })
+        if (!res.ok) {
+          res = await fetch(`/api/general-pages?slug=${encodeURIComponent(normSlug)}`, { cache: 'no-store' })
+        }
+        if (!res.ok) {
+          res = await fetch('/api/general-pages', { cache: 'no-store' })
+        }
         if (res.ok) {
-          const data = await res.json()
-          if (data && data.slug) {
+          const rawData = await res.json()
+          let data = null
+          if (Array.isArray(rawData)) {
+            data = matchPage(rawData)
+          } else if (rawData && (rawData.slug || rawData.title)) {
+            data = rawData
+          }
+
+          if (data && (data.slug || data.title)) {
             const formattedPage: GeneralPageItem = {
-              id: String(data.id),
+              id: String(data.id || 'page-' + normSlug),
               title: data.title || '',
               subtitle: data.subtitle || '',
               slug: data.slug || normSlug,
               pageType: (data.pageType as any) || 'General Page',
               status: (data.status as any) || 'Published',
-              isActive: Boolean(data.isActive),
+              isActive: Boolean(data.isActive ?? true),
               featuredImage: data.featuredImage || undefined,
               content: data.content || '',
               seoTitle: data.seoTitle || '',
               seoDescription: data.seoDescription || '',
               seoKeywords: data.seoKeywords || '',
               ogImage: data.ogImage || undefined,
-              allowIndexing: Boolean(data.allowIndexing),
+              allowIndexing: Boolean(data.allowIndexing ?? true),
               author: data.author || 'Silky Team',
               createdAt: data.createdAt ? String(data.createdAt).split('T')[0] : '',
               updatedAt: data.updatedAt ? String(data.updatedAt).split('T')[0] : '',

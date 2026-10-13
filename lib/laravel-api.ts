@@ -7,11 +7,26 @@ function getPhpApiUrl(): string {
   // Client-side: use the URL embedded at build time (injected via layout.tsx)
   if (typeof window !== 'undefined') {
     const envUrl = (window as any).__NEXT_PUBLIC_LARAVEL_API_URL__
-    if (envUrl) return envUrl
+    if (envUrl && typeof envUrl === 'string' && envUrl.startsWith('http')) {
+      try {
+        const parsed = new URL(envUrl)
+        if (parsed.origin === window.location.origin) {
+          return '/api'
+        }
+      } catch (e) {}
+      return envUrl
+    }
     return `${window.location.origin}/api`
   }
   // Server-side (SSR/build): use env var
   return process.env.NEXT_PUBLIC_LARAVEL_API_URL || 'http://localhost:3000/api'
+}
+
+const getFetchOptions = (): RequestInit | undefined => {
+  if (typeof window !== 'undefined') {
+    return { cache: 'no-store' }
+  }
+  return undefined
 }
 
 async function safeJson(res: Response) {
@@ -30,7 +45,7 @@ async function safeJson(res: Response) {
 
 export async function getHeroSlides() {
   try {
-    const res = await fetch(`${getPhpApiUrl()}/hero-slides`)
+    const res = await fetch(`${getPhpApiUrl()}/hero-slides`, getFetchOptions())
     const data = await safeJson(res)
     if (Array.isArray(data) && data.length > 0) return data
   } catch (err) {
@@ -76,7 +91,7 @@ export async function deleteHeroSlide(id: number) {
 
 export async function getSiteConfig() {
   try {
-    const res = await fetch(`${getPhpApiUrl()}/site-config`)
+    const res = await fetch(`${getPhpApiUrl()}/site-config`, getFetchOptions())
     return await safeJson(res)
   } catch (err) {
     console.error('getSiteConfig error:', err)
@@ -100,7 +115,7 @@ export async function updateSiteConfig(data: any) {
 
 export async function getPageSections() {
   try {
-    const res = await fetch(`${getPhpApiUrl()}/page-sections`)
+    const res = await fetch(`${getPhpApiUrl()}/page-sections`, getFetchOptions())
     const data = await safeJson(res)
     return Array.isArray(data) ? data : []
   } catch (err) {
@@ -160,7 +175,7 @@ export async function deletePageSection(id: number) {
 
 export async function getProductPages() {
   try {
-    const res = await fetch(`${getPhpApiUrl()}/product-pages`)
+    const res = await fetch(`${getPhpApiUrl()}/product-pages`, getFetchOptions())
     const data = await safeJson(res)
     return Array.isArray(data) ? data : []
   } catch (err) {
@@ -171,7 +186,7 @@ export async function getProductPages() {
 
 export async function getProductPageBySlug(slug: string) {
   try {
-    const res = await fetch(`${getPhpApiUrl()}/product-pages/slug/${slug}`)
+    const res = await fetch(`${getPhpApiUrl()}/product-pages/slug/${slug}`, getFetchOptions())
     return await safeJson(res)
   } catch (err) {
     console.error('getProductPageBySlug error:', err)
@@ -263,7 +278,7 @@ export async function saveProductPageSections(pageId: number, sections: any[]) {
 
 export async function getGeneralPages() {
   try {
-    const res = await fetch(`${getPhpApiUrl()}/general-pages`, { cache: 'no-store' })
+    const res = await fetch(`${getPhpApiUrl()}/general-pages`, getFetchOptions())
     const json = await safeJson(res)
     if (json && Array.isArray(json)) return json
   } catch (err) {
@@ -275,7 +290,7 @@ export async function getGeneralPages() {
 export async function getGeneralPageBySlug(slug: string) {
   const cleanSlug = slug.replace(/^\//, '').trim().toLowerCase()
   try {
-    const res = await fetch(`${getPhpApiUrl()}/general-pages/slug/${cleanSlug}`, { cache: 'no-store' })
+    const res = await fetch(`${getPhpApiUrl()}/general-pages/slug/${cleanSlug}`, getFetchOptions())
     const json = await safeJson(res)
     if (json && json.slug) return json
   } catch (err) {

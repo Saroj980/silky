@@ -8,14 +8,32 @@ use Illuminate\Http\Request;
 
 class GeneralPageController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        if ($request->has('slug')) {
+            $slug = $request->query('slug');
+            $cleanSlug = trim(ltrim($slug, '/'));
+            $page = GeneralPage::where('slug', $cleanSlug)
+                ->orWhere('slug', '/' . $cleanSlug)
+                ->orWhere('slug', 'blog/' . $cleanSlug)
+                ->first();
+
+            if ($page) {
+                return response()->json($page);
+            }
+            return response()->json(['message' => 'General page not found'], 404);
+        }
+
         return response()->json(GeneralPage::orderBy('id', 'asc')->get());
     }
 
     public function showBySlug($slug)
     {
-        $page = GeneralPage::where('slug', $slug)->first();
+        $cleanSlug = trim(ltrim($slug, '/'));
+        $page = GeneralPage::where('slug', $cleanSlug)
+            ->orWhere('slug', '/' . $cleanSlug)
+            ->orWhere('slug', 'blog/' . $cleanSlug)
+            ->first();
 
         if (!$page) {
             return response()->json(['message' => 'General page not found'], 404);

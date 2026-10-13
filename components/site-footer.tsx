@@ -1,10 +1,30 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { MapPin, Phone, Mail, FileText, ArrowUpRight } from 'lucide-react'
 import { FaFacebookF, FaInstagram, FaLinkedinIn } from 'react-icons/fa6'
 
-export function SiteFooter() {
+export function SiteFooter({ config: initialConfig }: { config?: any } = {}) {
+  const [config, setConfig] = useState<any>(initialConfig)
+
+  useEffect(() => {
+    if (initialConfig) setConfig(initialConfig)
+  }, [initialConfig])
+
+  useEffect(() => {
+    fetch('/api/site-config', { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data) setConfig(data)
+      })
+      .catch(() => {})
+  }, [])
+
+  const phone = config?.phone || '+971 4 226 1050'
+  const email = config?.email || 'sales@silky.ae'
+  const logoUrl = config?.logoUrl || '/silky-logo.png'
+  const address = config?.address || 'Baniyas Road (D85), Deira Creek\nPO Box 792, Dubai, UAE'
+
   return (
     <footer className="bg-[#0A0F1D] text-slate-300 pt-16 sm:pt-20 pb-10 sm:pb-12 font-inter border-t border-slate-800">
       <div className="max-w-[1380px] mx-auto px-6 sm:px-10">
@@ -16,7 +36,7 @@ export function SiteFooter() {
           <div className="lg:col-span-4 space-y-6">
             <a href="#" className="inline-block">
               <img
-                src="/silky-logo.png"
+                src={logoUrl}
                 alt="Silky Textiles & Garments LLC Dubai"
                 className="h-14 sm:h-16 w-auto object-contain brightness-110"
               />
@@ -72,15 +92,15 @@ export function SiteFooter() {
             <div className="space-y-3.5 text-xs text-slate-400 leading-relaxed">
               <div className="flex items-start space-x-3 group">
                 <MapPin className="w-4 h-4 text-[#B38B59] shrink-0 mt-0.5" />
-                <span>Baniyas Road (D85), Deira Creek<br/>PO Box 792, Dubai, UAE</span>
+                <span className="whitespace-pre-line">{address}</span>
               </div>
               <div className="flex items-center space-x-3 group">
                 <Phone className="w-4 h-4 text-[#B38B59] shrink-0" />
-                <span>+971 4 226 1050</span>
+                <a href={`tel:${phone.replace(/\s+/g, '')}`} className="hover:text-white transition-colors">{phone}</a>
               </div>
               <div className="flex items-center space-x-3 group">
                 <Mail className="w-4 h-4 text-[#B38B59] shrink-0" />
-                <a href="mailto:sales@silky.ae" className="hover:text-white transition-colors">sales@silky.ae</a>
+                <a href={`mailto:${email}`} className="hover:text-white transition-colors">{email}</a>
               </div>
             </div>
           </div>

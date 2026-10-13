@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
@@ -1952,11 +1952,45 @@ function ClientTestimonialsSection({ data }: { data: any }) {
 // ----------------------------------------------------------------------
 // MAIN PRODUCT PAGE CLIENT DISPATCHER (Placed after all 11 sections)
 // ----------------------------------------------------------------------
-export function ProductPageClient({ page, config }: { page: any, config?: any }) {
+export function ProductPageClient({ page: initialPage, config: initialConfig }: { page: any, config?: any }) {
+  const [currentPage, setCurrentPage] = useState<any>(initialPage)
+  const [currentConfig, setCurrentConfig] = useState<any>(initialConfig)
   const [isQuoteOpen, setIsQuoteOpen] = useState(false)
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0)
 
-  const sections = page.sections || []
+  useEffect(() => {
+    if (initialPage) setCurrentPage(initialPage)
+  }, [initialPage])
+
+  useEffect(() => {
+    if (initialConfig) setCurrentConfig(initialConfig)
+  }, [initialConfig])
+
+  // Live client-side auto-sync to ensure changes saved in Admin reflect immediately without rebuild
+  useEffect(() => {
+    const slug = initialPage?.slug
+    if (!slug) return
+
+    fetch(`/api/product-pages/slug/${slug}`, { cache: 'no-store' })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && data.slug) {
+          setCurrentPage(data)
+        }
+      })
+      .catch(() => {})
+
+    fetch('/api/site-config', { cache: 'no-store' })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && typeof data === 'object') {
+          setCurrentConfig(data)
+        }
+      })
+      .catch(() => {})
+  }, [initialPage?.slug])
+
+  const sections = currentPage?.sections || []
 
   // Section render dispatch
   const renderSection = (section: any) => {
@@ -2077,13 +2111,13 @@ export function ProductPageClient({ page, config }: { page: any, config?: any })
 
   return (
     <div className="bg-white text-slate-900 font-sans antialiased min-h-screen relative selection:bg-[#D97A42] selection:text-white">
-      <SiteHeader onOpenQuoteModal={() => setIsQuoteOpen(true)} config={config} />
+      <SiteHeader onOpenQuoteModal={() => setIsQuoteOpen(true)} config={currentConfig} />
 
       <main id="main-content" className="relative z-0">
         {renderAllSections()}
       </main>
 
-      <SiteFooter />
+      <SiteFooter config={currentConfig} />
 
       <QuoteFormModal isOpen={isQuoteOpen} onClose={() => setIsQuoteOpen(false)} />
 

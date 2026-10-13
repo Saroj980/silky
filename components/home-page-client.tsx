@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { SiteHeader } from '@/components/site-header'
 import { Hero } from '@/components/hero'
 import { TrustStrip } from '@/components/trust-strip'
@@ -17,7 +17,63 @@ import { QuoteFormModal } from '@/components/quote-form'
 import { FaWhatsapp } from 'react-icons/fa6'
 
 export function HomePageClient({ heroSlides, config, sections = [] }: { heroSlides: any[], config?: any, sections?: any[] }) {
+  const [slides, setSlides] = useState<any[]>(heroSlides || [])
+  const [siteConfig, setSiteConfig] = useState<any>(config || null)
+  const [activeSections, setActiveSections] = useState<any[]>(sections || [])
   const [isQuoteOpen, setIsQuoteOpen] = useState(false)
+
+  // Synchronize when initial props change
+  useEffect(() => {
+    if (heroSlides && heroSlides.length > 0) setSlides(heroSlides)
+  }, [heroSlides])
+
+  useEffect(() => {
+    if (config) setSiteConfig(config)
+  }, [config])
+
+  useEffect(() => {
+    if (sections && sections.length > 0) setActiveSections(sections)
+  }, [sections])
+
+  // Live client-side auto-sync to ensure changes saved in Admin reflect immediately without rebuild
+  useEffect(() => {
+    // 1. Fetch live hero slides
+    fetch('/api/hero-slides', { cache: 'no-store' })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          const parsed = data.map((s: any) => ({
+            ...s,
+            trustBadges: typeof s.trustBadges === 'string' ? JSON.parse(s.trustBadges || '[]') : s.trustBadges,
+          }))
+          setSlides(parsed)
+        }
+      })
+      .catch(() => {})
+
+    // 2. Fetch live site config
+    fetch('/api/site-config', { cache: 'no-store' })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && typeof data === 'object') {
+          setSiteConfig(data)
+        }
+      })
+      .catch(() => {})
+
+    // 3. Fetch live page sections
+    fetch('/api/page-sections', { cache: 'no-store' })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          const active = data.filter((s: any) => s.isActive)
+          if (active.length > 0) {
+            setActiveSections(active)
+          }
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   // Track rendered section types to guarantee ZERO duplicates on homepage
   const renderedTypes = new Set<string>()
@@ -27,13 +83,17 @@ export function HomePageClient({ heroSlides, config, sections = [] }: { heroSlid
     if (!section || !section.isActive) return null
 
     let data = {}
-    try { data = JSON.parse(section.data) } catch (e) {}
+    if (typeof section.data === 'object' && section.data !== null) {
+      data = section.data
+    } else if (typeof section.data === 'string') {
+      try { data = JSON.parse(section.data) } catch (e) {}
+    }
 
     switch (section.type) {
       case 'HERO':
         if (renderedTypes.has('HERO')) return null
         renderedTypes.add('HERO')
-        return <Hero key={section.id} slides={heroSlides} onOpenQuoteModal={() => setIsQuoteOpen(true)} />
+        return <Hero key={section.id} slides={slides} onOpenQuoteModal={() => setIsQuoteOpen(true)} />
       
       case 'BRAND_STORY':
         if (renderedTypes.has('BRAND_STORY')) return null
@@ -92,17 +152,17 @@ export function HomePageClient({ heroSlides, config, sections = [] }: { heroSlid
       </a>
 
       {/* Main Navigation Header */}
-      <SiteHeader onOpenQuoteModal={() => setIsQuoteOpen(true)} config={config} />
+      <SiteHeader onOpenQuoteModal={() => setIsQuoteOpen(true)} config={siteConfig} />
 
       {/* Main Page Flow (Guaranteed Non-Duplicated Sections) */}
       <main id="main-content" className="relative z-0">
-        {sections && sections.length > 0 ? (
+        {activeSections && activeSections.length > 0 ? (
           <>
-            {sections.map(renderSection)}
+            {activeSections.map(renderSection)}
           </>
         ) : (
           <>
-            <Hero slides={heroSlides} onOpenQuoteModal={() => setIsQuoteOpen(true)} />
+            <Hero slides={slides} onOpenQuoteModal={() => setIsQuoteOpen(true)} />
             <TrustStrip />
             <BrandStory />
             <CategoryShowcase onOpenQuoteModal={() => setIsQuoteOpen(true)} />
@@ -117,7 +177,7 @@ export function HomePageClient({ heroSlides, config, sections = [] }: { heroSlid
       </main>
 
       {/* Site Footer */}
-      <SiteFooter />
+      <SiteFooter config={siteConfig} />
 
       {/* Quote Request Modal */}
       <QuoteFormModal
