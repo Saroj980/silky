@@ -49,11 +49,20 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const laravelApiUrl = process.env.NEXT_PUBLIC_LARAVEL_API_URL || ''
   return (
     <html
       lang="en"
       className={`${poppins.variable} ${montserrat.variable} bg-[#FBF7F2] text-[#2B241E] scroll-smooth`}
     >
+      <head>
+        {/* Embed the Laravel API URL so client-side JS can reach PHP backend from static export */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.__NEXT_PUBLIC_LARAVEL_API_URL__ = ${JSON.stringify(laravelApiUrl)};`,
+          }}
+        />
+      </head>
       <body className="antialiased selection:bg-[#D97A42] selection:text-white font-sans">
         {children}
       </body>

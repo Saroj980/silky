@@ -5,6 +5,18 @@ function getApiUrl(): string {
   return process.env.NEXT_PUBLIC_LARAVEL_API_URL || 'http://localhost:3000/api'
 }
 
+// For WRITE operations (POST/PUT/DELETE), always use the explicit Laravel API URL
+// to ensure they hit the PHP backend and not a stale static file on shared hosting.
+function getLaravelWriteUrl(): string {
+  if (typeof window !== 'undefined') {
+    // Prefer the env var embedded at build time; fall back to same-origin
+    const envUrl = (window as any).__NEXT_PUBLIC_LARAVEL_API_URL__
+    if (envUrl) return envUrl
+    return `${window.location.origin}/api`
+  }
+  return process.env.NEXT_PUBLIC_LARAVEL_API_URL || 'http://localhost:3000/api'
+}
+
 const LARAVEL_API_URL = getApiUrl()
 
 async function safeJson(res: Response) {
@@ -67,7 +79,7 @@ export async function createHeroSlide(data: any) {
       console.error('Prisma createHeroSlide error:', err)
     }
   }
-  const res = await fetch(`${getApiUrl()}/hero-slides`, {
+  const res = await fetch(`${getLaravelWriteUrl()}/hero-slides`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -108,10 +120,11 @@ export async function updateHeroSlide(id: number, data: any) {
       console.error('Prisma updateHeroSlide error:', err)
     }
   }
-  const res = await fetch(`${getApiUrl()}/hero-slides`, {
+  // PHP route: PUT /api/hero-slides/{id}
+  const res = await fetch(`${getLaravelWriteUrl()}/hero-slides/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id, ...data }),
+    body: JSON.stringify(data),
   })
   const json = await safeJson(res)
   if (!json) throw new Error(`HTTP ${res.status}`)
@@ -128,7 +141,8 @@ export async function deleteHeroSlide(id: number) {
       console.error('Prisma deleteHeroSlide error:', err)
     }
   }
-  const res = await fetch(`${getApiUrl()}/hero-slides?id=${id}`, {
+  // PHP route: DELETE /api/hero-slides/{id}
+  const res = await fetch(`${getLaravelWriteUrl()}/hero-slides/${id}`, {
     method: 'DELETE',
   })
   const json = await safeJson(res)
@@ -156,7 +170,8 @@ export async function getSiteConfig() {
 }
 
 export async function updateSiteConfig(data: any) {
-  const res = await fetch(`${getApiUrl()}/site-config`, {
+  // PHP route: PUT /api/site-config
+  const res = await fetch(`${getLaravelWriteUrl()}/site-config`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -187,7 +202,7 @@ export async function getPageSections() {
 }
 
 export async function createPageSection(type: string, data: any) {
-  const res = await fetch(`${getApiUrl()}/page-sections`, {
+  const res = await fetch(`${getLaravelWriteUrl()}/page-sections`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ type, data }),
@@ -198,10 +213,11 @@ export async function createPageSection(type: string, data: any) {
 }
 
 export async function updatePageSection(id: number, dataStr: string, isActive: boolean) {
-  const res = await fetch(`${getApiUrl()}/page-sections`, {
+  // PHP route: PUT /api/page-sections/{id}
+  const res = await fetch(`${getLaravelWriteUrl()}/page-sections/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id, data: dataStr, isActive }),
+    body: JSON.stringify({ data: dataStr, isActive }),
   })
   const json = await safeJson(res)
   if (!json) throw new Error(`HTTP ${res.status}`)
@@ -209,7 +225,7 @@ export async function updatePageSection(id: number, dataStr: string, isActive: b
 }
 
 export async function updateSectionOrder(sections: { id: number; order: number }[]) {
-  const res = await fetch(`${getApiUrl()}/page-sections/reorder`, {
+  const res = await fetch(`${getLaravelWriteUrl()}/page-sections/reorder`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ sections }),
@@ -220,7 +236,8 @@ export async function updateSectionOrder(sections: { id: number; order: number }
 }
 
 export async function deletePageSection(id: number) {
-  const res = await fetch(`${getApiUrl()}/page-sections?id=${id}`, {
+  // PHP route: DELETE /api/page-sections/{id}
+  const res = await fetch(`${getLaravelWriteUrl()}/page-sections/${id}`, {
     method: 'DELETE',
   })
   const json = await safeJson(res)
@@ -251,7 +268,7 @@ export async function getProductPageBySlug(slug: string) {
 }
 
 export async function createProductPage(data: any) {
-  const res = await fetch(`${getApiUrl()}/product-pages`, {
+  const res = await fetch(`${getLaravelWriteUrl()}/product-pages`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -262,7 +279,7 @@ export async function createProductPage(data: any) {
 }
 
 export async function updateProductPage(id: number, data: any) {
-  const res = await fetch(`${getApiUrl()}/product-pages/${id}`, {
+  const res = await fetch(`${getLaravelWriteUrl()}/product-pages/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -355,20 +372,11 @@ export async function saveProductPageSections(pageId: number, sections: any[]) {
     }
   }
 
-  try {
-    const res = await fetch(`${getApiUrl()}/product-pages/${pageId}/save-sections`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sections }),
-    })
-    const json = await safeJson(res)
-    if (json) return json
-  } catch (err) {}
-
-  const res = await fetch(`${getApiUrl()}/product-pages`, {
+  // PHP route: POST /api/product-pages/{id}/save-sections
+  const res = await fetch(`${getLaravelWriteUrl()}/product-pages/${pageId}/save-sections`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: pageId, sections }),
+    body: JSON.stringify({ sections }),
   })
   const json = await safeJson(res)
   if (!json) throw new Error(`HTTP ${res.status}`)
@@ -430,18 +438,9 @@ export async function getGeneralPageBySlug(slug: string) {
 }
 
 export async function saveGeneralPage(pageData: any) {
+  // PHP route: POST /api/general-pages
   try {
-    const res = await fetch('/api/general-pages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(pageData),
-    })
-    const json = await safeJson(res)
-    if (json) return json
-  } catch (e) {}
-
-  try {
-    const res = await fetch(`${getApiUrl()}/general-pages`, {
+    const res = await fetch(`${getLaravelWriteUrl()}/general-pages`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(pageData),
@@ -454,16 +453,9 @@ export async function saveGeneralPage(pageData: any) {
 }
 
 export async function deleteGeneralPage(idOrSlug: string | number) {
+  // PHP route: DELETE /api/general-pages/{id}
   try {
-    const res = await fetch(`/api/general-pages?id=${idOrSlug}&slug=${idOrSlug}`, {
-      method: 'DELETE',
-    })
-    const json = await safeJson(res)
-    if (json) return json
-  } catch (e) {}
-
-  try {
-    const res = await fetch(`${getApiUrl()}/general-pages/${idOrSlug}`, {
+    const res = await fetch(`${getLaravelWriteUrl()}/general-pages/${idOrSlug}`, {
       method: 'DELETE',
     })
     const json = await safeJson(res)
